@@ -82,6 +82,12 @@ make -C buildroot ARCH=arm menuconfig
 headers_4_9
 2 # (external)
 enter
+
+Toolchain->gcc 7.x
+
+# i also enabled tcpdump and gdb
+# next time i might want to add strace as well
+
 # overwrite original config
 make -C buildroot savedefconfig
 #+end_example
