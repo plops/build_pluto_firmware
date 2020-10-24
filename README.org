@@ -162,7 +162,7 @@ Linux pluto 4.19.0-g6edc6cd24b48-dirty #1 SMP PREEMPT Sat Oct 24 14:07:50 CEST 2
 #+end_example
 
 
-- persistent ssh host keys
+- persistent ssh host keys and root login
 https://wiki.analog.com/university/tools/pluto/users/customizing#enabling_persistent_ssh_keys 
 
 #+begin_example
