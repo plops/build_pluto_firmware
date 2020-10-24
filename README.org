@@ -61,3 +61,4 @@ comment out linux/scripts/dtc/dtc-lexer.l
 YYLTYPE yylloc;
 #+end_example
  
+- make sure the current cwd is not in LD_LIBRARY_PATH
