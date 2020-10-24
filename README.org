@@ -1,4 +1,4 @@
-
+- try to build pluto fpga firmware and linux on fedora 32
 - https://wiki.analog.com/resources/fpga/docs/releases
 #+begin_example
 master	        Quartus 18.1	Vivado 2019.1	Release Notes	master
