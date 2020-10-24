@@ -80,7 +80,7 @@ https://hnap.de/assets/pdf/Masterthesis%20-%20Design%20of%20a%20Radio%20Communic
 make -C buildroot ARCH=arm zynq_pluto_defconfig
 make -C buildroot ARCH=arm menuconfig
 /
-headers_4_9
+headers_4_9 
 2 # (external)
 enter
 
