@@ -93,3 +93,5 @@ Toolchain->gcc 7.x
 make -C buildroot savedefconfig
 #+end_example
  
+- how to boot from a fresh build
+https://wiki.analog.com/university/tools/pluto/devs/reboot
