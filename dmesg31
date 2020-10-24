@@ -1,0 +1,172 @@
+Booting Linux on physical CPU 0x0
+Linux version 4.14.0-42540-g387d584 (michael@mhenneri-D06) (gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11-rc1)) #301 SMP PREEMPT Wed Jul 3 15:06:53 CEST 2019
+CPU: ARMv7 Processor [413fc090] revision 0 (ARMv7), cr=18c5387d
+CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+OF: fdt: Machine model: Analog Devices PlutoSDR Rev.B (Z7010/AD9363)
+Memory policy: Data cache writealloc
+cma: Reserved 256 MiB at 0x0e400000
+On node 0 totalpages: 131072
+free_area_init_node: node 0, pgdat c093bf00, node_mem_map dfb77000
+  Normal zone: 1024 pages used for memmap
+  Normal zone: 0 pages reserved
+  Normal zone: 131072 pages, LIFO batch:31
+random: fast init done
+percpu: Embedded 16 pages/cpu @dfb4b000 s32972 r8192 d24372 u65536
+pcpu-alloc: s32972 r8192 d24372 u65536 alloc=16*4096
+pcpu-alloc: [0] 0 [0] 1 
+Built 1 zonelists, mobility grouping on.  Total pages: 130048
+Kernel command line: console=ttyPS0,115200 maxcpus=1 rootfstype=ramfs root=/dev/ram0 rw quiet loglevel=4 uboot=U-Boot PlutoSDR v0.20-PlutoSDR-00043-gefdb9e8 (Dec 18 2017 - 18:25:09 +0100)
+PID hash table entries: 2048 (order: 1, 8192 bytes)
+Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
+Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
+Memory: 242260K/524288K available (5120K kernel code, 243K rwdata, 1288K rodata, 1024K init, 151K bss, 19884K reserved, 262144K cma-reserved, 0K highmem)
+Virtual kernel memory layout:
+    vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+    fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+    vmalloc : 0xe0800000 - 0xff800000   ( 496 MB)
+    lowmem  : 0xc0000000 - 0xe0000000   ( 512 MB)
+    pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)
+    modules : 0xbf000000 - 0xbfe00000   (  14 MB)
+      .text : 0xc0008000 - 0xc0600000   (6112 kB)
+      .init : 0xc0800000 - 0xc0900000   (1024 kB)
+      .data : 0xc0900000 - 0xc093cde0   ( 244 kB)
+       .bss : 0xc0940ec0 - 0xc0966af4   ( 152 kB)
+Preemptible hierarchical RCU implementation.
+	RCU restricting CPUs from NR_CPUS=4 to nr_cpu_ids=2.
+	Tasks RCU enabled.
+RCU: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+efuse mapped to e0800000
+slcr mapped to e0802000
+L2C: platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C: DT/platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C-310 erratum 769419 enabled
+L2C-310 enabling early BRESP for Cortex-A9
+L2C-310 full line of zeros enabled for Cortex-A9
+L2C-310 ID prefetch enabled, offset 1 lines
+L2C-310 dynamic clock gating enabled, standby mode enabled
+L2C-310 cache controller enabled, 8 ways, 512 kB
+L2C-310: CACHE_ID 0x410000c8, AUX_CTRL 0x76760001
+zynq_clock_init: clkc starts at e0802100
+Zynq clock init
+sched_clock: 64 bits at 333MHz, resolution 3ns, wraps every 4398046511103ns
+clocksource: arm_global_timer: mask: 0xffffffffffffffff max_cycles: 0x4ce07af025, max_idle_ns: 440795209040 ns
+Switching to timer-based delay loop, resolution 3ns
+clocksource: ttc_clocksource: mask: 0xffff max_cycles: 0xffff, max_idle_ns: 537538477 ns
+timer #0 at e080a000, irq=17
+Console: colour dummy device 80x30
+Calibrating delay loop (skipped), value calculated using timer frequency.. 666.66 BogoMIPS (lpj=3333333)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+CPU: Testing write buffer coherency: ok
+CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+Setting up static identity map for 0x100000 - 0x100060
+Hierarchical SRCU implementation.
+smp: Bringing up secondary CPUs ...
+smp: Brought up 1 node, 1 CPU
+SMP: Total of 1 processors activated (666.66 BogoMIPS).
+CPU: All CPU(s) started in SVC mode.
+devtmpfs: initialized
+VFP support v0.3: implementor 41 architecture 3 part 30 variant 9 rev 4
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+futex hash table entries: 512 (order: 3, 32768 bytes)
+pinctrl core: initialized pinctrl subsystem
+NET: Registered protocol family 16
+DMA: preallocated 256 KiB pool for atomic coherent allocations
+cpuidle: using governor ladder
+hw-breakpoint: found 5 (+1 reserved) breakpoint and 1 watchpoint registers.
+hw-breakpoint: maximum watchpoint size is 4 bytes.
+zynq-ocm f800c000.ocmc: ZYNQ OCM pool: 256 KiB @ 0xe0840000
+zynq-pinctrl 700.pinctrl: zynq pinctrl initialized
+e0001000.serial: ttyPS0 at MMIO 0xe0001000 (irq = 25, base_baud = 6249999) is a xuartps
+console [ttyPS0] enabled
+SCSI subsystem initialized
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+FPGA manager framework
+clocksource: Switched to clocksource arm_global_timer
+NET: Registered protocol family 2
+TCP established hash table entries: 4096 (order: 2, 16384 bytes)
+TCP bind hash table entries: 4096 (order: 3, 32768 bytes)
+TCP: Hash tables configured (established 4096 bind 4096)
+UDP hash table entries: 256 (order: 1, 8192 bytes)
+UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
+NET: Registered protocol family 1
+Trying to unpack rootfs image as initramfs...
+Freeing initrd memory: 5540K
+hw perfevents: no interrupt-affinity property for /pmu@f8891000, guessing.
+hw perfevents: enabled with armv7_cortex_a9 PMU driver, 7 counters available
+workingset: timestamp_bits=30 max_order=17 bucket_order=0
+io scheduler noop registered
+io scheduler deadline registered
+io scheduler cfq registered (default)
+io scheduler mq-deadline registered
+io scheduler kyber registered
+brd: module loaded
+loop: module loaded
+m25p80 spi1.0: SPI-NOR-UniqueID 104400b83991000b0d000f00bbd8642eff
+m25p80 spi1.0: found n25q512a, expected n25q256a
+m25p80 spi1.0: n25q512a (65536 Kbytes)
+4 ofpart partitions found on MTD device spi1.0
+Creating 4 MTD partitions on "spi1.0":
+0x000000000000-0x000000100000 : "qspi-fsbl-uboot"
+0x000000100000-0x000000120000 : "qspi-uboot-env"
+0x000000120000-0x000000200000 : "qspi-nvmfs"
+0x000000200000-0x000002000000 : "qspi-linux"
+libphy: Fixed MDIO Bus: probed
+usbcore: registered new interface driver rt2500usb
+usbcore: registered new interface driver rt73usb
+usbcore: registered new interface driver rt2800usb
+usbcore: registered new interface driver rtl8187
+usbcore: registered new interface driver rtl8192cu
+usbcore: registered new interface driver rtl8xxxu
+usbcore: registered new interface driver r8152
+usbcore: registered new interface driver lan78xx
+usbcore: registered new interface driver asix
+usbcore: registered new interface driver ax88179_178a
+usbcore: registered new interface driver cdc_ether
+usbcore: registered new interface driver smsc75xx
+usbcore: registered new interface driver smsc95xx
+usbcore: registered new interface driver rndis_host
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+usbcore: registered new interface driver usb-storage
+usbcore: registered new interface driver usbserial
+usbcore: registered new interface driver usbserial_generic
+usbserial: USB Serial support registered for generic
+usbcore: registered new interface driver ftdi_sio
+usbserial: USB Serial support registered for FTDI USB Serial Device
+chipidea-usb2 e0002000.usb: e0002000.usb supply vbus not found, using dummy regulator
+ULPI transceiver vendor/product ID 0x0424/0x0007
+Found SMSC USB3320 ULPI transceiver.
+ULPI integrity check: passed.
+i2c /dev entries driver
+cdns-wdt f8005000.watchdog: Xilinx Watchdog Timer at e081e000 with timeout 10s
+Xilinx Zynq CpuIdle Driver started
+ledtrig-cpu: registered to indicate activity on CPUs
+hidraw: raw HID events driver (C) Jiri Kosina
+usbcore: registered new interface driver usbhid
+usbhid: USB HID core driver
+usbcore: registered new interface driver r8712u
+usbcore: registered new interface driver r8188eu
+ad9361 spi0.0: ad9361_probe : enter (ad9364)
+ad9361 spi0.0: ad9361_probe : AD936x Rev 2 successfully initialized
+cf_axi_dds 79024000.cf-ad9361-dds-core-lpc: Analog Devices CF_AXI_DDS_DDS MASTER (9.00.b) at 0x79024000 mapped to 0xe083c000, probed DDS AD9364
+fpga_manager fpga0: Xilinx Zynq FPGA Manager registered
+NET: Registered protocol family 17
+Registering SWP/SWPB emulation handler
+cf_axi_adc 79020000.cf-ad9361-lpc: ADI AIM (10.00.b) at 0x79020000 mapped to 0xe0938000, probed ADC AD9364 as MASTER
+input: gpio_keys as /devices/soc0/gpio_keys/input/input0
+Freeing unused kernel memory: 1024K
+file system registered
+using random self ethernet address
+using random host ethernet address
+Mass Storage Function, version: 2009/09/11
+LUN: removable file: (no medium)
+read descriptors
+read strings
+usb0: HOST MAC 00:e0:22:ff:09:db
+usb0: MAC 00:05:f7:84:95:fb
+random: crng init done
+configfs-gadget gadget: high-speed config #1: c
