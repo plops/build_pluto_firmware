@@ -151,3 +151,4 @@ https://wiki.analog.com/university/tools/pluto/users/firmware
 
 - WAIT 4 minutes for firmware to update
 - i started at 21:31
+- it finished faster (21:33 or so)
