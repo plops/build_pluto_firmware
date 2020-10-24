@@ -92,7 +92,8 @@ Toolchain->gcc 7.x
 # overwrite original config
 make -C buildroot savedefconfig
 #+end_example
- 
+
+- final size of plutosdr-fw is 7.9G 
 - how to boot from a fresh build
 https://wiki.analog.com/university/tools/pluto/devs/reboot
 
@@ -166,19 +167,19 @@ https://wiki.analog.com/university/tools/pluto/users/customizing#enabling_persis
 
 #+begin_example
 # on host
-cd ~/.ssh; ssh-keygen -t ed25519 -f id_pluto
+cd ~/.ssh; ssh-keygen -f id_pluto
 # into ~/.ssh/config:
 Host pluto
      HostName 192.168.2.1
      User root
      IdentityFile ~/.ssh/id_pluto
-# copy and paste: ssh-ed25519 AAAAC3..
+# copy and paste: ssh-rsa AAAAB3
 cat id_pluto.pub 
 
 # on device
 device_format_jffs2
 mkdir /root/.ssh
-echo "ssh-ed25519 AAAAC3... martin@localhost.localdomain" > /root/.ssh/authorized_keys
+echo "ssh-rsa AAAAB3... martin@localhost.localdomain" > /root/.ssh/authorized_keys
 chmod og-rwx /root/.ssh
 chmod og-rwx /root/.ssh/authorized_keys
 device_persistent_keys
