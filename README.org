@@ -42,12 +42,13 @@ git checkout    remotes/origin/hdl_2019_r1
 - build firmware
 - https://wiki.analog.com/university/tools/pluto/obtaining_the_sources
 #+begin_example
-git clone https://github.com/analogdevicesinc/plutosdr-fw/
-git submodule update --init --recursive
-cd hdl
-git checkout    remotes/origin/hdl_2019_r1
-cd ../linux
-git checkout remotes/origin/2019_R1
+git clone --recursive https://github.com/analogdevicesinc/plutosdr-fw.git
+#git clone https://github.com/analogdevicesinc/plutosdr-fw/
+#git submodule update --init --recursive
+#cd hdl
+#git checkout    remotes/origin/hdl_2019_r1
+#cd ../linux
+#git checkout remotes/origin/2019_R1
 dnf  install ccache dfu-util fakeroot help2man rsync cpio file \
              bison flex uboot-tools ncurses-compat-libs patch \
 	     perl-ExtUtils-MakeMaker
@@ -66,3 +67,6 @@ YYLTYPE yylloc;
 #+end_example
  
 - make sure the current cwd is not in LD_LIBRARY_PATH
+
+
+- it seems like the current plutosdr-fw needs VIVADO_VERSION ?= 2019.1
