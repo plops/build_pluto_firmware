@@ -47,7 +47,8 @@ git submodule update --init --recursive
 cd hdl
 git checkout    remotes/origin/hdl_2019_r1
 dnf  install ccache dfu-util fakeroot help2man rsync cpio file \
-             bison flex uboot-tools ncurses-compat-libs patch
+             bison flex uboot-tools ncurses-compat-libs patch \
+	     perl-ExtUtils-MakeMaker
 #+end_example 
 - https://wiki.analog.com/university/tools/pluto/building_the_image 
 
