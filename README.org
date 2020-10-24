@@ -123,3 +123,7 @@ fit_config=config@9
 #+end_example
 
 - gnss receiver https://github.com/oscimp/oscimpDigital/wiki
+
+
+- start to update firmware
+https://wiki.analog.com/university/tools/pluto/users/firmware
