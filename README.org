@@ -70,3 +70,18 @@ YYLTYPE yylloc;
 
 
 - it seems like the current plutosdr-fw needs VIVADO_VERSION ?= 2019.1
+
+- someone else compiling pluto:
+https://manual.hnap.de/building_the_fw/
+
+
+#+begin_example
+make -C buildroot ARCH=arm zynq_pluto_defconfig
+make -C buildroot ARCH=arm menuconfig
+/
+headers_4_9
+2 # (external)
+enter
+# overwrite original config
+make -C buildroot savedefconfig
+#+end_example
