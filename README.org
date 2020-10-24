@@ -87,7 +87,7 @@ enter
 Toolchain->gcc 7.x
 
 # i also enabled tcpdump and gdb
-# next time i might want to add strace as well
+# next time i might want to add strace as well (note: it's already included)
 
 # overwrite original config
 make -C buildroot savedefconfig
@@ -152,3 +152,18 @@ https://wiki.analog.com/university/tools/pluto/users/firmware
 - WAIT 4 minutes for firmware to update
 - i started at 21:31
 - it finished faster (21:33 or so)
+
+#+begin_example
+v0.32-dirty
+# uname -a
+Linux pluto 4.19.0-g6edc6cd24b48-dirty #1 SMP PREEMPT Sat Oct 24 14:07:50 CEST 2020 armv7l GNU/Linux
+
+#+end_example
+
+
+- persistent ssh keys
+https://wiki.analog.com/university/tools/pluto/users/customizing#enabling_persistent_ssh_keys 
+
+#+begin_example
+device_format_jffs2
+#+end_example
