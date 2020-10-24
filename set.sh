@@ -6,3 +6,6 @@ export VIVADO_VERSION=v2018.3
 
 #git clone https://github.com/analogdevicesinc/hdl/
 #git checkout    remotes/origin/hdl_2019_r1
+
+# git clone https://github.com/analogdevicesinc/plutosdr-fw/
+# git submodule update --init --recursive
