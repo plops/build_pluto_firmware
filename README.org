@@ -15,3 +15,16 @@ hdl_2014_r1	Quartus 14.0	Vivado 2013.4	Release Notes	2014_r1
 #+end_example
 
 - i need to get vivado 2018.3
+
+- to install:
+#+begin_example
+[martin@localhost pluto]$ cat /etc/os-release
+#NAME=Fedora
+NAME=Ubuntu
+#VERSION="32 (Thirty Two)"
+VERSION="18.04.4 LTS (Bionic Beaver)" 
+#+end_example
+
+- export ADI_USE_OOC_SYNTHESIS=y
+  - is will synthesize each IP from the block design individually and
+    will store it in a common cache for future re-use
