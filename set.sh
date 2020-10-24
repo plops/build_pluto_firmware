@@ -3,4 +3,5 @@ export PATH=$PATH:/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/b
 export VIVADO_SETTINGS=/opt/Xilinx/Vivado/2020.1/settings64.sh
 
 export VIVADO_VERSION=v2020.1
- 
+
+#git checkout    remotes/origin/hdl_2019_r1
