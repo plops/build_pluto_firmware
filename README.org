@@ -165,5 +165,23 @@ Linux pluto 4.19.0-g6edc6cd24b48-dirty #1 SMP PREEMPT Sat Oct 24 14:07:50 CEST 2
 https://wiki.analog.com/university/tools/pluto/users/customizing#enabling_persistent_ssh_keys 
 
 #+begin_example
+# on host
+cd ~/.ssh; ssh-keygen -t ed25519 -f id_pluto
+# into ~/.ssh/config:
+Host pluto
+     HostName 192.168.2.1
+     User root
+     IdentityFile ~/.ssh/id_pluto
+# copy and paste: ssh-ed25519 AAAAC3..
+cat id_pluto.pub 
+
+# on device
 device_format_jffs2
+mkdir /root/.ssh
+echo "ssh-ed25519 AAAAC3... martin@localhost.localdomain" > /root/.ssh/authorized_keys
+chmod og-rwx /root/.ssh
+chmod og-rwx /root/.ssh/authorized_keys
+device_persistent_keys
+
 #+end_example
+
