@@ -145,3 +145,9 @@ SysRoot 	Old Sysroot for firmware v0.31 (please upgrade firmware to v0.32)
 
 - start to update firmware
 https://wiki.analog.com/university/tools/pluto/users/firmware
+
+- Copy the pluto.frm file onto the mass storage device, and
+  then eject it. LED1 will start blinking rapidly.
+
+- WAIT 4 minutes for firmware to update
+- i started at 21:31
