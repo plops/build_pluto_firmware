@@ -49,3 +49,15 @@ git checkout    remotes/origin/hdl_2019_r1
 dnf  install ccache dfu-util fakeroot help2man rsync cpio file bison flex uboot-tools ncurses-compat-libs
 #+end_example
 - https://wiki.analog.com/university/tools/pluto/building_the_image 
+
+#+begin_example
+  HOSTLD  scripts/dtc/dtc
+/usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
+collect2: error: ld returned 1 exit status
+#+end_example
+- https://www.reddit.com/r/LineageOS/comments/hkq8ah/multiple_definitions_error_in_dtc_tool_when/
+#+begin_example
+comment out linux/scripts/dtc/dtc-lexer.l 
+YYLTYPE yylloc;
+#+end_example
+ 
