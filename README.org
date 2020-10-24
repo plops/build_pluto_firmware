@@ -73,7 +73,8 @@ YYLTYPE yylloc;
 
 - someone else compiling pluto:
 https://manual.hnap.de/building_the_fw/
-
+https://hamnetdb.net/map.cgi
+https://hnap.de/assets/pdf/Masterthesis%20-%20Design%20of%20a%20Radio%20Communications%20Protocol%20for%20HAMNET%20Access%20in%20the%2070cm%20Amateur%20Radio%20Band.pdf
 
 #+begin_example
 make -C buildroot ARCH=arm zynq_pluto_defconfig
