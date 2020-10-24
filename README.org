@@ -48,4 +48,4 @@ cd hdl
 git checkout    remotes/origin/hdl_2019_r1
 dnf  install ccache dfu-util fakeroot help2man rsync cpio file bison flex uboot-tools ncurses-compat-libs
 #+end_example
-- https://wiki.analog.com/university/tools/pluto/building_the_image
+- https://wiki.analog.com/university/tools/pluto/building_the_image 
