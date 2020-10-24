@@ -95,3 +95,6 @@ make -C buildroot savedefconfig
  
 - how to boot from a fresh build
 https://wiki.analog.com/university/tools/pluto/devs/reboot
+
+- updating firmware according to usb standard
+https://wiki.analog.com/university/tools/pluto/users/firmware#dfu_update
