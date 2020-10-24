@@ -25,6 +25,25 @@ NAME=Ubuntu
 VERSION="18.04.4 LTS (Bionic Beaver)" 
 #+end_example
 
+- build fpga bitstream
+
+#+begin_example
+git clone https://github.com/analogdevicesinc/hdl/
+git checkout    remotes/origin/hdl_2019_r1
+
+#+end_example
+
+
+
 - export ADI_USE_OOC_SYNTHESIS=y
   - is will synthesize each IP from the block design individually and
     will store it in a common cache for future re-use
+
+- build firmware
+- https://wiki.analog.com/university/tools/pluto/obtaining_the_sources
+#+begin_example
+git clone https://github.com/analogdevicesinc/plutosdr-fw/
+git submodule update --init --recursive
+
+#+end_example
+- https://wiki.analog.com/university/tools/pluto/building_the_image
