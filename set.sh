@@ -4,4 +4,5 @@ export VIVADO_SETTINGS=/opt/Xilinx/Vivado/2020.1/settings64.sh
  
 export VIVADO_VERSION=v2018.3
 
+#git clone https://github.com/analogdevicesinc/hdl/
 #git checkout    remotes/origin/hdl_2019_r1
