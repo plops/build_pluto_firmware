@@ -182,5 +182,5 @@ echo "ssh-ed25519 AAAAC3... martin@localhost.localdomain" > /root/.ssh/authorize
 chmod og-rwx /root/.ssh
 chmod og-rwx /root/.ssh/authorized_keys
 device_persistent_keys
-#+end_example
+#+end_example 
 
