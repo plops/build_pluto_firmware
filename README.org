@@ -46,6 +46,8 @@ git clone https://github.com/analogdevicesinc/plutosdr-fw/
 git submodule update --init --recursive
 cd hdl
 git checkout    remotes/origin/hdl_2019_r1
+cd ../linux
+git checkout remotes/origin/2019_R1
 dnf  install ccache dfu-util fakeroot help2man rsync cpio file \
              bison flex uboot-tools ncurses-compat-libs patch \
 	     perl-ExtUtils-MakeMaker
