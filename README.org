@@ -185,3 +185,25 @@ chmod og-rwx /root/.ssh/authorized_keys
 device_persistent_keys
 #+end_example  
 
+- install sdrangel
+
+#+begin_example
+sudo dnf install qt5-devel fftw-devel opus-devel
+git clone https://github.com/analogdevicesinc/libiio
+git clone https://github.com/f4exb/cm256cc.git
+cd cm256cc;git reset --hard c0e92b92aca3d1d36c990b642b937c64d363c559
+
+git clone https://github.com/f4exb/serialDV.git
+cd serialDV;git reset --hard "v1.1.4"
+
+git clone https://github.com/f4exb/sdrangel
+
+# new intels always need peformance governor
+dnf install kernel-tools
+cpupower frequency-set -g performance
+
+# increase fan speed during compilation
+rmmod thinkpad_acpi
+modprobe thinkpad_acpi fan_control=1
+echo "level 7" > /proc/acpi/ibm/fan
+#+end_example
