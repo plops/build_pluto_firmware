@@ -287,6 +287,20 @@ set IGNORE_VERSION_CHECK true
 source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 adi_ip_create axi_ad9361
 
-# now it loads things
+
 #+end_example
+- now it loads things but not all
  
+- try again with top level tcl
+
+#+begin_example
+cd /home/martin/src/plutosdr-fw/hdl/library/axi_ad9361
+vivado 
+set IGNORE_VERSION_CHECK true
+source axi_ad9361_ip.tcl 
+#+end_example
+
+- this takes a few minutes (seems rather slow)
+- synthesis doesn't really seem to succeed
+
+- lets try cross compiling
