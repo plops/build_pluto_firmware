@@ -1,0 +1,6 @@
+- runs in adalm-pluto arm processor
+
+- TODO
+  - libmems for iio
+  - imtui for user interface
+  - imgcat to display plots over ssh

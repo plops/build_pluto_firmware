@@ -4,32 +4,22 @@
 #include "globals.h"
 
 extern State state;
-#include <chrono>
-#include <iio.h>
-#include <iostream>
-#include <thread>
-#define MHz(x) ((long long)(x * 1000000.0 + .5))
-#define GHz(x) ((long long)(x * 1000000000.0 + .5))
-struct stream_cfg {
-  long long bw_hz;
-  long long fs_hz;
-  long long lo_hz;
-  const char *rfport;
-};
-typedef struct stream_cfg stream_cfg;
 #include "libmems/iio_context_impl.h"
 #include "libmems/iio_device.h"
+#include <chrono>
+#include <iostream>
+#include <thread>
 using namespace std::chrono_literals;
 
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "acd688ddbec0ce39ae994cd6172c586a8e7899b5";
+  state._code_version = "853874c2a0369e64cc921296f89fb644b73f623e";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "12:24:50 of Sunday, 2020-10-25 (GMT+1)";
+  state._code_generation_time = "13:55:59 of Sunday, 2020-10-25 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -88,17 +78,6 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
-  auto ctx = iio_create_default_context();
-  if (!(ctx)) {
 
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("create_default") << (" ") << (std::setw(8)) << (" ctx='")
-                << (ctx) << ("'") << (std::endl) << (std::flush);
-  }
   return 0;
 }

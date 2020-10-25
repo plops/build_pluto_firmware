@@ -146,7 +146,7 @@
 			     
 			     )
 
-		    (do0
+		    #+Nil (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
 		     (include <iio.h>)
 
@@ -163,6 +163,25 @@
 		     ;; https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/mems_setup/main.cc
 		     (include "libmems/iio_context_impl.h"
 			      "libmems/iio_device.h")
+		     
+		     ;; At the root of the hierarchy, there exists the
+		     ;; IioContext, which represents the IIO devices
+		     ;; currently available on the system. These can
+		     ;; be retrieved by name and inspected, via
+		     ;; instances of IioDevice.
+
+		     ;; An IioDevice allows reading and writing
+		     ;; attributes of an IIO device via type-safe
+		     ;; helper APIs. It also offers support for
+		     ;; configuring the buffer and trigger of an IIO
+		     ;; device, which we use in order to allow the
+		     ;; Chrome UI to read accelerometer data and
+		     ;; support screen rotation.
+		     
+		     ;; An IioDevice also exposes a list of
+		     ;; IioChannels, which can individually be enabled
+		     ;; and disabled.
+		     
 		     )
 		    "using namespace std::chrono_literals;"
 		    " "
@@ -230,7 +249,7 @@
 				 collect
 				 `(setf (dot rxcfg ,e)
 					,f)))
-		       (let ((ctx (iio_create_default_context)))
+		       #+nil (let ((ctx (iio_create_default_context)))
 			 (unless ctx
 			   ,(logprint "create_default" `(ctx)))))
 

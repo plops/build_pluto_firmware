@@ -8,8 +8,6 @@
 #include <iostream>
 #include <thread>
 ;
-#include <iio.h>
-;
 #include "libmems/iio_context_impl.h"
 #include "libmems/iio_device.h"
 ;
