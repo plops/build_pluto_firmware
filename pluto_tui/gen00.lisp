@@ -253,6 +253,10 @@
 			 (unless ctx
 			   ,(logprint "create_default" `(ctx)))))
 
+		      (let ((ctx (std--unique_ptr<libmems--IioContext>
+				  (new libmems--IioContextImpl)))
+			    ))
+		      
 		      (return 0)))))
 
     

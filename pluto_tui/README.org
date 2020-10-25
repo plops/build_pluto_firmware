@@ -3,4 +3,7 @@
 - TODO
   - libmems for iio
   - imtui for user interface
-  - imgcat to display plots over ssh
+  - imgcat or tiv [2] to display plots over ssh
+
+[1] https://github.com/trashhalo/imgcat/
+[2] https://github.com/stefanhaustein/TerminalImageViewer

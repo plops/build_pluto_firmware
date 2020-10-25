@@ -9,6 +9,7 @@
 #include <base/strings/string_number_conversions.h>
 
 #include "libmems/iio_channel.h"
+#include <string.h>
 
 namespace libmems {
 

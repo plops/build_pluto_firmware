@@ -14,12 +14,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "853874c2a0369e64cc921296f89fb644b73f623e";
+  state._code_version = "05dfa2b2c6f58c86e424a8c6be73ebd328a9c0f7";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "13:55:59 of Sunday, 2020-10-25 (GMT+1)";
+  state._code_generation_time = "16:17:31 of Sunday, 2020-10-25 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -79,5 +79,6 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
 
+  auto ctx = std::unique_ptr<libmems::IioContext>(new libmems::IioContextImpl);
   return 0;
 }

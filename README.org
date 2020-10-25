@@ -412,3 +412,5 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
  libmems/iio_device_impl.h libmems/iio_device_trigger_impl.h \
  libmems/iio_device.h
 #+end_example
+
+- read about how to transfer images in ssh terminal: https://news.ycombinator.com/item?id=24883601

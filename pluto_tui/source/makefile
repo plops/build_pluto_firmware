@@ -14,6 +14,10 @@ CXXFLAGS= -O2 \
 -Wno-error=unused-variable \
 -Wno-error=unused-parameter \
 -Wno-error=double-promotion \
+-Wno-error=unused-parameter \
+-Wno-error=shift-negative-value \
+-Wno-error=attributes \
+-Wno-error=sign-compare \
 -pipe \
 --sysroot=${SDK} \
 -I. \
@@ -40,15 +44,24 @@ LDFLAGS= \
 
 all: vis
 
-CFILES=$(shell find *.cpp| grep .cpp$)
+LIBMEMS_FILES=libmems/iio_channel_impl.cc  libmems/iio_context_impl.cc  libmems/iio_device.cc  libmems/iio_device_impl.cc   libmems/iio_device_trigger_impl.cc  
+
+#$(shell ls libmems/*.cc | grep .cc$)
+LIBMEMS_OBJ:=$(LIBMEMS_FILES:%.cc=%.o2)
+
+CFILES=$(shell ls *.cpp| grep .cpp$)
 OBJ:=$(CFILES:%.cpp=%.o)
+
 
 %.o: %.cpp globals.h
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
+%.o2: %.cc globals.h
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 
-vis: $(OBJ)
+
+vis: $(OBJ) $(LIBMEMS_OBJ)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 
