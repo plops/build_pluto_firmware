@@ -380,3 +380,5 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
  libmems/iio_device_trigger_impl.h libmems/iio_device.h
 
 #+end_example
+
+- try to download chromium zip from github (its 1.3G)
