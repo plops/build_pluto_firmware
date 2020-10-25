@@ -14,16 +14,19 @@ CXXFLAGS=-Og -g3 -ggdb \
 -Wno-error=unused-parameter \
 -Wno-error=double-promotion \
 -pipe \
--I${SDK}/usr/include \
--I${CROSS_ROOT}/usr/include
+--sysroot=${SDK}
+# -I${SDK}/usr/include 
+# -I${CROSS_ROOT}/usr/include
 
 LDFLAGS= \
--L${SDK}/lib \
--L${SDK}/usr/lib \
--L${CROSS_ROOT}/lib \
--L${CROSS_ROOT}/usr/lib \
 -Wl,--gc-sections \
 -Wl,--print-gc-sections 
+
+
+#-L${SDK}/lib \
+#-L${SDK}/usr/lib \
+#-L${CROSS_ROOT}/lib \
+#-L${CROSS_ROOT}/usr/lib 
 
 
 

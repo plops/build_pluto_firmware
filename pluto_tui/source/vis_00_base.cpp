@@ -10,13 +10,14 @@ extern State state;
 using namespace std::chrono_literals;
 
 // implementation
+State state;
 int main(int argc, char **argv) {
-  state._code_version = "1a3d8dbc8736a38cf3fead13b56d14a10600c856";
+  state._code_version = "ca5b990a69c5a089b94920862e97babe26bbedfc";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "11:16:19 of Sunday, 2020-10-25 (GMT+1)";
+  state._code_generation_time = "11:35:24 of Sunday, 2020-10-25 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 

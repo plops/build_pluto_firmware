@@ -160,7 +160,7 @@
 		      "// implementation"
 
 		      ))
-
+		    "State state;"
 		    
 		    (defun main (argc argv
 				 )
