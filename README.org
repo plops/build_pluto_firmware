@@ -305,9 +305,9 @@ source axi_ad9361_ip.tcl
 
 #+begin_example
 [martin@localhost plutosdr-fw]$ git branch -a
-* master
+master
 [martin@localhost hdl]$ git branch -a
-* (HEAD detached at 847f0f22)
+(HEAD detached at 847f0f22)
   master
 #+end_example
 
@@ -414,3 +414,9 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
 #+end_example
 
 - read about how to transfer images in ssh terminal: https://news.ycombinator.com/item?id=24883601
+
+- overview 
+- https://wiki.analog.com/_media/adiplutoworkshop_grcon2019.pdf
+
+- iio internals
+- https://wiki.analog.com/resources/tools-software/linux-software/libiio_internals
