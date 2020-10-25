@@ -364,3 +364,19 @@ URL transformed to HTTPS due to an HSTS policy
 
 - how to build for adalm pluto: https://wiki.analog.com/university/tools/pluto/devs/embedded_code
 - example file https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
+
+- dependencies so far (i'm trying to use libmems)
+#+begin_example
+arm-linux-gnueabihf-g++ -c -o vis_00_base.o vis_00_base.cpp -O2 -std=gnu++17 -Wall -Wextra -Werror -Wfatal-errors -ffunction-sections -fdata-sections -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=double-promotion -pipe --sysroot=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot -I. -MM
+
+vis_00_base.o: vis_00_base.cpp utils.h globals.h \
+ libmems/iio_context_impl.h libmems/export.h libmems/iio_context.h \
+ base/macros.h libmems/iio_device.h base/containers/flat_map.h \
+ base/check.h base/base_export.h base/compiler_specific.h \
+ build/build_config.h base/dcheck_is_on.h base/immediate_crash.h \
+ base/containers/flat_tree.h base/ranges/algorithm.h \
+ base/ranges/functional.h base/ranges/ranges.h base/template_util.h \
+ base/stl_util.h base/optional.h libmems/iio_device_impl.h \
+ libmems/iio_device_trigger_impl.h libmems/iio_device.h
+
+#+end_example
