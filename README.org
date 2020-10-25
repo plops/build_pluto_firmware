@@ -312,3 +312,37 @@ source axi_ad9361_ip.tcl
 #+end_example
 
 - lets try cross compiling
+
+- where are the headers?
+
+#+begin_example
+[martin@localhost plutosdr-fw]$ find .|grep /iio.h$
+./linux/include/config/iio.h
+./linux/include/linux/iio/iio.h
+./buildroot/output/build/libiio-0.21/iio.h
+./buildroot/output/build/buildroot-config/br2/package/libad9361/iio.h
+./buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/include/iio.h (*)
+
+#+end_example
+
+- i think ./buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot/ contains headers for the target
+
+#+begin_example
+source ~/stage/build_pluto_firmware/set.sh
+unset LD_LIBRARY_PATH
+# try to enable ncurses on target
+make -C buildroot ARCH=arm menuconfig
+make -C buildroot savedefconfig
+make
+#+end_example
+
+- it seems to download the fpga bitstream from github:
+
+#+begin_example
+
+cp linux/arch/arm/boot/dts/zynq-pluto-sdr-revc.dtb build/zynq-pluto-sdr-revc.dtb
+wget -T 3 -t 1 -N --directory-prefix build http://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.32/system_top.hdf
+URL transformed to HTTPS due to an HSTS policy
+--2020-10-25 09:29:41--  https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.32/system_top.hdf
+
+#+end_example
