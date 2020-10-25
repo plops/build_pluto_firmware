@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <base/files/file_util.h>
-#include <base/logging.h>
+//#include <base/logging.h>
 #include <base/strings/stringprintf.h>
 
 #include "libmems/common_types.h"
@@ -75,8 +75,8 @@ base::Optional<std::string> IioDeviceTriggerImpl::ReadStringAttribute(
   ssize_t len =
       iio_device_attr_read(trigger_, name.c_str(), data, sizeof(data));
   if (len < 0) {
-    LOG(WARNING) << "Attempting to read attribute " << name
-                 << " failed: " << len;
+    //LOG(WARNING) << "Attempting to read attribute " << name
+    //             << " failed: " << len;
     return base::nullopt;
   }
   return std::string(data, len);
@@ -87,8 +87,8 @@ base::Optional<int64_t> IioDeviceTriggerImpl::ReadNumberAttribute(
   long long val = 0;  // NOLINT(runtime/int)
   int error = iio_device_attr_read_longlong(trigger_, name.c_str(), &val);
   if (error) {
-    LOG(WARNING) << "Attempting to read attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to read attribute " << name
+    //             << " failed: " << error;
     return base::nullopt;
   }
   return val;
@@ -103,8 +103,8 @@ bool IioDeviceTriggerImpl::WriteNumberAttribute(const std::string& name,
 
   int error = iio_device_attr_write_longlong(trigger_, name.c_str(), value);
   if (error) {
-    LOG(WARNING) << "Attempting to write attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to write attribute " << name
+    //             << " failed: " << error;
     return false;
   }
   return true;

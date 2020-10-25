@@ -7,7 +7,7 @@
 #include <sys/eventfd.h>
 
 #include <base/files/file_util.h>
-#include <base/logging.h>
+//#include <base/logging.h>
 #include "base/posix/eintr_wrapper.h"
 #include <base/stl_util.h>
 
@@ -167,12 +167,12 @@ base::Optional<IioDevice::IioSample> FakeIioDevice::ReadSample() {
 
   base::Optional<double> freq_opt = ReadDoubleAttribute(kSamplingFrequencyAttr);
   if (!freq_opt.has_value()) {
-    LOG(ERROR) << "sampling_frequency not set";
+    //LOG(ERROR) << "sampling_frequency not set";
     return base::nullopt;
   }
   double frequency = freq_opt.value();
   if (frequency <= 0.0) {
-    LOG(ERROR) << "Invalid frequency: " << frequency;
+    //LOG(ERROR) << "Invalid frequency: " << frequency;
     return base::nullopt;
   }
 
@@ -182,7 +182,7 @@ base::Optional<IioDevice::IioSample> FakeIioDevice::ReadSample() {
     FakeIioChannel* chn = dynamic_cast<FakeIioChannel*>(channels[i]);
     auto value = chn->GetData(sample_index_);
     if (!value.has_value()) {
-      LOG(ERROR) << "Channel: " << channels_[i].chn_id << " has no sample";
+      //LOG(ERROR) << "Channel: " << channels_[i].chn_id << " has no sample";
       return base::nullopt;
     }
 

@@ -6,7 +6,7 @@
 #include <string>
 
 #include <base/strings/stringprintf.h>
-#include <base/logging.h>
+// #include <base/logging.h>
 
 #include "libmems/common_types.h"
 #include "libmems/iio_channel_impl.h"
@@ -44,7 +44,7 @@ bool IioContextImpl::SetTimeout(uint32_t timeout) {
   if (error) {
     char errMsg[kErrorBufferSize];
     iio_strerror(-error, errMsg, sizeof(errMsg));
-    LOG(ERROR) << "Unable to set timeout " << timeout << ": " << errMsg;
+    //LOG(ERROR) << "Unable to set timeout " << timeout << ": " << errMsg;
 
     return false;
   }
@@ -107,7 +107,7 @@ std::vector<IioDevice*> IioContextImpl::GetByName(
   for (uint32_t i = 0; i < dev_count; ++i) {
     iio_device* dev = iio_context_get_device(ctx, i);
     if (!dev) {
-      LOG(WARNING) << "Unable to get " << i << "th device";
+      //LOG(WARNING) << "Unable to get " << i << "th device";
       continue;
     }
 
@@ -137,7 +137,7 @@ std::vector<IioDevice*> IioContextImpl::GetAll(
   for (uint32_t i = 0; i < dev_count; ++i) {
     iio_device* dev = iio_context_get_device(ctx, i);
     if (!dev) {
-      LOG(WARNING) << "Unable to get " << i << "th device";
+      //LOG(WARNING) << "Unable to get " << i << "th device";
       continue;
     }
 

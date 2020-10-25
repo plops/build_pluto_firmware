@@ -67,7 +67,7 @@ vis: $(OBJ) $(LIBMEMS_OBJ)
 
 
 clean:
-	rm vis *.o
+	rm vis *.o libmems/*.o2
 
 
 copy:

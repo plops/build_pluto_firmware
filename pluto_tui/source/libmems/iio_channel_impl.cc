@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include <base/logging.h>
+//#include <base/logging.h>
 #include <base/strings/stringprintf.h>
 
 #include "libmems/common_types.h"
@@ -46,8 +46,8 @@ bool IioChannelImpl::SetEnabled(bool en) {
       GetId());
   int error = iio_channel_attr_write_bool(channel_, en_attrib_name.c_str(), en);
   if (error) {
-    LOG(WARNING) << "could not write to " << en_attrib_name
-                 << ", error: " << error;
+    //LOG(WARNING) << "could not write to " << en_attrib_name
+    //             << ", error: " << error;
     return false;
   }
 
@@ -60,8 +60,8 @@ base::Optional<std::string> IioChannelImpl::ReadStringAttribute(
   ssize_t len =
       iio_channel_attr_read(channel_, name.c_str(), data, sizeof(data));
   if (len < 0) {
-    LOG(WARNING) << "Attempting to read attribute " << name
-                 << " failed: " << len;
+    //LOG(WARNING) << "Attempting to read attribute " << name
+    //             << " failed: " << len;
     return base::nullopt;
   }
   return std::string(data, len);
@@ -72,8 +72,8 @@ base::Optional<int64_t> IioChannelImpl::ReadNumberAttribute(
   long long val = 0;  // NOLINT(runtime/int)
   int error = iio_channel_attr_read_longlong(channel_, name.c_str(), &val);
   if (error) {
-    LOG(WARNING) << "Attempting to read attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to read attribute " << name
+    //             << " failed: " << error;
     return base::nullopt;
   }
   return val;
@@ -82,7 +82,7 @@ base::Optional<int64_t> IioChannelImpl::ReadNumberAttribute(
 base::Optional<int64_t> IioChannelImpl::Convert(const uint8_t* src) const {
   const iio_data_format* format = iio_channel_get_data_format(channel_);
   if (!format) {
-    LOG(WARNING) << "Cannot find format of channel: " << GetId();
+    //LOG(WARNING) << "Cannot find format of channel: " << GetId();
     return base::nullopt;
   }
 
@@ -110,8 +110,8 @@ base::Optional<double> IioChannelImpl::ReadDoubleAttribute(
   double val = 0;
   int error = iio_channel_attr_read_double(channel_, name.c_str(), &val);
   if (error) {
-    LOG(WARNING) << "Attempting to read attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to read attribute " << name
+    //             << " failed: " << error;
     return base::nullopt;
   }
   return val;
@@ -123,8 +123,8 @@ bool IioChannelImpl::WriteStringAttribute(const std::string& name,
       channel_, name.size() > 0 ? name.c_str() : nullptr, value.data(),
       value.size());
   if (error) {
-    LOG(WARNING) << "Attempting to write attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to write attribute " << name
+    //             << " failed: " << error;
     return false;
   }
   return true;
@@ -134,8 +134,8 @@ bool IioChannelImpl::WriteNumberAttribute(const std::string& name,
                                           int64_t value) {
   int error = iio_channel_attr_write_longlong(channel_, name.c_str(), value);
   if (error) {
-    LOG(WARNING) << "Attempting to write attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to write attribute " << name
+    //             << " failed: " << error;
     return false;
   }
   return true;
@@ -145,8 +145,8 @@ bool IioChannelImpl::WriteDoubleAttribute(const std::string& name,
                                           double value) {
   int error = iio_channel_attr_write_double(channel_, name.c_str(), value);
   if (error) {
-    LOG(WARNING) << "Attempting to write attribute " << name
-                 << " failed: " << error;
+    //LOG(WARNING) << "Attempting to write attribute " << name
+    //             << " failed: " << error;
     return false;
   }
   return true;
@@ -155,7 +155,7 @@ bool IioChannelImpl::WriteDoubleAttribute(const std::string& name,
 base::Optional<uint64_t> IioChannelImpl::Length() const {
   const iio_data_format* format = iio_channel_get_data_format(channel_);
   if (!format) {
-    LOG(WARNING) << "Cannot find format of channel: " << GetId();
+    //LOG(WARNING) << "Cannot find format of channel: " << GetId();
     return base::nullopt;
   }
 
