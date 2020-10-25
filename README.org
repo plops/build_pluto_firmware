@@ -382,3 +382,4 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
 #+end_example
 
 - try to download chromium zip from github (its 1.3G), 3.8GB extracted
+- it doesnt contain libmems
