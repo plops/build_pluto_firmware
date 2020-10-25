@@ -1,5 +1,6 @@
 # export PATH=$PATH:/opt/Xilinx/SDK/2018.3/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
 CROSS=arm-linux-gnueabihf-
+SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot
 CXX=${CROSS}g++
 LD=${CROSS}ld
 
@@ -10,10 +11,12 @@ CXXFLAGS=-Og -g3 -ggdb \
 -Wno-error=unused-variable \
 -Wno-error=unused-parameter \
 -Wno-error=double-promotion \
--pipe
+-pipe \
+-I${SDK}/usr/include
 
 LDFLAGS= \
--L/usr/local/lib \
+-L${SDK}/lib \
+-L${SDK}/usr/lib \
 -Wl,--gc-sections \
 -Wl,--print-gc-sections \
 -lpthread
@@ -24,7 +27,7 @@ LDFLAGS= \
 
 all: vis
 
-CFILES=$(shell find simple*.| grep .cpp$)
+CFILES=$(shell find *.cpp| grep .cpp$)
 OBJ:=$(CFILES:%.cpp=%.o)
 
 %.o: %.cpp globals.h
