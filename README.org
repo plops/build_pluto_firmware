@@ -345,7 +345,12 @@ wget -T 3 -t 1 -N --directory-prefix build http://github.com/analogdevicesinc/pl
 URL transformed to HTTPS due to an HSTS policy
 --2020-10-25 09:29:41--  https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.32/system_top.hdf
 
+# final output
+-rw-rw-r--. 1 martin martin  11281584 Oct 25 09:30 pluto.frm
+
 #+end_example
+
+- after install, my ssh keys are still there. nice!
 
 - good radar explanation with the constraints of pluto sdr: https://www.youtube.com/watch?v=SPORRWjQqbA
 - SDRA2020 - 11 - Jean-Michel Friedt: Noise RADAR implementation using software defines radio hardware
