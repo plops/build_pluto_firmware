@@ -173,7 +173,7 @@
 					(subseq str 0 (1- (length str))))))
 
                        (setf
-			,(g `_code_repository) (string ,(format nil "https://github.com/plops/cl-cpp-generator2/tree/master/example/27_sparse_eigen_hydrogen"))
+			,(g `_code_repository) (string ,(format nil "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui"))
 			,(g `_code_generation_time) 
 			(string ,(multiple-value-bind
                                        (second minute hour date month year day-of-week dst-p tz)

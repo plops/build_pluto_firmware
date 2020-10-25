@@ -356,3 +356,8 @@ URL transformed to HTTPS due to an HSTS policy
 - SDRA2020 - 11 - Jean-Michel Friedt: Noise RADAR implementation using software defines radio hardware
 
 - modulation classification https://youtu.be/jOTxLFDLn0A?t=1576
+  - https://gitlab.com/librespacefoundation/sdrmakerspace/gr-dnn
+
+- C++ wrapper for libiio: https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/libmems
+- i'm not sure how i can get the code for this and if it will compile standalone
+- https://chromium.googlesource.com/chromiumos/platform2/+archive/HEAD/libmems.tar.gz
