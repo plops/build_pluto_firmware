@@ -10,6 +10,9 @@
 ;
 #include <iio.h>
 ;
+#include "libmems/iio_context_impl.h"
+#include "libmems/iio_device.h"
+;
 // header;
 int main(int argc, char **argv);
 #endif

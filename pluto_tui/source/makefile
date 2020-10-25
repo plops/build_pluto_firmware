@@ -15,7 +15,8 @@ CXXFLAGS= -O2 \
 -Wno-error=unused-parameter \
 -Wno-error=double-promotion \
 -pipe \
---sysroot=${SDK}
+--sysroot=${SDK} \
+-I.
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 

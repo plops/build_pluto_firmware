@@ -146,17 +146,24 @@
 			     
 			     )
 
-		    (include <iio.h>)
+		    (do0
+		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
+		     (include <iio.h>)
 
-		    "#define MHz(x) ((long long)(x*1000000.0 + .5))"
+		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 
-		    "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
-		    (defstruct0 stream_cfg
-			(bw_hz "long long")
-		      (fs_hz "long long")
-		      (lo_hz "long long")
-		      (rfport "const char*")
-		      )
+		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
+		     (defstruct0 stream_cfg
+			 (bw_hz "long long")
+		       (fs_hz "long long")
+		       (lo_hz "long long")
+		       (rfport "const char*")
+		       ))
+		    (do0
+		     ;; https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/mems_setup/main.cc
+		     (include "libmems/iio_context_impl.h"
+			      "libmems/iio_device.h")
+		     )
 		    "using namespace std::chrono_literals;"
 		    " "
 
