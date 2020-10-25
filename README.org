@@ -426,3 +426,16 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
 - https://github.com/sdrforengineers/LabGuides/tree/master/grcon2020
 - https://wiki.analog.com/_media/plutoworkshop.pdf
   - no new content, it seems
+
+
+- pip install pyadi-iio
+#+begin_example
+import adi
+p = adi.Pluto()
+p.rx_rf_bandwidth=4_000_000
+p.rx_lo = 200_000_000
+p.tx_lo = 200_000_000
+p.disable_dds()
+#p.tx_cyclic_buffer = True
+p.gain_control_mode = "slow_attack"
+#+end_example

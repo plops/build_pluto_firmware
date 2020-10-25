@@ -260,7 +260,7 @@
 			 ,(logprint ""
 				    `((iio_context_get_devices_count ctx)))
 			 ,@(loop for (e f) in `((rx cf-ad9361-lpc)
-						 (phy ad9361-phy))
+						(phy ad9361-phy))
 				    collect
 				    `(let ((,e (iio_context_find_device ctx (string ,f))))
 				       ,(iio e)))
