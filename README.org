@@ -188,7 +188,10 @@ device_persistent_keys
 - install sdrangel
 
 #+begin_example
-sudo dnf install qt5-devel fftw-devel opus-devel
+sudo dnf install qt5-devel fftw-devel opus-devel libusb-devel
+# find libavcodec
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:/usr/local/lib64/pkgconfig/
+
 git clone https://github.com/analogdevicesinc/libiio
 git clone https://github.com/f4exb/cm256cc.git
 cd cm256cc;git reset --hard c0e92b92aca3d1d36c990b642b937c64d363c559
@@ -196,7 +199,31 @@ cd cm256cc;git reset --hard c0e92b92aca3d1d36c990b642b937c64d363c559
 git clone https://github.com/f4exb/serialDV.git
 cd serialDV;git reset --hard "v1.1.4"
 
+git clone https://github.com/f4exb/dsdcc.git
+cd dsdcc
+git reset --hard "v1.9.0"
+
+git clone https://github.com/drowe67/codec2.git
+cd codec2
+git reset --hard 76a20416d715ee06f8b36a9953506876689a3bd2
+
+
+
 git clone https://github.com/f4exb/sdrangel
+
+# override ffmpeg version check in plugins/channelrx/CMakeLists.txt:
+   message(STATUS "Include demoddatv")
+    add_subdirectory(demoddatv)
+      # if(WIN32)
+      #   add_subdirectory(demoddatv)
+      # else()
+      #   if((AVUTIL_VERSION VERSION_GREATER "55.27.99") AND (AVCODEC_VERSION VERSION_GREATER "57.48.101"))
+      #       message(STATUS "Include demoddatv")
+      #       add_subdirectory(demoddatv)
+      #   else()
+      #       message(STATUS "FFmpeg too old to compile demoddatv; needs at least avutil: 55.27.100, avcodec/avformat: 57.48.101")
+      #   endif()
+      # endif()
 
 # new intels always need peformance governor
 dnf install kernel-tools
