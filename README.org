@@ -303,4 +303,12 @@ source axi_ad9361_ip.tcl
 - this takes a few minutes (seems rather slow)
 - synthesis doesn't really seem to succeed
 
+#+begin_example
+[martin@localhost plutosdr-fw]$ git branch -a
+* master
+[martin@localhost hdl]$ git branch -a
+* (HEAD detached at 847f0f22)
+  master
+#+end_example
+
 - lets try cross compiling
