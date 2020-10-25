@@ -361,3 +361,5 @@ URL transformed to HTTPS due to an HSTS policy
 - C++ wrapper for libiio: https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/libmems
 - i'm not sure how i can get the code for this and if it will compile standalone
 - https://chromium.googlesource.com/chromiumos/platform2/+archive/HEAD/libmems.tar.gz
+
+- how to build for adalm pluto: https://wiki.analog.com/university/tools/pluto/devs/embedded_code
