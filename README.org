@@ -363,3 +363,4 @@ URL transformed to HTTPS due to an HSTS policy
 - https://chromium.googlesource.com/chromiumos/platform2/+archive/HEAD/libmems.tar.gz
 
 - how to build for adalm pluto: https://wiki.analog.com/university/tools/pluto/devs/embedded_code
+- example file https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c

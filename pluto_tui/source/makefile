@@ -1,3 +1,4 @@
+# source /opt/Xilinx/Vivado/2018.3/settings64.sh
 # export PATH=$PATH:/opt/Xilinx/SDK/2018.3/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
 CROSS=arm-linux-gnueabihf-
 CROSS_ROOT=/opt/Xilinx/SDK/2018.3/gnu/aarch32/lin/gcc-arm-none-eabi/arm-none-eabi/libc/
