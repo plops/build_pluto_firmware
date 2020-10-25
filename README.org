@@ -420,3 +420,8 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
 
 - iio internals
 - https://wiki.analog.com/resources/tools-software/linux-software/libiio_internals
+
+
+- more recent grcon
+- https://github.com/sdrforengineers/LabGuides/tree/master/grcon2020
+- https://wiki.analog.com/_media/plutoworkshop.pdf
