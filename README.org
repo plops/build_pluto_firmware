@@ -241,5 +241,9 @@ echo "level 7" > /proc/acpi/ibm/fan
 
 #+begin_example
 cd /home/martin/src/plutosdr-fw/hdl/library/axi_ad9361
-vivado -source axi_ad9361_ip.tcl 
+vivado 
+# in tcl console
+source axi_ad9361_ip.tcl 
 #+end_example
+
+-  this closes the vivado window
