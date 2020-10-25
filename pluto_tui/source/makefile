@@ -61,7 +61,7 @@ OBJ:=$(CFILES:%.cpp=%.o)
 
 
 
-vis: $(OBJ) $(LIBMEMS_OBJ)
+vis: $(OBJ) #$(LIBMEMS_OBJ)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 

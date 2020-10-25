@@ -38,6 +38,7 @@
     
     (defparameter *module-global-parameters* nil)
     (defparameter *module* nil)
+    
     (defun logprint (msg &optional rest)
       `(do0
 	" "
@@ -71,6 +72,10 @@
 		      (string "'")))
 	     "std::endl"
 	     "std::flush"))))
+    (defun iio (code)
+      `(unless code
+	 ,(logprint (format nil "~a" code))))
+
     (defun emit-globals (&key init)
       (let ((l `((_start_time ,(emit-c :code `(typeof (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)
@@ -146,7 +151,7 @@
 			     
 			     )
 
-		    #+Nil (do0
+		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
 		     (include <iio.h>)
 
@@ -159,7 +164,7 @@
 		       (lo_hz "long long")
 		       (rfport "const char*")
 		       ))
-		    (do0
+		    #+nil(do0
 		     ;; https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/mems_setup/main.cc
 		     (include "libmems/iio_context_impl.h"
 			      "libmems/iio_device.h")
@@ -249,10 +254,12 @@
 				 collect
 				 `(setf (dot rxcfg ,e)
 					,f)))
-		       #+nil (let ((ctx (iio_create_default_context)))
+		       (let ((ctx (iio_create_default_context)))
 			 (unless ctx
-			   ,(logprint "create_default" `(ctx)))))
-
+			   ,(logprint "create_default" `(ctx)))
+			 ,(logprint ""
+				     `((iio_context_get_devices_count ctx)))))
+		      #+nil
 		      (let ((ctx (std--unique_ptr<libmems--IioContext>
 				  (new libmems--IioContextImpl)))
 			    ))

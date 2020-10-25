@@ -4,22 +4,30 @@
 #include "globals.h"
 
 extern State state;
-#include "libmems/iio_context_impl.h"
-#include "libmems/iio_device.h"
 #include <chrono>
+#include <iio.h>
 #include <iostream>
 #include <thread>
+#define MHz(x) ((long long)(x * 1000000.0 + .5))
+#define GHz(x) ((long long)(x * 1000000000.0 + .5))
+struct stream_cfg {
+  long long bw_hz;
+  long long fs_hz;
+  long long lo_hz;
+  const char *rfport;
+};
+typedef struct stream_cfg stream_cfg;
 using namespace std::chrono_literals;
 
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "05dfa2b2c6f58c86e424a8c6be73ebd328a9c0f7";
+  state._code_version = "864ab148130ee4d26f81a7de410051317ad1005a";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "16:17:31 of Sunday, 2020-10-25 (GMT+1)";
+  state._code_generation_time = "20:05:17 of Sunday, 2020-10-25 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -78,7 +86,26 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
+  auto ctx = iio_create_default_context();
+  if (!(ctx)) {
 
-  auto ctx = std::unique_ptr<libmems::IioContext>(new libmems::IioContextImpl);
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("create_default") << (" ") << (std::setw(8)) << (" ctx='")
+                << (ctx) << ("'") << (std::endl) << (std::flush);
+  }
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" iio_context_get_devices_count(ctx)='")
+      << (iio_context_get_devices_count(ctx)) << ("'") << (std::endl)
+      << (std::flush);
   return 0;
 }
