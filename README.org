@@ -383,3 +383,33 @@ vis_00_base.o: vis_00_base.cpp utils.h globals.h \
 
 - try to download chromium zip from github (its 1.3G), 3.8GB extracted
 - it doesnt contain libmems
+
+- full dependencies (with the few headers i included so far)
+#+begin_example
+vis_00_base.o: vis_00_base.cpp utils.h globals.h \
+ libmems/iio_context_impl.h libmems/export.h libmems/iio_context.h \
+ /mnt/chromium-master/base/macros.h libmems/iio_device.h \
+ /mnt/chromium-master/base/containers/flat_map.h \
+ /mnt/chromium-master/base/check.h \
+ /mnt/chromium-master/base/base_export.h \
+ /mnt/chromium-master/base/compiler_specific.h \
+ /mnt/chromium-master/build/build_config.h \
+ /mnt/chromium-master/base/dcheck_is_on.h \
+ /mnt/chromium-master/base/immediate_crash.h \
+ /mnt/chromium-master/base/containers/flat_tree.h \
+ /mnt/chromium-master/base/ranges/algorithm.h \
+ /mnt/chromium-master/base/ranges/functional.h \
+ /mnt/chromium-master/base/ranges/ranges.h \
+ /mnt/chromium-master/base/template_util.h \
+ /mnt/chromium-master/base/stl_util.h \
+ /mnt/chromium-master/base/optional.h \
+ /mnt/chromium-master/base/files/file_path.h \
+ /mnt/chromium-master/base/strings/string16.h \
+ /mnt/chromium-master/base/strings/string_piece.h \
+ /mnt/chromium-master/base/check_op.h \
+ /mnt/chromium-master/base/strings/char_traits.h \
+ /mnt/chromium-master/base/strings/string_piece_forward.h \
+ libmems/iio_device_impl.h libmems/iio_device_trigger_impl.h \
+ libmems/iio_device.h
+
+#+end_example
