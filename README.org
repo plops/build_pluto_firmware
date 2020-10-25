@@ -354,3 +354,5 @@ URL transformed to HTTPS due to an HSTS policy
 
 - good radar explanation with the constraints of pluto sdr: https://www.youtube.com/watch?v=SPORRWjQqbA
 - SDRA2020 - 11 - Jean-Michel Friedt: Noise RADAR implementation using software defines radio hardware
+
+- modulation classification https://youtu.be/jOTxLFDLn0A?t=1576
