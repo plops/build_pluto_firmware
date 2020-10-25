@@ -6,7 +6,8 @@ SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnuea
 CXX=${CROSS}g++
 LD=${CROSS}ld
 
-CXXFLAGS=-Og -g3 -ggdb \
+#-Og -g3 -ggdb 
+CXXFLAGS= -O2 \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \
@@ -20,7 +21,10 @@ CXXFLAGS=-Og -g3 -ggdb \
 
 LDFLAGS= \
 -Wl,--gc-sections \
--Wl,--print-gc-sections 
+-Wl,--print-gc-sections \
+--sysroot=${SDK} \
+-L${SDK}/usr/lib \
+-liio
 
 
 #-L${SDK}/lib \
@@ -49,3 +53,7 @@ vis: $(OBJ)
 
 clean:
 	rm vis *.o
+
+
+copy:
+	scp vis root@pluto:/dev/shm

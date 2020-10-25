@@ -146,9 +146,17 @@
 			     
 			     )
 
-	
+		    (include <iio.h>)
 
+		    "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 
+		    "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
+		    (defstruct0 stream_cfg
+			(bw_hz "long long")
+		      (fs_hz "long long")
+		      (lo_hz "long long")
+		      (rfport "const char*")
+		      )
 		    "using namespace std::chrono_literals;"
 		    " "
 
@@ -203,8 +211,21 @@
 						     _code_generation_time _code_author
 						     _code_license)
 			      collect
-			      (logprint (format nil "~a" e)
+			      (logprint ""
 					`(,(g e))))
+
+		      (do0
+		       #+nil(let ((rxcfg (stream_cfg)))
+			 ,@(loop for (e f) in `((bw_hz (MHz 2))
+						(fs_hz (MHz 2.5))
+						(lo_hz (GHz 2.5))
+						(rfport (string "A_BALANCED")))
+				 collect
+				 `(setf (dot rxcfg ,e)
+					,f)))
+		       (let ((ctx (iio_create_default_context)))
+			 (unless ctx
+			   ,(logprint "create_default" `(ctx)))))
 
 		      (return 0)))))
 

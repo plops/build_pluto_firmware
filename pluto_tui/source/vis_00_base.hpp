@@ -8,6 +8,8 @@
 #include <iostream>
 #include <thread>
 ;
+#include <iio.h>
+;
 // header;
 int main(int argc, char **argv);
 #endif
