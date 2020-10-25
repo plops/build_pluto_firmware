@@ -73,7 +73,7 @@
 	     "std::endl"
 	     "std::flush"))))
     (defun iio (code)
-      `(unless code
+      `(unless ,code
 	 ,(logprint (format nil "~a" code))))
 
     (defun emit-globals (&key init)
@@ -153,11 +153,11 @@
 
 		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
-		     (include <iio.h>)
-
+		      (include <iio.h>)
+		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
-
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
+		     "enum iodev{RX,TX};"
 		     (defstruct0 stream_cfg
 			 (bw_hz "long long")
 		       (fs_hz "long long")
@@ -258,11 +258,14 @@
 			 (unless ctx
 			   ,(logprint "create_default" `(ctx)))
 			 ,(logprint ""
-				     `((iio_context_get_devices_count ctx)))))
-		      #+nil
-		      (let ((ctx (std--unique_ptr<libmems--IioContext>
-				  (new libmems--IioContextImpl)))
-			    ))
+				    `((iio_context_get_devices_count ctx)))
+			 ,@(loop for (e f) in `((rx cf-ad9361-lpc)
+						 (phy ad9361-phy))
+				    collect
+				    `(let ((,e (iio_context_find_device ctx (string ,f))))
+				       ,(iio e)))
+			 @()
+			 ))
 		      
 		      (return 0)))))
 

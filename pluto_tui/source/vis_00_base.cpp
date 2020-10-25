@@ -10,6 +10,7 @@ extern State state;
 #include <thread>
 #define MHz(x) ((long long)(x * 1000000.0 + .5))
 #define GHz(x) ((long long)(x * 1000000000.0 + .5))
+enum iodev { RX, TX };
 struct stream_cfg {
   long long bw_hz;
   long long fs_hz;
@@ -22,12 +23,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "864ab148130ee4d26f81a7de410051317ad1005a";
+  state._code_version = "b448f585e3ee727052ecc6d9b915e918f0fef219";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:05:17 of Sunday, 2020-10-25 (GMT+1)";
+  state._code_generation_time = "20:37:14 of Sunday, 2020-10-25 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -107,5 +108,27 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_context_get_devices_count(ctx)='")
       << (iio_context_get_devices_count(ctx)) << ("'") << (std::endl)
       << (std::flush);
+  auto rx = iio_context_find_device(ctx, "cf-ad9361-lpc");
+  if (!(rx)) {
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("rx")
+                << (" ") << (std::endl) << (std::flush);
+  }
+  auto phy = iio_context_find_device(ctx, "ad9361-phy");
+  if (!(phy)) {
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("phy") << (" ") << (std::endl) << (std::flush);
+  }
   return 0;
 }
