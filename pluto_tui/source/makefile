@@ -16,7 +16,8 @@ CXXFLAGS= -O2 \
 -Wno-error=double-promotion \
 -pipe \
 --sysroot=${SDK} \
--I.
+-I. \
+-I/mnt/chromium-master/
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 
