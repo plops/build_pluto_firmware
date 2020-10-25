@@ -247,3 +247,12 @@ source axi_ad9361_ip.tcl
 #+end_example
 
 -  this closes the vivado window
+- try line by line
+#+begin_example
+cd /home/martin/src/plutosdr-fw/hdl/library/axi_ad9361
+vivado
+# in tcl console:
+source ../scripts/adi_env.tcl
+puts $ad_hdl_dir
+# => /home/martin/src/plutosdr-fw/hdl
+#+end_example
