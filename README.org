@@ -438,4 +438,8 @@ p.tx_lo = 200_000_000
 p.disable_dds()
 #p.tx_cyclic_buffer = True
 p.gain_control_mode = "slow_attack"
+data = p.rx()
 #+end_example
+
+- this seems to give a good overview of the pluto devices
+https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py
