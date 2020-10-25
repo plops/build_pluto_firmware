@@ -256,4 +256,11 @@ source ../scripts/adi_env.tcl
 # check the main directory
 puts $ad_hdl_dir
 # => /home/martin/src/plutosdr-fw/hdl
+
+# this still works:
+source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
+
+# here vivado closes:
+adi_ip_create axi_ad9361
+
 #+end_example
