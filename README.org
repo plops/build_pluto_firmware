@@ -253,6 +253,7 @@ cd /home/martin/src/plutosdr-fw/hdl/library/axi_ad9361
 vivado
 # in tcl console:
 source ../scripts/adi_env.tcl
+# check the main directory
 puts $ad_hdl_dir
 # => /home/martin/src/plutosdr-fw/hdl
 #+end_example
