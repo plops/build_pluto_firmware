@@ -134,6 +134,8 @@
        `(base ((_code_version :type "std::string")
 	       (_code_repository :type "std::string")
 	       (_code_generation_time :type "std::string")
+	       (_code_author :type "std::string")
+	       (_code_license :type "std::string")
 		 )
 	      (do0
 	       
@@ -174,6 +176,8 @@
 
                        (setf
 			,(g `_code_repository) (string ,(format nil "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui"))
+			,(g `_code_author )(string "Martin Kielhorn <kielhorn.martin@gmail.com>")
+			,(g `_code_license )(string "GPL v3")
 			,(g `_code_generation_time) 
 			(string ,(multiple-value-bind
                                        (second minute hour date month year day-of-week dst-p tz)
@@ -194,7 +198,13 @@
                                                     (count))))
 
 		      ,(logprint "start" `(argc (aref argv 0)
-						,(g `_start_time)))
+						))
+		      ,@(loop for e in `(_start_time _code_version _code_repository
+						     _code_generation_time _code_author
+						     _code_license)
+			      collect
+			      (logprint (format nil "~a" e)
+					`(,(g e))))
 
 		      (return 0)))))
 
