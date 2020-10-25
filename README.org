@@ -264,3 +264,15 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 adi_ip_create axi_ad9361
 
 #+end_example
+
+- again, more manual:
+#+begin_example
+cd /home/martin/src/plutosdr-fw/hdl/library/axi_ad9361
+vivado
+source ../scripts/adi_env.tcl
+source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
+version -short
+# => 2018.3
+puts $REQUIRED_VIVADO_VERSION
+# => 2019.1
+#+end_example
