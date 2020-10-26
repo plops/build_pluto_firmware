@@ -26,12 +26,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "42cf69f118987c5a770583a617f125f9dde91a3d";
+  state._code_version = "74a57a9ec7d62f33d0f312b967a2e515d254461b";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:28:16 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "19:31:57 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -195,15 +195,21 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
-  auto const nbuf = 256;
+  auto const nbuf = ((1024) * (256));
   auto input = std::array<std::complex<float>, nbuf>();
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
+  auto sample_start =
+      std::chrono::high_resolution_clock::now().time_since_epoch();
   for (auto j = 0; (j) < (100); (j) += (1)) {
     auto nbytes = iio_buffer_refill(rxbuf);
+    auto sample_now =
+        std::chrono::high_resolution_clock::now().time_since_epoch();
+    auto dur = ((sample_now) - (sample_start)).count();
     auto step = iio_buffer_step(rxbuf);
     auto end = iio_buffer_end(rxbuf);
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
+    sample_start = sample_now;
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -211,7 +217,8 @@ int main(int argc, char **argv) {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
+                << (" ") << (std::setw(8)) << (" dur='") << (dur) << ("'")
+                << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
                 << (std::endl) << (std::flush);
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
