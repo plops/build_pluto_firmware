@@ -279,9 +279,10 @@
 			      (for ((= "void*ptr" (iio_buffer_first buf ch))
 				    (< ptr (iio_buffer_end buf))
 				    (incf ptr (iio_buffer_step)))
-				   (setf q *ptr)))
-			    (iio_channel_read_raw buf)
-			    (iio_device_refill buf)
+				   (setf q *ptr))
+				    (iio_channel_read_raw buf)
+				    (iio_device_refill buf))
+			    
 			    ))
 			 ))
 		      
