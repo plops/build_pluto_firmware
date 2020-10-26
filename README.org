@@ -443,3 +443,6 @@ data = p.rx()
 
 - this seems to give a good overview of the pluto devices
 https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py
+
+- enable fftw-single and optimize for speed
+
