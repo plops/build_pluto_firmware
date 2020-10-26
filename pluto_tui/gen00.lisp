@@ -249,9 +249,16 @@
 						 (phy ad9361-phy))
 				  collect
 				  `(let ((,e (iio_context_find_device ctx (string ,f))))
-				     ,(iio e)))
+				     ,(iio e)
+				     ,(logprint (format nil "~a" e)
+						`((iio_device_get_attrs_count ,e)))))
 			  (let ((n_chan (iio_device_get_channels_count rx)))
-			    ,(logprint "" `(n_chan))))
+			    ,(logprint "" `(n_chan))
+			    ,@(loop for e in `(ch_i ch_q) and i from 0 collect
+				    `(let ((,e (iio_device_get_channel rx ,i)))
+				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e))))))
+
+			  )
 
 			 (iio_context_destroy ctx)
 

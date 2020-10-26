@@ -24,12 +24,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "42beaac7eb979c18cd75a18195ee8cb6a8dd59d4";
+  state._code_version = "8a53dbe0ae56d047762b4fff0f5db49c93f498da";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:52:28 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "18:59:40 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -120,6 +120,15 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("rx")
                 << (" ") << (std::endl) << (std::flush);
   }
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx") << (" ")
+      << (std::setw(8)) << (" iio_device_get_attrs_count(rx)='")
+      << (iio_device_get_attrs_count(rx)) << ("'") << (std::endl)
+      << (std::flush);
   auto phy = iio_context_find_device(ctx, "ad9361-phy");
   if (!(phy)) {
 
@@ -131,6 +140,15 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("phy") << (" ") << (std::endl) << (std::flush);
   }
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("phy") << (" ")
+      << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
+      << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
+      << (std::flush);
   auto n_chan = iio_device_get_channels_count(rx);
 
   (std::cout)
@@ -139,6 +157,26 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" n_chan='") << (n_chan) << ("'") << (std::endl)
+      << (std::flush);
+  auto ch_i = iio_device_get_channel(rx, 0);
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("ch_i 0") << (" ")
+      << (std::setw(8)) << (" iio_channel_get_attrs_count(ch_i)='")
+      << (iio_channel_get_attrs_count(ch_i)) << ("'") << (std::endl)
+      << (std::flush);
+  auto ch_q = iio_device_get_channel(rx, 1);
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("ch_q 1") << (" ")
+      << (std::setw(8)) << (" iio_channel_get_attrs_count(ch_q)='")
+      << (iio_channel_get_attrs_count(ch_q)) << ("'") << (std::endl)
       << (std::flush);
   iio_context_destroy(ctx);
   return 0;
