@@ -7,6 +7,7 @@ extern State state;
 #include <array>
 #include <chrono>
 #include <complex>
+#include <fftw3.h>
 #include <iio.h>
 #include <iostream>
 #include <math.h>
@@ -26,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "890a103c0c6a92fb588831ffb38aa4ece0650ff2";
+  state._code_version = "1176e86ef5bfe7cc790971f36d0cfed796b3574f";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:38:17 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "21:17:20 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -195,21 +196,35 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
-  auto const nbuf = ((1000) * (100));
+  auto const nbuf = 1024;
+  auto input = std::array<std::complex<float>, nbuf>();
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
-  auto sample_start =
+  auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
+  auto sample_start = sample_and_compute_start;
+  auto compute_start = sample_and_compute_start;
   for (auto j = 0; (j) < (100); (j) += (1)) {
+    sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
-    auto sample_now =
+    auto time_now =
         std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto dur = ((sample_now) - (sample_start)).count();
+    auto sample_dur = ((time_now) - (sample_start)).count();
     auto step = iio_buffer_step(rxbuf);
     auto end = iio_buffer_end(rxbuf);
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
-    auto rate_MSamp_per_sec = (((((1.00e+3)) * (nbuf))) / (dur));
-    sample_start = sample_now;
+    compute_start =
+        std::chrono::high_resolution_clock::now().time_since_epoch();
+    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
+      auto si = reinterpret_cast<int16_t *>(p)[0];
+      auto sq = reinterpret_cast<int16_t *>(p)[1];
+      input[i] = std::complex<float>(si, sq);
+      (i)++;
+    }
+    auto compute_end =
+        std::chrono::high_resolution_clock::now().time_since_epoch();
+    auto compute_dur = ((compute_end) - (compute_start)).count();
+    auto compute_samp_dur = ((compute_end) - (sample_start)).count();
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -217,10 +232,10 @@ int main(int argc, char **argv) {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" rate_MSamp_per_sec='")
-                << (rate_MSamp_per_sec) << ("'") << (std::setw(8)) << (" dur='")
-                << (dur) << ("'") << (std::setw(8)) << (" nbytes='") << (nbytes)
-                << ("'") << (std::setw(8)) << (" nbuf='") << (nbuf) << ("'")
+                << (" ") << (std::setw(8)) << (" compute_dur='")
+                << (compute_dur) << ("'") << (std::setw(8)) << (" sample_dur='")
+                << (sample_dur) << ("'") << (std::setw(8))
+                << (" compute_samp_dur='") << (compute_samp_dur) << ("'")
                 << (std::endl) << (std::flush);
   }
   iio_context_destroy(ctx);

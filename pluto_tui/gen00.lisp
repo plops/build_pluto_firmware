@@ -156,7 +156,8 @@
 		      (include <iio.h>
 			       <array>
 			       <math.h>
-			       <complex>)
+			       <complex>
+			       <fftw3.h>)
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -267,30 +268,41 @@
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    (let (("const nbuf" (* 1000 100))
-				  ;(input ("std::array<std::complex<float>,nbuf>"))
+			    (let (("const nbuf" 1024)
+				  (input ("std::array<std::complex<float>,nbuf>"))
 				  (rxbuf (iio_device_create_buffer rx nbuf false))
-				  (sample_start (dot ("std::chrono::high_resolution_clock::now")
-						     (time_since_epoch)
-						     )))
-			      (dotimes (j 100)
-			       (let ((nbytes (iio_buffer_refill rxbuf))
-				     (sample_now (dot ("std::chrono::high_resolution_clock::now")
+				  (sample_and_compute_start
+				    (dot ("std::chrono::high_resolution_clock::now")
 						     (time_since_epoch)
 						     ))
-				     (dur (dot (- sample_now
-						  sample_start)
-					       (count)))
-				     (step (iio_buffer_step rxbuf))
-				     (end (iio_buffer_end rxbuf))
+				  (sample_start sample_and_compute_start)
+				  (compute_start sample_and_compute_start))
+			      (dotimes (j 100)
+				(setf sample_start (dot ("std::chrono::high_resolution_clock::now")
+						     (time_since_epoch)
+						     ))
+				(let (
+				      (nbytes (iio_buffer_refill rxbuf))
+				      (time_now (dot ("std::chrono::high_resolution_clock::now")
+						     (time_since_epoch)
+						     ))
+				      (sample_dur (dot (- time_now
+							  sample_start)
+						       (count)))
+				      (step (iio_buffer_step rxbuf))
+				      (end (iio_buffer_end rxbuf))
 				     (start (static_cast<uint8_t*>
 					     (iio_buffer_first rxbuf rx_i)))
 				     (i 0)
-				     (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur)))
-				 (setf sample_start sample_now)
-				 ,(logprint "" `(rate_MSamp_per_sec dur nbytes nbuf))
+				   ;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
+				      )
 				 
-				 #+nil (for ((= "uint8_t* p" start)
+				  
+				 (setf compute_start
+				    (dot ("std::chrono::high_resolution_clock::now")
+						     (time_since_epoch)
+						     )) 
+				  (for ((= "uint8_t* p" start)
 				       (< p end)
 				       (incf p step))
 				      (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
@@ -299,7 +311,24 @@
 					    (std--complex<float> si sq))
 				      (incf i)
 				     
-				      )))))
+				      )
+				  (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
+						     (time_since_epoch)
+						     ))
+					(compute_dur (dot (- compute_end compute_start)
+							  (count)))
+					(compute_samp_dur (dot (- compute_end
+								  sample_start)
+							       (count))))
+
+				    ,(logprint "" `(compute_dur
+						    sample_dur
+						    compute_samp_dur
+					;rate_MSamp_per_sec dur nbytes nbuf
+							       )))
+				 
+
+				 ))))
 
 			  )
 

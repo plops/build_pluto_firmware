@@ -10,6 +10,7 @@
 ;
 #include <array>
 #include <complex>
+#include <fftw3.h>
 #include <iio.h>
 #include <math.h>
 ;
