@@ -9,7 +9,9 @@
 #include <thread>
 ;
 #include <array>
+#include <complex>
 #include <iio.h>
+#include <math.h>
 ;
 // header;
 int main(int argc, char **argv);

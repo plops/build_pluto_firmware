@@ -6,8 +6,10 @@
 extern State state;
 #include <array>
 #include <chrono>
+#include <complex>
 #include <iio.h>
 #include <iostream>
+#include <math.h>
 #include <thread>
 #define MHz(x) ((long long)(x * 1000000.0 + .5))
 #define GHz(x) ((long long)(x * 1000000000.0 + .5))
@@ -24,12 +26,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "a50a2113dd898d99a8afb7c361c0404289456b64";
+  state._code_version = "f683b7d35136d37481a6f48f244e7212a98245d1";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:06:26 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "19:21:25 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -171,28 +173,50 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" n_chan='") << (n_chan) << ("'") << (std::endl)
       << (std::flush);
-  auto ch_i = iio_device_get_channel(rx, 0);
+  auto rx_i = iio_device_get_channel(rx, 0);
 
   (std::cout)
       << (std::setw(10))
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("ch_i 0") << (" ")
-      << (std::setw(8)) << (" iio_channel_get_attrs_count(ch_i)='")
-      << (iio_channel_get_attrs_count(ch_i)) << ("'") << (std::endl)
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_i 0") << (" ")
+      << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_i)='")
+      << (iio_channel_get_attrs_count(rx_i)) << ("'") << (std::endl)
       << (std::flush);
-  auto ch_q = iio_device_get_channel(rx, 1);
+  auto rx_q = iio_device_get_channel(rx, 1);
 
   (std::cout)
       << (std::setw(10))
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("ch_q 1") << (" ")
-      << (std::setw(8)) << (" iio_channel_get_attrs_count(ch_q)='")
-      << (iio_channel_get_attrs_count(ch_q)) << ("'") << (std::endl)
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_q 1") << (" ")
+      << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_q)='")
+      << (iio_channel_get_attrs_count(rx_q)) << ("'") << (std::endl)
       << (std::flush);
-  iio_channel_enable(ch_i);
-  iio_channel_enable(ch_q);
+  iio_channel_enable(rx_i);
+  iio_channel_enable(rx_q);
+  auto const nbuf = 1024;
+  auto input = std::array<std::complex<float>, nbuf>();
+  auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
+  auto nbytes = iio_buffer_refill(rxbuf);
+  auto step = iio_buffer_step(rxbuf);
+  auto end = iio_buffer_end(rxbuf);
+  auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
+  auto i = 0;
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'") << (std::endl)
+      << (std::flush);
+  for (uint8_t *p = start; (p) < (end); (p) += (step)) {
+    auto si = reinterpret_cast<int16_t *>(p)[0];
+    auto sq = reinterpret_cast<int16_t *>(p)[1];
+    input[i] = std::complex<float>(si, sq);
+    (i)++;
+  }
   iio_context_destroy(ctx);
   return 0;
 }

@@ -154,7 +154,9 @@
 		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
 		      (include <iio.h>
-			       <array>)
+			       <array>
+			       <math.h>
+			       <complex>)
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -260,11 +262,32 @@
 						`((iio_device_get_attrs_count ,e)))))
 			  (let ((n_chan (iio_device_get_channels_count rx)))
 			    ,(logprint "" `(n_chan))
-			    ,@(loop for e in `(ch_i ch_q) and i from 0 collect
+			    ,@(loop for e in `(rx_i rx_q) and i from 0 collect
 				    `(let ((,e (iio_device_get_channel rx ,i)))
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
-			    (iio_channel_enable ch_i)
-			    (iio_channel_enable ch_q))
+			    (iio_channel_enable rx_i)
+			    (iio_channel_enable rx_q)
+			    (let (("const nbuf" 1024)
+				  (input ("std::array<std::complex<float>,nbuf>"))
+				  (rxbuf (iio_device_create_buffer rx nbuf false)))
+			      (let ((nbytes (iio_buffer_refill rxbuf))
+				    (step (iio_buffer_step rxbuf))
+				    (end (iio_buffer_end rxbuf))
+				    (start (static_cast<uint8_t*>
+					    (iio_buffer_first rxbuf rx_i)))
+				    (i 0)
+				    )
+				,(logprint "" `(nbytes))
+				(for ((= "uint8_t* p" start)
+				      (< p end)
+				      (incf p step))
+				     (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+					   (sq (aref (reinterpret_cast<int16_t*> p) 1))))
+				     (setf (aref input i)
+					   (std--complex<float> si sq))
+				     (incf i)
+				     
+				     ))))
 
 			  )
 
