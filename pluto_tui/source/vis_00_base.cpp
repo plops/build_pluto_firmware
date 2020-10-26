@@ -27,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "19efb2fcdd1dcc8499f790d8429e6169cf4cf490";
+  state._code_version = "1b9380efb197c2c8ee3214f4507a3c8eb6a696cb";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "22:24:08 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "22:26:59 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -232,6 +232,8 @@ int main(int argc, char **argv) {
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
     auto compute_samp_dur = ((compute_end) - (sample_start)).count();
+    auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
+    auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -239,11 +241,11 @@ int main(int argc, char **argv) {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" compute_dur='")
-                << (compute_dur) << ("'") << (std::setw(8)) << (" sample_dur='")
-                << (sample_dur) << ("'") << (std::setw(8))
-                << (" compute_samp_dur='") << (compute_samp_dur) << ("'")
-                << (std::endl) << (std::flush);
+                << (" ") << (std::setw(8)) << (" compute_perc='")
+                << (compute_perc) << ("'") << (std::setw(8))
+                << (" sample_perc='") << (sample_perc) << ("'")
+                << (std::setw(8)) << (" compute_samp_dur='")
+                << (compute_samp_dur) << ("'") << (std::endl) << (std::flush);
   }
   fftw_destroy_plan(plan);
   fftw_free(input);

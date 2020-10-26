@@ -330,10 +330,14 @@
 							   (count)))
 					 (compute_samp_dur (dot (- compute_end
 								   sample_start)
-								(count))))
+								(count)))
+					 (compute_perc (/ (* 100 compute_dur)
+							  compute_samp_dur))
+					 (sample_perc (/ (* 100 sample_dur)
+							 compute_samp_dur)))
 
-				     ,(logprint "" `(compute_dur
-						     sample_dur
+				     ,(logprint "" `(compute_perc
+						     sample_perc
 						     compute_samp_dur
 					;rate_MSamp_per_sec dur nbytes nbuf
 						     )))
