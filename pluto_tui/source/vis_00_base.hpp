@@ -13,6 +13,7 @@
 #include <fftw3.h>
 #include <iio.h>
 #include <math.h>
+#include <omp.h>
 ;
 // header;
 int main(int argc, char **argv);

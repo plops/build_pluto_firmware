@@ -157,7 +157,8 @@
 			       <array>
 			       <math.h>
 			       <complex>
-			       <fftw3.h>)
+			       <fftw3.h>
+			       <omp.h>)
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -318,7 +319,8 @@
 				      (setf compute_start
 					    (dot ("std::chrono::high_resolution_clock::now")
 						 (time_since_epoch)
-						 )) 
+						 ))
+				      "#pragma omp parallel"
 			              (for ((= "uint8_t* p" start)
 					    (< p end)
 					    (incf p step))
@@ -333,7 +335,7 @@
 					   (incf i)
 				     
 					   )
-				      (fftwf_execute plan)
+				      ;(fftwf_execute plan)
 				      (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							      (time_since_epoch)
 							      ))
