@@ -11,7 +11,6 @@ extern State state;
 #include <iio.h>
 #include <iostream>
 #include <math.h>
-#include <omp.h>
 #include <thread>
 #define MHz(x) ((long long)(x * 1000000.0 + .5))
 #define GHz(x) ((long long)(x * 1000000000.0 + .5))
@@ -28,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "1f9cb8f0e4cb1d07e1857e5d142ccf43478e4aa2";
+  state._code_version = "ba21ee14491e2917986bd4cd3f6657b9ab2b00e9";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "23:18:02 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "23:22:37 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -205,7 +204,7 @@ int main(int argc, char **argv) {
   auto plan_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto plan =
-      fftwf_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_MEASURE);
+      fftwf_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_EXHAUSTIVE);
   auto plan_end = std::chrono::high_resolution_clock::now().time_since_epoch();
   auto plan_duration = ((plan_end) - (plan_start)).count();
 
@@ -236,7 +235,6 @@ int main(int argc, char **argv) {
     auto i = 0;
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
-#pragma omp parallel
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
@@ -244,6 +242,7 @@ int main(int argc, char **argv) {
       input[i][1] = sq;
       (i)++;
     }
+    fftwf_execute(plan);
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();

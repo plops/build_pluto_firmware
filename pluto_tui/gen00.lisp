@@ -158,7 +158,8 @@
 			       <math.h>
 			       <complex>
 			       <fftw3.h>
-			       <omp.h>)
+			       ;<omp.h>
+			       )
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -277,7 +278,7 @@
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
-			      (let ((plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
+			      (let ((plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_EXHAUSTIVE ;MEASURE ;ESTIMATE
 							     ))
 				    (plan_end (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
@@ -320,7 +321,7 @@
 					    (dot ("std::chrono::high_resolution_clock::now")
 						 (time_since_epoch)
 						 ))
-				      "#pragma omp parallel"
+				      ;"#pragma omp parallel"
 			              (for ((= "uint8_t* p" start)
 					    (< p end)
 					    (incf p step))
@@ -335,7 +336,7 @@
 					   (incf i)
 				     
 					   )
-				      ;(fftwf_execute plan)
+				      (fftwf_execute plan)
 				      (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							      (time_since_epoch)
 							      ))
