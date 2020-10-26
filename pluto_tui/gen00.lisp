@@ -153,7 +153,8 @@
 
 		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
-		      (include <iio.h>)
+		      (include <iio.h>
+			       <array>)
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -164,30 +165,6 @@
 		       (lo_hz "long long")
 		       (rfport "const char*")
 		       ))
-		    #+nil(do0
-		     ;; https://chromium.googlesource.com/chromiumos/platform2/+/HEAD/mems_setup/main.cc
-		     (include "libmems/iio_context_impl.h"
-			      "libmems/iio_device.h")
-		     
-		     ;; At the root of the hierarchy, there exists the
-		     ;; IioContext, which represents the IIO devices
-		     ;; currently available on the system. These can
-		     ;; be retrieved by name and inspected, via
-		     ;; instances of IioDevice.
-
-		     ;; An IioDevice allows reading and writing
-		     ;; attributes of an IIO device via type-safe
-		     ;; helper APIs. It also offers support for
-		     ;; configuring the buffer and trigger of an IIO
-		     ;; device, which we use in order to allow the
-		     ;; Chrome UI to read accelerometer data and
-		     ;; support screen rotation.
-		     
-		     ;; An IioDevice also exposes a list of
-		     ;; IioChannels, which can individually be enabled
-		     ;; and disabled.
-		     
-		     )
 		    "using namespace std::chrono_literals;"
 		    " "
 
@@ -254,37 +231,31 @@
 				 collect
 				 `(setf (dot rxcfg ,e)
 					,f)))
+		       ;;https://analogdevicesinc.github.io/libiio/master/libiio/index.html
 		       (let ((ctx (iio_create_default_context)))
-			 (unless ctx
-			   ,(logprint "create_default" `(ctx)))
-			 ,(logprint ""
-				    `((iio_context_get_devices_count ctx)))
-			 ,@(loop for (e f) in `((rx cf-ad9361-lpc)
-						(phy ad9361-phy))
-				    collect
-				    `(let ((,e (iio_context_find_device ctx (string ,f))))
-				       ,(iio e)))
-
 			 (do0
-			  (iio_channel_enable 0)
-			  (iio_channel_enable 1)
-			  
-			  (let ((buf (iio_device_create_buffer rx
-							       1024
-							       false)))
-			    #+nil (memcpy (iio_buffer_start buf)
-					  (- (iio_buffer_end buf)
-					     (iio_buffer_start buf)))
-			    #+nil (let ((ch 0))
-			      (for ((= "void*ptr" (iio_buffer_first buf ch))
-				    (< ptr (iio_buffer_end buf))
-				    (incf ptr (iio_buffer_step)))
-				   (setf q *ptr))
-				    (iio_channel_read_raw buf)
-				    (iio_device_refill buf))
+			  (unless ctx
+			    ,(logprint "create_default" `(ctx)))
+			  ,(logprint ""
+				     `((iio_context_get_devices_count ctx)))
+			  #+nil (let ((n (iio_context_get_devices_count ctx))
+				(dev ("std--array<iio_device*,n>")))
 			    
-			    ))
-			 ))
+			   (dotimes (i n)
+			     (setf (aref dev i)
+				   (iio_context_get_device ctx i)))
+			    )
+			  ,@(loop for (e f) in `((rx cf-ad9361-lpc)
+						 (phy ad9361-phy))
+				  collect
+				  `(let ((,e (iio_context_find_device ctx (string ,f))))
+				     ,(iio e)))
+			  (let ((n_chan (iio_device_get_channels_count rx)))
+			    ,(logprint "" `(n_chan))))
+
+			 (iio_context_destroy ctx)
+
+			 			 ))
 		      
 		      (return 0)))))
 

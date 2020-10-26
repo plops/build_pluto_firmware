@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 ;
+#include <array>
 #include <iio.h>
 ;
 // header;

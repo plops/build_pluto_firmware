@@ -4,6 +4,7 @@
 #include "globals.h"
 
 extern State state;
+#include <array>
 #include <chrono>
 #include <iio.h>
 #include <iostream>
@@ -23,12 +24,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "7a1ff8b87e736ff7a490d9346ffc6d06d334ff95";
+  state._code_version = "42beaac7eb979c18cd75a18195ee8cb6a8dd59d4";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:20:31 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "18:52:28 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -130,13 +131,15 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("phy") << (" ") << (std::endl) << (std::flush);
   }
-  iio_channel_enable(0);
-  iio_channel_enable(1);
-  auto buf = iio_device_create_buffer(rx, 1024, false);
-  auto ch = 0;
-  for (void *ptr = iio_buffer_first(buf, ch); (ptr) < (iio_buffer_end(buf));
-       (ptr) += (iio_buffer_step())) {
-    q = *ptr;
-  }
+  auto n_chan = iio_device_get_channels_count(rx);
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" n_chan='") << (n_chan) << ("'") << (std::endl)
+      << (std::flush);
+  iio_context_destroy(ctx);
   return 0;
 }
