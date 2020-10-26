@@ -14,6 +14,10 @@
 #include <iio.h>
 #include <math.h>
 ;
+#include "imtui-demo.h"
+#include "imtui/imtui-impl-ncurses.h"
+#include "imtui/imtui.h"
+;
 // header;
 int main(int argc, char **argv);
 #endif

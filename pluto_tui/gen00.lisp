@@ -160,6 +160,10 @@
 			       <fftw3.h>
 			       ;<omp.h>
 			       )
+
+		      (include "imtui/imtui.h"
+			       "imtui/imtui-impl-ncurses.h"
+			       "imtui-demo.h")
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -226,6 +230,13 @@
 			      collect
 			      (logprint ""
 					`(,(g e))))
+
+		      (do0
+		       (IMGUI_CHECKVERSION)
+		       (ImGui--CreateContext)
+		       (let ((screen (ImTui_ImplNcurses_Init true)))
+			 (ImTui_ImplText_Init) )
+		       )
 
 		      (do0
 		       #+nil(let ((rxcfg (stream_cfg)))
@@ -299,6 +310,20 @@
 				     (sample_start sample_and_compute_start)
 				     (compute_start sample_and_compute_start))
 				 (do0
+				  (do0
+			"bool demo = true;"
+			(while true
+			       (ImTui_ImplNcurses_NewFrame)
+			       (ImTui_ImplText_NewFrame)
+			       (ImGui--NewFrame)
+			       (ImGui--Begin (string "hello world"))
+			       (ImGui--End)
+			       (ImTui--ShowDemoWindow &demo)
+			       (ImGui--Render)
+			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
+			       (ImTui_ImplNcurses_DrawScreen)
+			       ))
+				  
 				  (dotimes (j 100)
 				
 				    (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
@@ -370,6 +395,10 @@
 				  (fftwf_free input)
 				  (fftwf_free output))))))
 
+			  (do0
+			   (ImTui_ImplText_Shutdown)
+			   (ImTui_ImplNcurses_Shutdown))
+			  
 			  )
 
 			 (iio_context_destroy ctx)

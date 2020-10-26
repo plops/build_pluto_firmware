@@ -11,7 +11,7 @@ LD=${CROSS}ld
 # model name      : ARMv7 Processor rev 0 (v7l)
 # Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpd32 
 # Hardware        : Xilinx Zynq Platform
-GUI_INCLUDES=-I/home/martin/src/imtui/examples/ncurses0/.. -I/home/martin/src/imtui/src/../include -I/home/martin/src/imtui/third-party/imgui 
+GUI_INCLUDES=-I/home/martin/src/imtui/examples/ncurses0/.. -I/home/martin/src/imtui/src/../include -I/home/martin/src/imtui/third-party/imgui -I/home/martin/src/imtui/third-party/imgui/imgui
 
 CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
@@ -38,7 +38,7 @@ LDFLAGS= \
 -Wl,--print-gc-sections \
 --sysroot=${SDK} \
 -L${SDK}/usr/lib \
--liio -lfftw3f -lm
+-liio -lfftw3f -lm -lncurses
 
 #-L${SDK}/lib \
 #-L${SDK}/usr/lib \

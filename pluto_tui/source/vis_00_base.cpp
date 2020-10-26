@@ -4,6 +4,9 @@
 #include "globals.h"
 
 extern State state;
+#include "imtui-demo.h"
+#include "imtui/imtui-impl-ncurses.h"
+#include "imtui/imtui.h"
 #include <array>
 #include <chrono>
 #include <complex>
@@ -27,12 +30,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "ca212b6bc071b038f06b14f68fb0a3ecb5b2dc27";
+  state._code_version = "52e665028d4d0e8cea8d5125b17d8b87979e221e";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "23:31:54 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "00:27:42 of Tuesday, 2020-10-27 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -91,6 +94,10 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  auto screen = ImTui_ImplNcurses_Init(true);
+  ImTui_ImplText_Init();
   auto ctx = iio_create_default_context();
   auto major = uint(0);
   auto minor = uint(0);
@@ -223,6 +230,18 @@ int main(int argc, char **argv) {
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
+  bool demo = true;
+  while (true) {
+    ImTui_ImplNcurses_NewFrame();
+    ImTui_ImplText_NewFrame();
+    ImGui::NewFrame();
+    ImGui::Begin("hello world");
+    ImGui::End();
+    ImTui::ShowDemoWindow(&demo);
+    ImGui::Render();
+    ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+    ImTui_ImplNcurses_DrawScreen();
+  }
   for (auto j = 0; (j) < (100); (j) += (1)) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
@@ -266,6 +285,8 @@ int main(int argc, char **argv) {
   fftwf_destroy_plan(plan);
   fftwf_free(input);
   fftwf_free(output);
+  ImTui_ImplText_Shutdown();
+  ImTui_ImplNcurses_Shutdown();
   iio_context_destroy(ctx);
   return 0;
 }
