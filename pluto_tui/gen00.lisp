@@ -234,6 +234,12 @@
 		       ;;https://analogdevicesinc.github.io/libiio/master/libiio/index.html
 		       (let ((ctx (iio_create_default_context)))
 			 (do0
+			  (let ((major (uint 0))
+				(minor (uint 0))
+				(git_tag))
+			    (declare (type (array char 8) git_tag))
+			    (iio_library_get_version &major &minor git_tag)
+			   ,(logprint "" `(major minor git_tag)))
 			  (unless ctx
 			    ,(logprint "create_default" `(ctx)))
 			  ,(logprint ""
@@ -256,7 +262,9 @@
 			    ,(logprint "" `(n_chan))
 			    ,@(loop for e in `(ch_i ch_q) and i from 0 collect
 				    `(let ((,e (iio_device_get_channel rx ,i)))
-				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e))))))
+				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
+			    (iio_channel_enable ch_i)
+			    (iio_channel_enable ch_q))
 
 			  )
 

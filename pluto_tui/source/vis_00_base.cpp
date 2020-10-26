@@ -24,12 +24,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "8a53dbe0ae56d047762b4fff0f5db49c93f498da";
+  state._code_version = "a50a2113dd898d99a8afb7c361c0404289456b64";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:59:40 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "19:06:26 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -89,6 +89,19 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
   auto ctx = iio_create_default_context();
+  auto major = uint(0);
+  auto minor = uint(0);
+  char git_tag[8];
+  iio_library_get_version(&major, &minor, git_tag);
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" major='") << (major) << ("'") << (std::setw(8))
+      << (" minor='") << (minor) << ("'") << (std::setw(8)) << (" git_tag='")
+      << (git_tag) << ("'") << (std::endl) << (std::flush);
   if (!(ctx)) {
 
     (std::cout) << (std::setw(10))
@@ -178,6 +191,8 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_channel_get_attrs_count(ch_q)='")
       << (iio_channel_get_attrs_count(ch_q)) << ("'") << (std::endl)
       << (std::flush);
+  iio_channel_enable(ch_i);
+  iio_channel_enable(ch_q);
   iio_context_destroy(ctx);
   return 0;
 }
