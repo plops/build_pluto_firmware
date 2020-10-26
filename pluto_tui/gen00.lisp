@@ -273,7 +273,8 @@
 				    (static_cast<fftw_complex*> (fftw_malloc (* nbuf (sizeof fftw_complex)))))
 				  (output 
 				    (static_cast<fftw_complex*> (fftw_malloc (* nbuf (sizeof fftw_complex)))))
-				  (plan (fftw_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_ESTIMATE))
+				  (plan (fftw_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
+							  ))
 				  (rxbuf (iio_device_create_buffer rx nbuf false))
 				  (sample_and_compute_start
 				    (dot ("std::chrono::high_resolution_clock::now")
@@ -339,7 +340,7 @@
 				     ,(logprint "" `(compute_perc
 						     sample_perc
 						     compute_samp_dur
-						     (sizeof fftw_complex)
+						     ;(sizeof fftw_complex)
 					;rate_MSamp_per_sec dur nbytes nbuf
 						     )))
 				 

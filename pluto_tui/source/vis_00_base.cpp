@@ -27,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "1680da61806f05dbaf1cf0496ff997623a51eb9e";
+  state._code_version = "dc4123a4292d7b612e921258595c33bf030bb97a";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "22:28:01 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "22:34:25 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -201,8 +201,7 @@ int main(int argc, char **argv) {
       fftw_malloc(((nbuf) * (sizeof(fftw_complex)))));
   auto output = static_cast<fftw_complex *>(
       fftw_malloc(((nbuf) * (sizeof(fftw_complex)))));
-  auto plan =
-      fftw_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_ESTIMATE);
+  auto plan = fftw_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_MEASURE);
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -245,9 +244,7 @@ int main(int argc, char **argv) {
                 << (compute_perc) << ("'") << (std::setw(8))
                 << (" sample_perc='") << (sample_perc) << ("'")
                 << (std::setw(8)) << (" compute_samp_dur='")
-                << (compute_samp_dur) << ("'") << (std::setw(8))
-                << (" sizeof(fftw_complex)='") << (sizeof(fftw_complex))
-                << ("'") << (std::endl) << (std::flush);
+                << (compute_samp_dur) << ("'") << (std::endl) << (std::flush);
   }
   fftw_destroy_plan(plan);
   fftw_free(input);

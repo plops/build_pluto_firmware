@@ -6,8 +6,14 @@ SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnuea
 CXX=${CROSS}g++
 LD=${CROSS}ld
 
-#-Og -g3 -ggdb 
-CXXFLAGS= -O2 \
+#-Og -g3 -ggdb
+
+# model name      : ARMv7 Processor rev 0 (v7l)
+# Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpd32 
+# Hardware        : Xilinx Zynq Platform
+
+
+CXXFLAGS= -O3 -ffast-math -funsafe-math-optimizations -mfpu=neon \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \
