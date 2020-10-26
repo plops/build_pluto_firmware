@@ -269,7 +269,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    (let (("const nbuf" 1024)
-				  (input ("std::array<std::complex<float>,nbuf>"))
+				 ; (input ("std::array<std::complex<float>,nbuf>"))
 				  (rxbuf (iio_device_create_buffer rx nbuf false))
 				  (sample_and_compute_start
 				    (dot ("std::chrono::high_resolution_clock::now")
@@ -302,7 +302,7 @@
 				    (dot ("std::chrono::high_resolution_clock::now")
 						     (time_since_epoch)
 						     )) 
-				  (for ((= "uint8_t* p" start)
+				#+nil  (for ((= "uint8_t* p" start)
 				       (< p end)
 				       (incf p step))
 				      (let ((si (aref (reinterpret_cast<int16_t*> p) 0))

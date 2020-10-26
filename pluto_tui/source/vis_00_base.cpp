@@ -27,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "1176e86ef5bfe7cc790971f36d0cfed796b3574f";
+  state._code_version = "96a48b3d5f57105d783aae8414a6b3729dd70615";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:17:20 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "21:22:12 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -197,7 +197,6 @@ int main(int argc, char **argv) {
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
   auto const nbuf = 1024;
-  auto input = std::array<std::complex<float>, nbuf>();
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -215,12 +214,6 @@ int main(int argc, char **argv) {
     auto i = 0;
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
-    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
-      auto si = reinterpret_cast<int16_t *>(p)[0];
-      auto sq = reinterpret_cast<int16_t *>(p)[1];
-      input[i] = std::complex<float>(si, sq);
-      (i)++;
-    }
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
