@@ -270,10 +270,10 @@
 			    (iio_channel_enable rx_q)
 			    (let (("const nbuf" 1024)
 				  (input ;("std::array<std::complex<float>,nbuf>")
-				    (static_cast<fftw_complex*> (fftw_malloc (* nbuf (sizeof fftw_complex)))))
+				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				  (output 
-				    (static_cast<fftw_complex*> (fftw_malloc (* nbuf (sizeof fftw_complex)))))
-				  (plan (fftw_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
+				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				  (plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
 							  ))
 				  (rxbuf (iio_device_create_buffer rx nbuf false))
 				  (sample_and_compute_start
@@ -323,7 +323,7 @@
 					(incf i)
 				     
 					)
-				   (fftw_execute plan)
+				   (fftwf_execute plan)
 				   (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)
 							   ))
@@ -340,7 +340,7 @@
 				     ,(logprint "" `(compute_perc
 						     sample_perc
 						     compute_samp_dur
-						     ;(sizeof fftw_complex)
+						     ;(sizeof fftwf_complex)
 					;rate_MSamp_per_sec dur nbytes nbuf
 						     )))
 				 
@@ -348,9 +348,9 @@
 				   )))
 
 			      (do0
-			       (fftw_destroy_plan plan)
-			       (fftw_free input)
-			       (fftw_free output))))
+			       (fftwf_destroy_plan plan)
+			       (fftwf_free input)
+			       (fftwf_free output))))
 
 			  )
 

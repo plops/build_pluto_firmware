@@ -36,7 +36,7 @@ LDFLAGS= \
 -Wl,--print-gc-sections \
 --sysroot=${SDK} \
 -L${SDK}/usr/lib \
--liio -lfftw3 -lm
+-liio -lfftw3f -lm
 
 #-L${SDK}/lib \
 #-L${SDK}/usr/lib \

@@ -27,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "dc4123a4292d7b612e921258595c33bf030bb97a";
+  state._code_version = "90eba7a3311e4f941c71bd1ed8a7ef3b58638f01";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "22:34:25 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "22:48:15 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -197,11 +197,12 @@ int main(int argc, char **argv) {
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
   auto const nbuf = 1024;
-  auto input = static_cast<fftw_complex *>(
-      fftw_malloc(((nbuf) * (sizeof(fftw_complex)))));
-  auto output = static_cast<fftw_complex *>(
-      fftw_malloc(((nbuf) * (sizeof(fftw_complex)))));
-  auto plan = fftw_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_MEASURE);
+  auto input = static_cast<fftwf_complex *>(
+      fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
+  auto output = static_cast<fftwf_complex *>(
+      fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
+  auto plan =
+      fftwf_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_MEASURE);
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -226,7 +227,7 @@ int main(int argc, char **argv) {
       input[i][1] = sq;
       (i)++;
     }
-    fftw_execute(plan);
+    fftwf_execute(plan);
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
@@ -246,9 +247,9 @@ int main(int argc, char **argv) {
                 << (std::setw(8)) << (" compute_samp_dur='")
                 << (compute_samp_dur) << ("'") << (std::endl) << (std::flush);
   }
-  fftw_destroy_plan(plan);
-  fftw_free(input);
-  fftw_free(output);
+  fftwf_destroy_plan(plan);
+  fftwf_free(input);
+  fftwf_free(output);
   iio_context_destroy(ctx);
   return 0;
 }
