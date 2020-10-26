@@ -339,6 +339,7 @@
 				     ,(logprint "" `(compute_perc
 						     sample_perc
 						     compute_samp_dur
+						     (sizeof fftw_complex)
 					;rate_MSamp_per_sec dur nbytes nbuf
 						     )))
 				 
