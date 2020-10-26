@@ -11,8 +11,8 @@ LD=${CROSS}ld
 # model name      : ARMv7 Processor rev 0 (v7l)
 # Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpd32 
 # Hardware        : Xilinx Zynq Platform
+GUI_INCLUDES=-I/home/martin/src/imtui/examples/ncurses0/.. -I/home/martin/src/imtui/src/../include -I/home/martin/src/imtui/third-party/imgui 
 
-#-mfpu=neon
 CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
 -O3 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3 \
@@ -28,8 +28,8 @@ CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -Wno-error=sign-compare \
 -pipe \
 --sysroot=${SDK} \
--I. \
--I/mnt/chromium-master/
+${GUI_INCLUDES} \
+-I. 
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 
@@ -51,13 +51,21 @@ LDFLAGS= \
 
 all: vis
 
-LIBMEMS_FILES=libmems/iio_channel_impl.cc  libmems/iio_context_impl.cc  libmems/iio_device.cc  libmems/iio_device_impl.cc   libmems/iio_device_trigger_impl.cc  
+#LIBMEMS_FILES=libmems/iio_channel_impl.cc  libmems/iio_context_impl.cc  libmems/iio_device.cc  libmems/iio_device_impl.cc   libmems/iio_device_trigger_impl.cc  
 
 #$(shell ls libmems/*.cc | grep .cc$)
-LIBMEMS_OBJ:=$(LIBMEMS_FILES:%.cc=%.o2)
+#LIBMEMS_OBJ:=$(LIBMEMS_FILES:%.cc=%.o2)
 
 CFILES=$(shell ls *.cpp| grep .cpp$)
 OBJ:=$(CFILES:%.cpp=%.o)
+
+GUI_FILES=third-party/imgui/imgui/imgui.cpp \
+third-party/imgui/imgui/imgui_draw.cpp \
+third-party/imgui/imgui/imgui_demo.cpp \
+third-party/imgui/imgui/imgui_widgets.cpp \
+src/imtui-impl-text.cpp \
+src/imtui-impl-ncurses.cpp \
+examples/imtui-demo.cpp 
 
 
 %.o: %.cpp globals.h

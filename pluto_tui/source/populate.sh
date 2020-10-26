@@ -1,19 +1,13 @@
-wget https://chromium.googlesource.com/chromiumos/platform2/+archive/HEAD/libmems.tar.gz
-mkdir libmems/
-cd libmems
-tar xaf ../libmems.tar.gz
-cd ..
-mkdir build
-cd build
-wget https://raw.githubusercontent.com/chromium/chromium/master/build/build_config.h
-cd ..
-mkdir base
-cd base
-wget https://raw.githubusercontent.com/chromium/chromium/master/base/{optional,{stl,template}_util,macros,check,check_is_on,dcheck_is_on,immediate_crash,base_export,compiler_specific}.h
-mkdir containers
-cd containers
-wget https://raw.githubusercontent.com/chromium/chromium/master/base/containers/flat_{map,tree}.h
-cd ..
-mkdir ranges
-cd ranges
-wget https://raw.githubusercontent.com/chromium/chromium/master/base/ranges/{algorithm,functional,ranges}.h
+cd ~/src
+
+git clone https://github.com/ggerganov/imtui --recursive
+
+for i in third-party/imgui/imgui/imgui.cpp \
+third-party/imgui/imgui/imgui_draw.cpp \
+third-party/imgui/imgui/imgui_demo.cpp \
+third-party/imgui/imgui/imgui_widgets.cpp \
+src/imtui-impl-text.cpp \
+src/imtui-impl-ncurses.cpp \
+		    examples/imtui-demo.cpp ; do
+    cp /home/martin/src/imtui/$i .
+done
