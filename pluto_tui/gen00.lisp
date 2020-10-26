@@ -264,7 +264,25 @@
 				    collect
 				    `(let ((,e (iio_context_find_device ctx (string ,f))))
 				       ,(iio e)))
-			 @()
+
+			 (do0
+			  (iio_channel_enable 0)
+			  (iio_channel_enable 1)
+			  
+			  (let ((buf (iio_device_create_buffer rx
+							       1024
+							       false)))
+			    #+nil (memcpy (iio_buffer_start buf)
+					  (- (iio_buffer_end buf)
+					     (iio_buffer_start buf)))
+			    #+nil (let ((ch 0))
+			      (for ((= "void*ptr" (iio_buffer_first buf ch))
+				    (< ptr (iio_buffer_end buf))
+				    (incf ptr (iio_buffer_step)))
+				   (setf q *ptr)))
+			    (iio_channel_read_raw buf)
+			    (iio_device_refill buf)
+			    ))
 			 ))
 		      
 		      (return 0)))))
