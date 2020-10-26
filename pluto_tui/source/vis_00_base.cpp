@@ -26,12 +26,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "74a57a9ec7d62f33d0f312b967a2e515d254461b";
+  state._code_version = "890a103c0c6a92fb588831ffb38aa4ece0650ff2";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:31:57 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "19:38:17 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -195,8 +195,7 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
-  auto const nbuf = ((1024) * (256));
-  auto input = std::array<std::complex<float>, nbuf>();
+  auto const nbuf = ((1000) * (100));
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -209,6 +208,7 @@ int main(int argc, char **argv) {
     auto end = iio_buffer_end(rxbuf);
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
+    auto rate_MSamp_per_sec = (((((1.00e+3)) * (nbuf))) / (dur));
     sample_start = sample_now;
 
     (std::cout) << (std::setw(10))
@@ -217,15 +217,11 @@ int main(int argc, char **argv) {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" dur='") << (dur) << ("'")
-                << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
+                << (" ") << (std::setw(8)) << (" rate_MSamp_per_sec='")
+                << (rate_MSamp_per_sec) << ("'") << (std::setw(8)) << (" dur='")
+                << (dur) << ("'") << (std::setw(8)) << (" nbytes='") << (nbytes)
+                << ("'") << (std::setw(8)) << (" nbuf='") << (nbuf) << ("'")
                 << (std::endl) << (std::flush);
-    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
-      auto si = reinterpret_cast<int16_t *>(p)[0];
-      auto sq = reinterpret_cast<int16_t *>(p)[1];
-      input[i] = std::complex<float>(si, sq);
-      (i)++;
-    }
   }
   iio_context_destroy(ctx);
   return 0;
