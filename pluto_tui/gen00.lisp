@@ -278,7 +278,11 @@
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
-			      (let ((plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_EXHAUSTIVE ;MEASURE ;ESTIMATE
+			      (let ((plan (fftwf_plan_dft_1d nbuf input output
+							     FFTW_FORWARD
+							     ;FFTW_EXHAUSTIVE
+							     ;FFTW_MEASURE
+							     FFTW_ESTIMATE
 							     ))
 				    (plan_end (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
@@ -316,27 +320,28 @@
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
 					  )
 				 
-				  
-				      (setf compute_start
-					    (dot ("std::chrono::high_resolution_clock::now")
-						 (time_since_epoch)
-						 ))
-				      ;"#pragma omp parallel"
-			              (for ((= "uint8_t* p" start)
-					    (< p end)
-					    (incf p step))
-					   (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
-						 (sq (aref (reinterpret_cast<int16_t*> p) 1))))
-					   (setf (aref (aref input i) 0)
-					      
-						 si)
-					   (setf (aref (aref input i) 1)
-					      
-						 sq)
-					   (incf i)
-				     
-					   )
-				      (fftwf_execute plan)
+				      (do0
+				       (setf compute_start
+					     (dot ("std::chrono::high_resolution_clock::now")
+						  (time_since_epoch)
+						  ))
+					;"#pragma omp parallel"
+				       "#pragma GCC ivdep"
+			               (for ((= "uint8_t* p" start)
+					     (< p end)
+					     (incf p step))
+					    (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+						  (sq (aref (reinterpret_cast<int16_t*> p) 1))))
+					    (setf (aref (aref input i) 0)
+						  
+						  si)
+					    (setf (aref (aref input i) 1)
+						  
+						  sq)
+					    (incf i)
+					    
+					    )
+				       (fftwf_execute plan))
 				      (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							      (time_since_epoch)
 							      ))
