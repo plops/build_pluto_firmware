@@ -12,8 +12,10 @@ LD=${CROSS}ld
 # Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpd32 
 # Hardware        : Xilinx Zynq Platform
 
-
-CXXFLAGS= -O3 -ffast-math -funsafe-math-optimizations -mfpu=neon \
+#-mfpu=neon
+CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
+-mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
+-O3 -ffast-math -funsafe-math-optimizations -mfpu=neon \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \

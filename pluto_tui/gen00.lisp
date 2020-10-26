@@ -269,88 +269,98 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    (let (("const nbuf" 1024)
-				  (input ;("std::array<std::complex<float>,nbuf>")
-				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
-				  (output 
-				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
-				  (plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
-							  ))
-				  (rxbuf (iio_device_create_buffer rx nbuf false))
-				  (sample_and_compute_start
-				    (dot ("std::chrono::high_resolution_clock::now")
-						     (time_since_epoch)
-						     ))
-				  (sample_start sample_and_compute_start)
-				  (compute_start sample_and_compute_start))
-			      (do0
-			       (dotimes (j 100)
+				   (input ;("std::array<std::complex<float>,nbuf>")
+				     (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				   (output 
+				     (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
+					    (time_since_epoch)
+					    )))
+			      (let ((plan (fftwf_plan_dft_1d nbuf input output FFTW_FORWARD FFTW_MEASURE ;ESTIMATE
+							     ))
+				    (plan_end (dot ("std::chrono::high_resolution_clock::now")
+					    (time_since_epoch)
+					    ))
+				    (plan_duration (dot (- plan_end plan_start)
+							(count))))
+				,(logprint "" `(plan_duration))
+			       (let (
+				     (rxbuf (iio_device_create_buffer rx nbuf false))
+				     (sample_and_compute_start
+				       (dot ("std::chrono::high_resolution_clock::now")
+					    (time_since_epoch)
+					    ))
+				     (sample_start sample_and_compute_start)
+				     (compute_start sample_and_compute_start))
+				 (do0
+				  (dotimes (j 100)
 				
-				 (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
+				    (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
+							    (time_since_epoch)
+							    ))
+				    (let (
+					  (nbytes (iio_buffer_refill rxbuf))
+					  (time_now (dot ("std::chrono::high_resolution_clock::now")
 							 (time_since_epoch)
 							 ))
-				 (let (
-				       (nbytes (iio_buffer_refill rxbuf))
-				       (time_now (dot ("std::chrono::high_resolution_clock::now")
-						      (time_since_epoch)
-						      ))
-				       (sample_dur (dot (- time_now
-							   sample_start)
-							(count)))
-				       (step (iio_buffer_step rxbuf))
-				       (end (iio_buffer_end rxbuf))
-				       (start (static_cast<uint8_t*>
-					       (iio_buffer_first rxbuf rx_i)))
-				       (i 0)
+					  (sample_dur (dot (- time_now
+							      sample_start)
+							   (count)))
+					  (step (iio_buffer_step rxbuf))
+					  (end (iio_buffer_end rxbuf))
+					  (start (static_cast<uint8_t*>
+						  (iio_buffer_first rxbuf rx_i)))
+					  (i 0)
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
-				       )
+					  )
 				 
 				  
-				   (setf compute_start
-					 (dot ("std::chrono::high_resolution_clock::now")
-					      (time_since_epoch)
-					      )) 
-			           (for ((= "uint8_t* p" start)
-					 (< p end)
-					 (incf p step))
-					(let ((si (aref (reinterpret_cast<int16_t*> p) 0))
-					      (sq (aref (reinterpret_cast<int16_t*> p) 1))))
-					(setf (aref (aref input i) 0)
+				      (setf compute_start
+					    (dot ("std::chrono::high_resolution_clock::now")
+						 (time_since_epoch)
+						 )) 
+			              (for ((= "uint8_t* p" start)
+					    (< p end)
+					    (incf p step))
+					   (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+						 (sq (aref (reinterpret_cast<int16_t*> p) 1))))
+					   (setf (aref (aref input i) 0)
 					      
-					      si)
-					(setf (aref (aref input i) 1)
+						 si)
+					   (setf (aref (aref input i) 1)
 					      
-					      sq)
-					(incf i)
+						 sq)
+					   (incf i)
 				     
-					)
-				   (fftwf_execute plan)
-				   (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
-							   (time_since_epoch)
-							   ))
-					 (compute_dur (dot (- compute_end compute_start)
-							   (count)))
-					 (compute_samp_dur (dot (- compute_end
-								   sample_start)
-								(count)))
-					 (compute_perc (/ (* 100 compute_dur)
-							  compute_samp_dur))
-					 (sample_perc (/ (* 100 sample_dur)
-							 compute_samp_dur)))
+					   )
+				      (fftwf_execute plan)
+				      (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
+							      (time_since_epoch)
+							      ))
+					    (compute_dur (dot (- compute_end compute_start)
+							      (count)))
+					    (compute_samp_dur (dot (- compute_end
+								      sample_start)
+								   (count)))
+					    (compute_perc (/ (* 100 compute_dur)
+							     compute_samp_dur))
+					    (sample_perc (/ (* 100 sample_dur)
+							    compute_samp_dur)))
 
-				     ,(logprint "" `(compute_perc
-						     sample_perc
-						     compute_samp_dur
-						     ;(sizeof fftwf_complex)
+					,(logprint "" `(compute_perc
+							sample_perc
+							compute_samp_dur
+					;(sizeof fftwf_complex)
 					;rate_MSamp_per_sec dur nbytes nbuf
-						     )))
+							)))
 				 
 
-				   )))
+				      )))
 
-			      (do0
-			       (fftwf_destroy_plan plan)
-			       (fftwf_free input)
-			       (fftwf_free output))))
+				 (do0
+				  (fftwf_destroy_plan plan)
+				  (fftwf_free input)
+				  (fftwf_free output))))))
 
 			  )
 

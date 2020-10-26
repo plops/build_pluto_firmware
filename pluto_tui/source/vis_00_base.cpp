@@ -27,12 +27,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "90eba7a3311e4f941c71bd1ed8a7ef3b58638f01";
+  state._code_version = "b199430804f23d5b0e006a386540e2f2203d177b";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "22:48:15 of Monday, 2020-10-26 (GMT+1)";
+  state._code_generation_time = "23:07:20 of Monday, 2020-10-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -201,8 +201,20 @@ int main(int argc, char **argv) {
       fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
   auto output = static_cast<fftwf_complex *>(
       fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
+  auto plan_start =
+      std::chrono::high_resolution_clock::now().time_since_epoch();
   auto plan =
       fftwf_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_MEASURE);
+  auto plan_end = std::chrono::high_resolution_clock::now().time_since_epoch();
+  auto plan_duration = ((plan_end) - (plan_start)).count();
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" plan_duration='") << (plan_duration) << ("'")
+      << (std::endl) << (std::flush);
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
