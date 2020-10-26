@@ -15,7 +15,7 @@ LD=${CROSS}ld
 #-mfpu=neon
 CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
--O3 -ffast-math -funsafe-math-optimizations -mfpu=neon \
+-O3 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3 \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \

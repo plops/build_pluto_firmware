@@ -283,7 +283,7 @@
 					    ))
 				    (plan_duration (dot (- plan_end plan_start)
 							(count))))
-				,(logprint "" `(plan_duration))
+				,(logprint "" `(nbuf plan_duration (* 8 (sizeof fftwf_complex))))
 			       (let (
 				     (rxbuf (iio_device_create_buffer rx nbuf false))
 				     (sample_and_compute_start
