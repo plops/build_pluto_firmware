@@ -446,3 +446,8 @@ https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py
 
 - enable fftw-single and optimize for speed
 
+#+begin_example
+cd /home/martin/src/plutosdr-fw/buildroot/output/build/ncurses-6.1
+./configure --target=arm-buildroot-linux-gnueabihf --host=arm-buildroot-linux-gnueabihf --build=x86_64-pc-linux-gnu --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --localstatedir=/var --program-prefix= --disable-gtk-doc --disable-gtk-doc-html --disable-doc --disable-docs --disable-documentation --with-xmlto=no --with-fop=no --disable-dependency-tracking --enable-ipv6 --disable-nls --disable-static --enable-shared --without-cxx --without-cxx-binding --without-ada --without-tests --disable-big-core --without-profile --disable-rpath --disable-rpath-hack --enable-echo --enable-const --enable-overwrite --enable-pc-files --disable-stripping --with-pkg-config-libdir=/usr/lib/pkgconfig --without-progs --without-manpages --with-shared --without-normal --without-gpm --without-debug
+
+#+end_example
