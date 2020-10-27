@@ -231,7 +231,7 @@
 			      (logprint ""
 					`(,(g e))))
 
-		      (do0
+		      #+nil (do0
 		       (IMGUI_CHECKVERSION)
 		       (ImGui--CreateContext)
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
@@ -369,9 +369,9 @@
 							     compute_samp_dur))
 					    (sample_perc (/ (* 100 sample_dur)
 							    compute_samp_dur)))
+					
 
-
-					(do0 
+				#+nil	(do0 
 			       (ImTui_ImplNcurses_NewFrame)
 			       (ImTui_ImplText_NewFrame)
 			       (do0
@@ -393,6 +393,8 @@
 			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
 			       (ImTui_ImplNcurses_DrawScreen)
 			       )
+					 (<< std--cout (string-u8 "▒▓▒▓▒▓▒▓")
+				     std--endl)
 					
 					#+nil ,(logprint "" `(compute_perc
 							sample_perc
@@ -402,13 +404,13 @@
 				 
 
 				      )))
-
+				
 				 (do0
 				  (fftwf_destroy_plan plan)
 				  (fftwf_free input)
 				  (fftwf_free output))))))
 
-			  (do0
+			  #+nil (do0
 			   (ImTui_ImplText_Shutdown)
 			   (ImTui_ImplNcurses_Shutdown))
 			  
