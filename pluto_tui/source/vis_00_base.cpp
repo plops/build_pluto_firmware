@@ -30,12 +30,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "52e665028d4d0e8cea8d5125b17d8b87979e221e";
+  state._code_version = "be3a1e572ec990e05f89670b624194be190f6ab9";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "00:27:42 of Tuesday, 2020-10-27 (GMT+1)";
+  state._code_generation_time = "16:41:51 of Tuesday, 2020-10-27 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -232,17 +232,6 @@ int main(int argc, char **argv) {
   auto compute_start = sample_and_compute_start;
   bool demo = true;
   while (true) {
-    ImTui_ImplNcurses_NewFrame();
-    ImTui_ImplText_NewFrame();
-    ImGui::NewFrame();
-    ImGui::Begin("hello world");
-    ImGui::End();
-    ImTui::ShowDemoWindow(&demo);
-    ImGui::Render();
-    ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
-    ImTui_ImplNcurses_DrawScreen();
-  }
-  for (auto j = 0; (j) < (100); (j) += (1)) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
@@ -269,18 +258,18 @@ int main(int argc, char **argv) {
     auto compute_samp_dur = ((compute_end) - (sample_start)).count();
     auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" compute_perc='")
-                << (compute_perc) << ("'") << (std::setw(8))
-                << (" sample_perc='") << (sample_perc) << ("'")
-                << (std::setw(8)) << (" compute_samp_dur='")
-                << (compute_samp_dur) << ("'") << (std::endl) << (std::flush);
+    ImTui_ImplNcurses_NewFrame();
+    ImTui_ImplText_NewFrame();
+    ImGui::NewFrame();
+    ImGui::SetNextWindowPos(ImVec2(4, 2), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2((50.f), (10.f)), ImGuiCond_Once);
+    ImGui::Begin("hello world");
+    ImGui::Text("%lld", compute_perc);
+    ImGui::End();
+    ImTui::ShowDemoWindow(&demo);
+    ImGui::Render();
+    ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+    ImTui_ImplNcurses_DrawScreen();
   }
   fftwf_destroy_plan(plan);
   fftwf_free(input);

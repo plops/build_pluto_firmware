@@ -312,20 +312,10 @@
 				 (do0
 				  (do0
 			"bool demo = true;"
-			(while true
-			       (ImTui_ImplNcurses_NewFrame)
-			       (ImTui_ImplText_NewFrame)
-			       (ImGui--NewFrame)
-			       (ImGui--Begin (string "hello world"))
-			       (ImGui--End)
-			       (ImTui--ShowDemoWindow &demo)
-			       (ImGui--Render)
-			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
-			       (ImTui_ImplNcurses_DrawScreen)
-			       ))
+			)
 				  
-				  (dotimes (j 100)
-				
+				  (while true ;dotimes (j 100)
+				    
 				    (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
 							    (time_since_epoch)
 							    ))
@@ -380,11 +370,29 @@
 					    (sample_perc (/ (* 100 sample_dur)
 							    compute_samp_dur)))
 
-					,(logprint "" `(compute_perc
+
+					(do0 
+			       (ImTui_ImplNcurses_NewFrame)
+			       (ImTui_ImplText_NewFrame)
+			       (do0
+				(ImGui--NewFrame)
+				(ImGui--SetNextWindowPos (ImVec2 4 2)
+							 ImGuiCond_Once)
+				(ImGui--SetNextWindowSize (ImVec2 50s0 10s0)
+							  ImGuiCond_Once)
+				(ImGui--Begin (string "hello world"))
+				,@(loop for e in `(compute_perc "%lld") (ImGui--Text (string "%lld")  compute_perc))
+				(ImGui--End))
+			       (ImTui--ShowDemoWindow &demo)
+			       (ImGui--Render)
+			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
+			       (ImTui_ImplNcurses_DrawScreen)
+			       )
+					
+					#+nil ,(logprint "" `(compute_perc
 							sample_perc
 							compute_samp_dur
-					;(sizeof fftwf_complex)
-					;rate_MSamp_per_sec dur nbytes nbuf
+					
 							)))
 				 
 
