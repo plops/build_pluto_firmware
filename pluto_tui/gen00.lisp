@@ -242,11 +242,12 @@
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
 			 (ImTui_ImplText_Init) )
 		       )
-		      (let ((wstr (curly 9474 "L'\0'")))
-			(declare (type (array wchar_t 2) wstr))
-			(mvaddwstr 0 0 wstr)
-			(refresh))
-		      (do0
+		      (while true
+		       (let ((wstr (curly 9474 "L'\0'")))
+			 (declare (type (array wchar_t 2) wstr))
+			 (mvaddwstr 0 0 wstr)
+			 (refresh)))
+		      #+nil(do0
 		       #+nil(let ((rxcfg (stream_cfg)))
 			 ,@(loop for (e f) in `((bw_hz (MHz 2))
 						(fs_hz (MHz 2.5))

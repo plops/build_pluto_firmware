@@ -39,7 +39,7 @@ LDFLAGS= \
 -Wl,--print-gc-sections \
 --sysroot=${SDK} \
 -L${SDK}/usr/lib \
--liio -lfftw3f -lm -lncurses
+-liio -lfftw3f -lm -lncursesw
 
 #-L${SDK}/lib \
 #-L${SDK}/usr/lib \

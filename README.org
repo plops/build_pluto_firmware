@@ -448,6 +448,21 @@ https://github.com/analogdevicesinc/pyadi-iio/blob/master/adi/ad936x.py
 
 #+begin_example
 cd /home/martin/src/plutosdr-fw/buildroot/output/build/ncurses-6.1
-./configure --target=arm-buildroot-linux-gnueabihf --host=arm-buildroot-linux-gnueabihf --build=x86_64-pc-linux-gnu --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --localstatedir=/var --program-prefix= --disable-gtk-doc --disable-gtk-doc-html --disable-doc --disable-docs --disable-documentation --with-xmlto=no --with-fop=no --disable-dependency-tracking --enable-ipv6 --disable-nls --disable-static --enable-shared --without-cxx --without-cxx-binding --without-ada --without-tests --disable-big-core --without-profile --disable-rpath --disable-rpath-hack --enable-echo --enable-const --enable-overwrite --enable-pc-files --disable-stripping --with-pkg-config-libdir=/usr/lib/pkgconfig --without-progs --without-manpages --with-shared --without-normal --without-gpm --without-debug
+./configure --target=arm-buildroot-linux-gnueabihf --host=arm-buildroot-linux-gnueabihf --build=x86_64-pc-linux-gnu \
+  --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --localstatedir=/var --program-prefix= --disable-gtk-doc \
+  --disable-gtk-doc-html --disable-doc --disable-docs --disable-documentation --with-xmlto=no --with-fop=no \
+  --disable-dependency-tracking --enable-ipv6 --disable-nls --disable-static --enable-shared --without-cxx \
+  --without-cxx-binding --without-ada --without-tests --disable-big-core --without-profile --disable-rpath \
+  --disable-rpath-hack --enable-echo --enable-const --enable-overwrite --enable-pc-files --disable-stripping \
+  --with-pkg-config-libdir=/usr/lib/pkgconfig --without-progs --without-manpages --with-shared --without-normal \
+  --without-gpm --without-debug
+
+[martin@localhost ncurses-6.1]$ ./configure --help|grep char
+  --enable-widec          compile with wide-char/UTF-8 code
+  --with-ccharw-max=XXX   override size CCHARW_MAX
+  --enable-signed-char    compile using signed Boolean's in term.h
 
 #+end_example
+
+- it should have --enable-widec but i don't see this here
+- look how BR2_PACKAGE_NCURSES_WCHAR propagates through buildroot
