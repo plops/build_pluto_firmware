@@ -29,7 +29,8 @@ CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -pipe \
 --sysroot=${SDK} \
 ${GUI_INCLUDES} \
--I. 
+-I. \
+-D_GNU_SOURCE -D_DEFAULT_SOURCE
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 

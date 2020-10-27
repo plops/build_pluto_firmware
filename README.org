@@ -330,7 +330,7 @@ master
 #+begin_example
 source ~/stage/build_pluto_firmware/set.sh
 unset LD_LIBRARY_PATH
-# try to enable ncurses on target
+# try to enable ncurses on target, enable wide char support (for images)
 make -C buildroot ARCH=arm menuconfig
 make -C buildroot savedefconfig
 make

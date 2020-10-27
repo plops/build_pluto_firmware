@@ -7,6 +7,9 @@ extern State state;
 #include "imtui-demo.h"
 #include "imtui/imtui-impl-ncurses.h"
 #include "imtui/imtui.h"
+#include "locale.h"
+#include "ncurses.h"
+#include "wchar.h"
 #include <array>
 #include <chrono>
 #include <complex>
@@ -30,12 +33,13 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "27ec45a02bbe728459d9f44512758fd84a07cec8";
+  setlocale(LC_ALL, "");
+  state._code_version = "6df5241630e7a37b500c77cb6b8faf9366df869f";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:24:40 of Tuesday, 2020-10-27 (GMT+1)";
+  state._code_generation_time = "21:05:55 of Tuesday, 2020-10-27 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -94,6 +98,13 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  auto screen = ImTui_ImplNcurses_Init(true);
+  ImTui_ImplText_Init();
+  wchar_t wstr[2] = {9474, L'0'};
+  mvaddwstr(0, 0, wstr);
+  refresh();
   auto ctx = iio_create_default_context();
   auto major = uint(0);
   auto minor = uint(0);
@@ -254,11 +265,27 @@ int main(int argc, char **argv) {
     auto compute_samp_dur = ((compute_end) - (sample_start)).count();
     auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
-    (std::cout) << (u8"(▒▓▒▓▒▓▒▓)") << (std::endl);
+    ImTui_ImplNcurses_NewFrame();
+    ImTui_ImplText_NewFrame();
+    ImGui::NewFrame();
+    ImGui::SetNextWindowPos(ImVec2(4, 2), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2((50.f), (10.f)), ImGuiCond_Once);
+    ImGui::Begin("pluto rx");
+    ImGui::Text("compute_perc     : %2lld%%", compute_perc);
+    ImGui::Text("sample_perc      : %2lld%%", sample_perc);
+    ImGui::Text("compute_samp_dur : %lld ns", compute_samp_dur);
+    ImGui::Text(u8"(▒▓)");
+    ImGui::End();
+    ImTui::ShowDemoWindow(&demo);
+    ImGui::Render();
+    ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+    ImTui_ImplNcurses_DrawScreen();
   }
   fftwf_destroy_plan(plan);
   fftwf_free(input);
   fftwf_free(output);
+  ImTui_ImplText_Shutdown();
+  ImTui_ImplNcurses_Shutdown();
   iio_context_destroy(ctx);
   return 0;
 }

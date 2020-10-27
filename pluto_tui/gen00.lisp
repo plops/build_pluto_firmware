@@ -164,6 +164,10 @@
 		      (include "imtui/imtui.h"
 			       "imtui/imtui-impl-ncurses.h"
 			       "imtui-demo.h")
+
+		      (include "wchar.h"
+			       "locale.h"
+			       "ncurses.h")
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -194,6 +198,7 @@
 			       (values int))
 
 		      (do0
+		       (setlocale LC_ALL (string ""))
 		       (setf ,(g `_code_version)
                              (string ,(let ((str (with-output-to-string (s)
                                                    (sb-ext:run-program "/usr/bin/git" (list "rev-parse" "HEAD") :output s))))
@@ -231,13 +236,16 @@
 			      (logprint ""
 					`(,(g e))))
 
-		      #+nil (do0
+		      #-nil (do0
 		       (IMGUI_CHECKVERSION)
 		       (ImGui--CreateContext)
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
 			 (ImTui_ImplText_Init) )
 		       )
-
+		      (let ((wstr (curly 9474 "L'\0'")))
+			(declare (type (array wchar_t 2) wstr))
+			(mvaddwstr 0 0 wstr)
+			(refresh))
 		      (do0
 		       #+nil(let ((rxcfg (stream_cfg)))
 			 ,@(loop for (e f) in `((bw_hz (MHz 2))
@@ -371,7 +379,7 @@
 							    compute_samp_dur)))
 					
 
-				#+nil	(do0 
+					(do0 
 			       (ImTui_ImplNcurses_NewFrame)
 			       (ImTui_ImplText_NewFrame)
 			       (do0
@@ -393,7 +401,7 @@
 			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
 			       (ImTui_ImplNcurses_DrawScreen)
 			       )
-					 (<< std--cout (string-u8 "▒▓▒▓▒▓▒▓")
+					 #+nil (<< std--cout (string-u8 "▒▓▒▓▒▓▒▓")
 				     std--endl)
 					
 					#+nil ,(logprint "" `(compute_perc
@@ -410,7 +418,7 @@
 				  (fftwf_free input)
 				  (fftwf_free output))))))
 
-			  #+nil (do0
+			  #-nil (do0
 			   (ImTui_ImplText_Shutdown)
 			   (ImTui_ImplNcurses_Shutdown))
 			  
