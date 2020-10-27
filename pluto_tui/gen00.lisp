@@ -386,6 +386,7 @@
 						       (compute_samp_dur "%lld ns"))
 					collect
 					`(ImGui--Text (string ,(format nil "~17a: ~a" e f))  ,e))
+				(ImGui--Text (string-u8 "▒▓"))
 				(ImGui--End))
 			       (ImTui--ShowDemoWindow &demo)
 			       (ImGui--Render)

@@ -30,12 +30,12 @@ using namespace std::chrono_literals;
 // implementation
 State state;
 int main(int argc, char **argv) {
-  state._code_version = "c345e1ae8698d6f301187b5bf17db2b5955af4f6";
+  state._code_version = "9ec148cd0350e6025463a11baeeafae413d76634";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:40:28 of Tuesday, 2020-10-27 (GMT+1)";
+  state._code_generation_time = "19:18:36 of Tuesday, 2020-10-27 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -267,6 +267,7 @@ int main(int argc, char **argv) {
     ImGui::Text("compute_perc     : %2lld%%", compute_perc);
     ImGui::Text("sample_perc      : %2lld%%", sample_perc);
     ImGui::Text("compute_samp_dur : %lld ns", compute_samp_dur);
+    ImGui::Text(u8"(▒▓)");
     ImGui::End();
     ImTui::ShowDemoWindow(&demo);
     ImGui::Render();
