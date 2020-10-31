@@ -297,7 +297,7 @@
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				  (output 
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
-				  (aoutput ("std::array<float,nbuf>"))
+				  (aoutput ("std::array<std::array<float,nbuf>,8>"))
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
@@ -370,11 +370,11 @@
 						  )
 					     (fftwf_execute plan)
 					     (dotimes (i nbuf)
-					       (setf (aref aoutput i) (std--log (+ (* (aref (aref output i) 0)
-										      (aref (aref output i) 0))
-										   (* (aref (aref output i) 1)
-										      (aref (aref output i) 1))
-										   )))))
+					       (setf (aref (aref aoutput (% count 8)) i) (std--log (+ (* (aref (aref output i) 0)
+													 (aref (aref output i) 0))
+												      (* (aref (aref output i) 1)
+													 (aref (aref output i) 1))
+												      )))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 								    (time_since_epoch)
 								    ))
@@ -398,7 +398,7 @@
 						 ,(logprint "" `(compute_perc
 								    sample_perc
 								    compute_samp_dur
-								    (* (/ 255 15.2) (deref (std--max_element (dot aoutput (begin))
+								    #+nil (* (/ 255 15.2) (deref (std--max_element (dot aoutput (begin))
 												   (dot aoutput (end)))))
 					
 								    ))
