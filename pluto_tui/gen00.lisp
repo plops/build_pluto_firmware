@@ -166,7 +166,7 @@
 			       "imtui/imtui-impl-ncurses.h"
 			       "imtui-demo.h")
 
-		      (include "wchar.h"
+		      #+nil (include "wchar.h"
 			       "locale.h"
 			       "ncurses.h")
 		      
@@ -243,21 +243,13 @@
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
 			 (ImTui_ImplText_Init) )
 		       )
-		      (let ((count 0))
-			(while true
-			       (incf count)
-			      ;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
-			      ;; https://en.wikipedia.org/wiki/ANSI_escape_code
-			       (unless (% count 12)
-				 (usleep 16000)
-				 (<< std--cout (string "\\x1b[H\\x1b[J")))
-			      (<< std--cout count std--endl)
-			     
-			      #+nil (let ((wstr (curly 9474 "L'\0'")))
+
+		      #+nil (let ((wstr (curly 9474 "L'\0'")))
 				      (declare (type (array wchar_t 2) wstr))
 				      (mvaddwstr 0 0 wstr)
-				      (refresh))))
-		      #+nil(do0
+				      (refresh))
+		      
+		      (do0
 		       #+nil(let ((rxcfg (stream_cfg)))
 			 ,@(loop for (e f) in `((bw_hz (MHz 2))
 						(fs_hz (MHz 2.5))
@@ -300,7 +292,7 @@
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    (let (("const nbuf" 1024)
+			    (let (("const nbuf" 320)
 				   (input ;("std::array<std::complex<float>,nbuf>")
 				     (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				   (output 
@@ -310,9 +302,9 @@
 					    )))
 			      (let ((plan (fftwf_plan_dft_1d nbuf input output
 							     FFTW_FORWARD
-							     ;FFTW_EXHAUSTIVE
-							     ;FFTW_MEASURE
-							     FFTW_ESTIMATE
+					;FFTW_EXHAUSTIVE
+					;FFTW_MEASURE
+					FFTW_ESTIMATE
 							     ))
 				    (plan_end (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
@@ -332,97 +324,108 @@
 				  (do0
 			"bool demo = true;"
 			)
-				  
-				  (while true ;dotimes (j 100)
+				  (let ((count 0))
+				   (while true ;dotimes (j 100)
 				    
-				    (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
-							    (time_since_epoch)
-							    ))
-				    (let (
-					  (nbytes (iio_buffer_refill rxbuf))
-					  (time_now (dot ("std::chrono::high_resolution_clock::now")
-							 (time_since_epoch)
-							 ))
-					  (sample_dur (dot (- time_now
-							      sample_start)
-							   (count)))
-					  (step (iio_buffer_step rxbuf))
-					  (end (iio_buffer_end rxbuf))
-					  (start (static_cast<uint8_t*>
-						  (iio_buffer_first rxbuf rx_i)))
-					  (i 0)
+					  (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
+								  (time_since_epoch)
+								  ))
+					  (let (
+						(nbytes (iio_buffer_refill rxbuf))
+						(time_now (dot ("std::chrono::high_resolution_clock::now")
+							       (time_since_epoch)
+							       ))
+						(sample_dur (dot (- time_now
+								    sample_start)
+								 (count)))
+						(step (iio_buffer_step rxbuf))
+						(end (iio_buffer_end rxbuf))
+						(start (static_cast<uint8_t*>
+							(iio_buffer_first rxbuf rx_i)))
+						(i 0)
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
-					  )
+						)
 				 
-				      (do0
-				       (setf compute_start
-					     (dot ("std::chrono::high_resolution_clock::now")
-						  (time_since_epoch)
-						  ))
+					    (do0
+					     (setf compute_start
+						   (dot ("std::chrono::high_resolution_clock::now")
+							(time_since_epoch)
+							))
 					;"#pragma omp parallel"
-				       "#pragma GCC ivdep"
-			               (for ((= "uint8_t* p" start)
-					     (< p end)
-					     (incf p step))
-					    (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
-						  (sq (aref (reinterpret_cast<int16_t*> p) 1))))
-					    (setf (aref (aref input i) 0)
+					     "#pragma GCC ivdep"
+					     (for ((= "uint8_t* p" start)
+						   (< p end)
+						   (incf p step))
+						  (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+							(sq (aref (reinterpret_cast<int16_t*> p) 1))))
+						  (setf (aref (aref input i) 0)
 						  
-						  si)
-					    (setf (aref (aref input i) 1)
+							si)
+						  (setf (aref (aref input i) 1)
 						  
-						  sq)
-					    (incf i)
+							sq)
+						  (incf i)
 					    
-					    )
-				       (fftwf_execute plan))
-				      (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
-							      (time_since_epoch)
-							      ))
-					    (compute_dur (dot (- compute_end compute_start)
-							      (count)))
-					    (compute_samp_dur (dot (- compute_end
-								      sample_start)
-								   (count)))
-					    (compute_perc (/ (* 100 compute_dur)
-							     compute_samp_dur))
-					    (sample_perc (/ (* 100 sample_dur)
-							    compute_samp_dur)))
+						  )
+					     (fftwf_execute plan))
+					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
+								    (time_since_epoch)
+								    ))
+						  (compute_dur (dot (- compute_end compute_start)
+								    (count)))
+						  (compute_samp_dur (dot (- compute_end
+									    sample_start)
+									 (count)))
+						  (compute_perc (/ (* 100 compute_dur)
+								   compute_samp_dur))
+						  (sample_perc (/ (* 100 sample_dur)
+								  compute_samp_dur)))
 					
-
-				#+gui	(do0 
-			       (ImTui_ImplNcurses_NewFrame)
-			       (ImTui_ImplText_NewFrame)
-			       (do0
-				(ImGui--NewFrame)
-				(ImGui--SetNextWindowPos (ImVec2 4 2)
-							 ImGuiCond_Once)
-				(ImGui--SetNextWindowSize (ImVec2 50s0 10s0)
-							  ImGuiCond_Once)
-				(ImGui--Begin (string "pluto rx"))
-				,@(loop for (e f) in `((compute_perc "%2lld%%")
-						       (sample_perc "%2lld%%")
-						       (compute_samp_dur "%lld ns"))
-					collect
-					`(ImGui--Text (string ,(format nil "~17a: ~a" e f))  ,e))
-				(ImGui--Text (string-u8 "▒▓"))
-				(ImGui--End))
-			       (ImTui--ShowDemoWindow &demo)
-			       (ImGui--Render)
-			       (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
-			       (ImTui_ImplNcurses_DrawScreen)
-			       )
-					 #+nil (<< std--cout (string-u8 "▒▓▒▓▒▓▒▓")
-				     std--endl)
+					      (do0
+						(incf count)
+						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
+						;; https://en.wikipedia.org/wiki/ANSI_escape_code
+						(unless (% count 12)
+						  (usleep 8000)
+						  (<< std--cout (string "\\x1b[H\\x1b[J")))
+						 ,(logprint "" `(compute_perc
+								    sample_perc
+								    compute_samp_dur
+								    (aref (aref output 0) 0)
 					
-					#+nil ,(logprint "" `(compute_perc
-							sample_perc
-							compute_samp_dur
+								    ))
+						 ;(<< std--cout count std--endl)
+					  
+						)
+					      #+gui	(do0 
+							 (ImTui_ImplNcurses_NewFrame)
+							 (ImTui_ImplText_NewFrame)
+							 (do0
+							  (ImGui--NewFrame)
+							  (ImGui--SetNextWindowPos (ImVec2 4 2)
+										   ImGuiCond_Once)
+							  (ImGui--SetNextWindowSize (ImVec2 50s0 10s0)
+										    ImGuiCond_Once)
+							  (ImGui--Begin (string "pluto rx"))
+							  ,@(loop for (e f) in `((compute_perc "%2lld%%")
+										 (sample_perc "%2lld%%")
+										 (compute_samp_dur "%lld ns"))
+								  collect
+								  `(ImGui--Text (string ,(format nil "~17a: ~a" e f))  ,e))
+							  (ImGui--Text (string-u8 "▒▓"))
+							  (ImGui--End))
+							 (ImTui--ShowDemoWindow &demo)
+							 (ImGui--Render)
+							 (ImTui_ImplText_RenderDrawData (ImGui--GetDrawData) screen)
+							 (ImTui_ImplNcurses_DrawScreen)
+							 )
+					      #+nil (<< std--cout (string-u8 "▒▓▒▓▒▓▒▓")
+							std--endl)
 					
-							)))
+					     )
 				 
 
-				      )))
+					    ))))
 				
 				 (do0
 				  (fftwf_destroy_plan plan)
