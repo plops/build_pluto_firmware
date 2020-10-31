@@ -31,12 +31,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "3398c018a9475b82284cb03edea15f04590feca8";
+  state._code_version = "210ff9e66c09a7a09f1db347b00c7dea181b55b7";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "15:26:09 of Saturday, 2020-10-31 (GMT+1)";
+  state._code_generation_time = "15:31:10 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -95,8 +95,11 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
+  auto count = 0;
   while (true) {
-    (std::cout) << ("");
+    (count)++;
+    (std::cout) << ("\x1b[H\x1b[J");
+    (std::cout) << (count);
   }
   return 0;
 }

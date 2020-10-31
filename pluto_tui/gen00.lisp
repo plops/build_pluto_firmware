@@ -242,13 +242,18 @@
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
 			 (ImTui_ImplText_Init) )
 		       )
-		      (while true
-			     (<< std--cout (string ""))
+		      (let ((count 0))
+			(while true
+			       (incf count)
+			      ;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
+			      ;; https://en.wikipedia.org/wiki/ANSI_escape_code
+			      (<< std--cout (string "\\x1b[H\\x1b[J"))
+			      (<< std--cout count)
 			     
-		      #+nil (let ((wstr (curly 9474 "L'\0'")))
-			 (declare (type (array wchar_t 2) wstr))
-			 (mvaddwstr 0 0 wstr)
-			 (refresh)))
+			      #+nil (let ((wstr (curly 9474 "L'\0'")))
+				      (declare (type (array wchar_t 2) wstr))
+				      (mvaddwstr 0 0 wstr)
+				      (refresh))))
 		      #+nil(do0
 		       #+nil(let ((rxcfg (stream_cfg)))
 			 ,@(loop for (e f) in `((bw_hz (MHz 2))
@@ -465,8 +470,8 @@
 		      )
 		     (do0
 		      "// implementation"
-		      (include "vis_00_base.hpp")
-		      (include "vis_01_complex.hpp")
+		      (include "vis_01_simple.hpp")
+		      (include "vis_02_complex.hpp")
 		      ))
 
 
@@ -674,7 +679,7 @@
 		      )
 		     (do0
 		      "// implementation"
-		      (include "vis_00_base.hpp")
+		      (include "vis_01_simple.hpp")
 		      ))
 
 
