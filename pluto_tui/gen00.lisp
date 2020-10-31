@@ -160,7 +160,7 @@
 			       <fftw3.h>
 					;<omp.h>
 			       <unistd.h>
-			       )
+			       <algorithm>)
 
 		      #+gui (include "imtui/imtui.h"
 			       "imtui/imtui-impl-ncurses.h"
@@ -293,10 +293,11 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    (let (("const nbuf" 320)
-				   (input ;("std::array<std::complex<float>,nbuf>")
-				     (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
-				   (output 
-				     (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				  (input ;("std::array<std::complex<float>,nbuf>")
+				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				  (output 
+				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
+				  (aoutput ("std::array<float,nbuf>"))
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
@@ -367,7 +368,13 @@
 						  (incf i)
 					    
 						  )
-					     (fftwf_execute plan))
+					     (fftwf_execute plan)
+					     (dotimes (i nbuf)
+					       (setf (aref aoutput i) (std--log (+ (* (aref (aref output i) 0)
+										      (aref (aref output i) 0))
+										   (* (aref (aref output i) 1)
+										      (aref (aref output i) 1))
+										   )))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 								    (time_since_epoch)
 								    ))
@@ -391,7 +398,8 @@
 						 ,(logprint "" `(compute_perc
 								    sample_perc
 								    compute_samp_dur
-								    (aref (aref output 0) 0)
+								    (* (/ 255 15.2) (deref (std--max_element (dot aoutput (begin))
+												   (dot aoutput (end)))))
 					
 								    ))
 						 ;(<< std--cout count std--endl)

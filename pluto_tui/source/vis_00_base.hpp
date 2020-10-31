@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 ;
+#include <algorithm>
 #include <array>
 #include <complex>
 #include <fftw3.h>
