@@ -415,7 +415,7 @@
 								    #+nil (* (/ 255 15.2) (deref (std--max_element (dot aoutput (begin))
 												   (dot aoutput (end)))))
 					
-								    ))
+								    )) 
 						 ;(<< std--cout count std--endl)
 					  
 						)
