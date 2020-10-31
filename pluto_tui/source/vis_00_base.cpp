@@ -31,12 +31,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "2832854d51445fd101f6481aa337b1266ef4c390";
+  state._code_version = "11965ca67ab0e29ad105831c79323749809eb6f7";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:16:46 of Saturday, 2020-10-31 (GMT+1)";
+  state._code_generation_time = "19:43:06 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
-  auto const nbuf = ((200) * (4));
+  auto const nbuf = ((128) * (4));
   auto input = static_cast<fftwf_complex *>(
       fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
   auto output = static_cast<fftwf_complex *>(
@@ -253,7 +253,7 @@ int main(int argc, char **argv) {
     fftwf_execute(plan);
     for (auto i = 0; (i) < (nbuf); (i) += (1)) {
       auto v = std::min((255.f),
-                        ((((255) / ((15.f)))) *
+                        ((((255) / ((18.f)))) *
                          (std::log(((((output[i][0]) * (output[i][0]))) +
                                     (((output[i][1]) * (output[i][1]))))))));
       uoutput[((0) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
@@ -268,11 +268,10 @@ int main(int argc, char **argv) {
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
     (count)++;
     if ((0) == (count % 8)) {
-      usleep(16000);
-      emit_image(uoutput, nbuf, 8);
+      emit_image(uoutput, ((nbuf) / (2)), 8, ((nbuf) / (2)));
+      emit_image(uoutput, ((nbuf) / (2)), 8, 0);
     }
     if ((0) == (count % ((8) * (30)))) {
-      usleep(16000);
       (std::cout) << ("\x1b[H");
     }
   }

@@ -293,7 +293,7 @@
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    (let (("const nbuf" (* 200 4))
+			    (let (("const nbuf" (* 128 4))
 				  (input ;("std::array<std::complex<float>,nbuf>")
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				  (output 
@@ -373,7 +373,7 @@
 						  )
 					     (fftwf_execute plan)
 					     (dotimes (i nbuf)
-					       (let ((v (std--min 255s0 (* (/ 255 15s0) (std--log (+ (* (aref (aref output i) 0)
+					       (let ((v (std--min 255s0 (* (/ 255 18s0) (std--log (+ (* (aref (aref output i) 0)
 											 (aref (aref output i) 0))
 										      (* (aref (aref output i) 1)
 											 (aref (aref output i) 1))
@@ -400,13 +400,15 @@
 					       (incf count)
 
 					       (when (== 0 (% count 8))
-						 (usleep 16000)
+						 ;(usleep 2000)
 						 
-						 (emit_image uoutput nbuf 8))
+						 (emit_image uoutput (/ nbuf 2) 8 (/ nbuf 2))
+						 (emit_image uoutput (/ nbuf 2) 8 0)
+						 )
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
 						(when (== 0 (% count (* 8 30)))
-						  (usleep 16000)
+						  ;(usleep 16000)
 						  (<< std--cout ;(string "\\x1b[H\\x1b[J")
 						      (string "\\x1b[H")))
 						 #+nil ,(logprint "" `(compute_perc
@@ -522,9 +524,9 @@
 					 ))
 
 		(defun createCharData_simple (img w h x0 y0 codepoint pattern
-					      )
+					      xoffset)
 		  (declare (type uint8_t* img)
-			   (type int w h x0 y0 codepoint pattern)
+			   (type int w h x0 y0 codepoint pattern xoffset)
 			   (values CharData))
 		  (let ((result (CharData codepoint))
 			(fg_count (* 4 4))
@@ -536,13 +538,13 @@
 		       (dotimes (x 4)
 			 (dotimes (i 3)
 			   (incf (aref avg i)
-				 (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y)))))))))))
+				 (aref img (+ i (* 3 (+ x0 x xoffset (* w (+ y0 y)))))))))))
 		    (let ((*avg1 (result.fgColor.data)))
 		     (dotimes (y 4)
 		       (dotimes (x 4)
 			 (dotimes (i 3)
 			   (incf (aref avg1 i)
-				 (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y 4)))))))))))
+				 (aref img (+ i (* 3 (+ x0 x xoffset (* w (+ y0 y 4)))))))))))
 		    (do0 (comments "average color for each bucket")
 			 
 			 (dotimes (i 3)
@@ -614,9 +616,9 @@
 		     (<< std--cout (static_cast<char> (logior #x80 (logand codepoint #x3f))))
 		     return)
 		   (<< std--cerr (string "error")))
-		 (defun emit_image (img w h)
+		 (defun emit_image (img w h xoffset)
 		   (declare (type uint8_t* img)
-			    (type int w h))
+			    (type int w h xoffset))
 		   (let ((lastCharData (CharData 0)))
 		     (for ((= "int y" 0)
 			   (<= y (- h 8))
@@ -625,7 +627,7 @@
 				(<= x (- w 4))
 				(incf x 4))
 			       (let ((charData
-				      (findCharData img w h x y)
+				      (findCharData img w h x y xoffset)
 				      #+nil (createCharData_simple img w h x y (hex #x2584) (hex #x0000ffff))))
 				 (when (or (== 0 x)
 					   (!= charData.bgColor
@@ -650,7 +652,7 @@
 			      std--endl)
 			  ))))
 
-		    
+		    #+nil
 		    (defun main2 (argc argv
 				 )
 		      (declare (type int argc)
@@ -820,10 +822,10 @@
 				   ))))
 		    (return result)))
 
-		(defun findCharData (img w h x0 y0 )
+		(defun findCharData (img w h x0 y0 xoffset)
 		  (declare (values CharData)
 			   (type uint8_t* img)
-			   (type int w h x0 y0))
+			   (type int w h x0 y0 xoffset))
 		  (let ((min (curly 255 255 255))
 			(max (curly  0 0 0))
 			(count_per_color ("std::map<long,int>")))
@@ -834,7 +836,7 @@
 		       (dotimes (x 4)
 			 (let ((color 0))
 			   (dotimes (i 3)
-			     (let ((d (static_cast<int> (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y)))))))))
+			     (let ((d (static_cast<int> (aref img (+ i (* 3 (+ x0 x xoffset (* w (+ y0 y)))))))))
 			       (setf (aref min i)
 				     (std--min (aref min i)
 					       d))
@@ -886,7 +888,7 @@
 					 (c2 (logand (>> max_count_color2
 							 shift)
 						     255))
-					 (c (aref img (+ i (* 3 (+ x0 x
+					 (c (aref img (+ i (* 3 (+ x0 x xoffset
 								   (* w (+ y0 y))) ))))
 					 )
 				     (incf d1 (* (- c1 c)
@@ -915,7 +917,7 @@
 				    (setf bits (<< bits 1))
 				    (when (< splitValue
 					     (aref img (+ splitIndex
-							  (* 3 (+ x0 x
+							  (* 3 (+ x0 x xoffset
 								  (* w (+ y0 y)))))))
 				      (setf bits (logior 1 bits)))))))))))
 
