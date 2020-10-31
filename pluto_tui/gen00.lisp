@@ -373,14 +373,14 @@
 						  )
 					     (fftwf_execute plan)
 					     (dotimes (i nbuf)
-					       (let ((v (* (/ 255 15s0) (std--log (+ (* (aref (aref output i) 0)
-										 (aref (aref output i) 0))
-									      (* (aref (aref output i) 1)
-										 (aref (aref output i) 1))
-									      )))))
+					       (let ((v (std--min 255s0 (* (/ 255 15s0) (std--log (+ (* (aref (aref output i) 0)
+											 (aref (aref output i) 0))
+										      (* (aref (aref output i) 1)
+											 (aref (aref output i) 1))
+										      ))))))
 						(setf ;(aref (aref aoutput (% count 8)) i)
 						 (aref uoutput (+ 0 (* 3 (+ i (* nbuf (% count 8)))))) v
-						 (aref uoutput (+ 1 (* 3 (+ i (* nbuf (% count 8)))))) v
+						 (aref uoutput (+ 1 (* 3 (+ i (* nbuf (% count 8)))))) (- 255 v)
 						 (aref uoutput (+ 2 (* 3 (+ i (* nbuf (% count 8)))))) v
 						 ))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
@@ -400,7 +400,7 @@
 					       (incf count)
 
 					       (when (== 0 (% count 8))
-						 (usleep 16000)
+						 ;(usleep 16000)
 						 (emit_image uoutput nbuf 8))
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
