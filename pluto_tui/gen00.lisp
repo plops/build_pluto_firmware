@@ -595,7 +595,7 @@
 		 
 
 		 (defun emitCodepoint (codepoint)
-		   (declare (type int codepoint)
+		   (declare (type int codepoint) 
 			    )
 		   (when (< codepoint 128)
 		     (<< std--cout (static_cast<char> codepoint))
