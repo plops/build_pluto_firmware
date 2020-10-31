@@ -16,6 +16,8 @@
 #include <math.h>
 #include <unistd.h>
 ;
+#include "vis_01_simple.hpp"
+;
 // header;
 int main(int argc, char **argv);
 #endif

@@ -162,6 +162,7 @@
 			       <unistd.h>
 			       <algorithm>)
 
+		      (include "vis_01_simple.hpp")
 		      #+gui (include "imtui/imtui.h"
 			       "imtui/imtui-impl-ncurses.h"
 			       "imtui-demo.h")
@@ -297,10 +298,12 @@
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				  (output 
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
-				  (aoutput ("std::array<std::array<float,nbuf>,8>"))
+				  ;(aoutput ("std::array<std::array<float,nbuf>,8>"))
+				  (uoutput)
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
+			      (declare (type (array uint8_t (* 3 8 320)) uoutput))
 			      (let ((plan (fftwf_plan_dft_1d nbuf input output
 							     FFTW_FORWARD
 					;FFTW_EXHAUSTIVE
@@ -370,11 +373,16 @@
 						  )
 					     (fftwf_execute plan)
 					     (dotimes (i nbuf)
-					       (setf (aref (aref aoutput (% count 8)) i) (std--log (+ (* (aref (aref output i) 0)
-													 (aref (aref output i) 0))
-												      (* (aref (aref output i) 1)
-													 (aref (aref output i) 1))
-												      )))))
+					       (let ((v (std--log (+ (* (aref (aref output i) 0)
+								 (aref (aref output i) 0))
+							      (* (aref (aref output i) 1)
+								 (aref (aref output i) 1))
+							      ))))
+						(setf ;(aref (aref aoutput (% count 8)) i)
+						 (aref uoutput (+ 0 (* 3 (+ i (* 320 (% count 8)))))) v
+						 (aref uoutput (+ 1 (* 3 (+ i (* 320 (% count 8)))))) v
+						 (aref uoutput (+ 2 (* 3 (+ i (* 320 (% count 8)))))) v
+						 ))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 								    (time_since_epoch)
 								    ))
@@ -389,13 +397,16 @@
 								  compute_samp_dur)))
 					
 					      (do0
-						(incf count)
+					       (incf count)
+
+					       (when (== 0 (% count 8))
+						 (emit_image uoutput 320 8))
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
-						(unless (% count 12)
+						(when (== 0 (% count (* 8 12)))
 						  (usleep 8000)
 						  (<< std--cout (string "\\x1b[H\\x1b[J")))
-						 ,(logprint "" `(compute_perc
+						 #+nil ,(logprint "" `(compute_perc
 								    sample_perc
 								    compute_samp_dur
 								    #+nil (* (/ 255 15.2) (deref (std--max_element (dot aoutput (begin))

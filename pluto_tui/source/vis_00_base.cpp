@@ -4,6 +4,7 @@
 #include "globals.h"
 
 extern State state;
+#include "vis_01_simple.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -30,12 +31,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "5e2bf7f7bf460ecc612081898edacf945edff2c8";
+  state._code_version = "b9eaddece048c55c7041f51431c027d40eef6baf";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:40:12 of Saturday, 2020-10-31 (GMT+1)";
+  state._code_generation_time = "18:51:46 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -204,7 +205,7 @@ int main(int argc, char **argv) {
       fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
   auto output = static_cast<fftwf_complex *>(
       fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
-  auto aoutput = std::array<std::array<float, nbuf>, 8>();
+  uint8_t uoutput[((3) * (8) * (320))];
   auto plan_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto plan =
@@ -251,8 +252,11 @@ int main(int argc, char **argv) {
     }
     fftwf_execute(plan);
     for (auto i = 0; (i) < (nbuf); (i) += (1)) {
-      aoutput[count % 8][i] = std::log(((((output[i][0]) * (output[i][0]))) +
-                                        (((output[i][1]) * (output[i][1])))));
+      auto v = std::log(((((output[i][0]) * (output[i][0]))) +
+                         (((output[i][1]) * (output[i][1])))));
+      uoutput[((0) + (((3) * (((i) + (((320) * (count % 8))))))))] = v;
+      uoutput[((1) + (((3) * (((i) + (((320) * (count % 8))))))))] = v;
+      uoutput[((2) + (((3) * (((i) + (((320) * (count % 8))))))))] = v;
     }
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -261,22 +265,13 @@ int main(int argc, char **argv) {
     auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
     (count)++;
-    if (!(count % 12)) {
+    if ((0) == (count % 8)) {
+      emit_image(uoutput, 320, 8);
+    }
+    if ((0) == (count % ((8) * (12)))) {
       usleep(8000);
       (std::cout) << ("\x1b[H\x1b[J");
     }
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" compute_perc='")
-                << (compute_perc) << ("'") << (std::setw(8))
-                << (" sample_perc='") << (sample_perc) << ("'")
-                << (std::setw(8)) << (" compute_samp_dur='")
-                << (compute_samp_dur) << ("'") << (std::endl) << (std::flush);
   }
   fftwf_destroy_plan(plan);
   fftwf_free(input);
