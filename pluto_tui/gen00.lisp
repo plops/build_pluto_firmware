@@ -380,7 +380,7 @@
 										      ))))))
 						(setf ;(aref (aref aoutput (% count 8)) i)
 						 (aref uoutput (+ 0 (* 3 (+ i (* nbuf (% count 8)))))) v
-						 (aref uoutput (+ 1 (* 3 (+ i (* nbuf (% count 8)))))) (- 255 v)
+						 (aref uoutput (+ 1 (* 3 (+ i (* nbuf (% count 8)))))) v
 						 (aref uoutput (+ 2 (* 3 (+ i (* nbuf (% count 8)))))) v
 						 ))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
@@ -400,13 +400,15 @@
 					       (incf count)
 
 					       (when (== 0 (% count 8))
-						 ;(usleep 16000)
+						 (usleep 16000)
+						 
 						 (emit_image uoutput nbuf 8))
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
 						(when (== 0 (% count (* 8 30)))
 						  (usleep 16000)
-						  (<< std--cout (string "\\x1b[H\\x1b[J")))
+						  (<< std--cout ;(string "\\x1b[H\\x1b[J")
+						      (string "\\x1b[H")))
 						 #+nil ,(logprint "" `(compute_perc
 								    sample_perc
 								    compute_samp_dur

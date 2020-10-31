@@ -31,12 +31,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "e6ecd26f62f792bb182f07b66c3b9388ca397008";
+  state._code_version = "2832854d51445fd101f6481aa337b1266ef4c390";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:04:31 of Saturday, 2020-10-31 (GMT+1)";
+  state._code_generation_time = "19:16:46 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -257,8 +257,7 @@ int main(int argc, char **argv) {
                          (std::log(((((output[i][0]) * (output[i][0]))) +
                                     (((output[i][1]) * (output[i][1]))))))));
       uoutput[((0) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
-      uoutput[((1) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] =
-          ((255) - (v));
+      uoutput[((1) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
       uoutput[((2) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
     }
     auto compute_end =
@@ -269,11 +268,12 @@ int main(int argc, char **argv) {
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
     (count)++;
     if ((0) == (count % 8)) {
+      usleep(16000);
       emit_image(uoutput, nbuf, 8);
     }
     if ((0) == (count % ((8) * (30)))) {
       usleep(16000);
-      (std::cout) << ("\x1b[H\x1b[J");
+      (std::cout) << ("\x1b[H");
     }
   }
   fftwf_destroy_plan(plan);
