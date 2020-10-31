@@ -15,6 +15,7 @@ extern State state;
 #include <iostream>
 #include <math.h>
 #include <thread>
+#include <unistd.h>
 #define MHz(x) ((long long)(x * 1000000.0 + .5))
 #define GHz(x) ((long long)(x * 1000000000.0 + .5))
 enum iodev { RX, TX };
@@ -31,12 +32,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "210ff9e66c09a7a09f1db347b00c7dea181b55b7";
+  state._code_version = "e2a2628e73f315feabd22814ab210b685be5c4c1";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "15:31:10 of Saturday, 2020-10-31 (GMT+1)";
+  state._code_generation_time = "16:28:24 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -98,8 +99,11 @@ int main(int argc, char **argv) {
   auto count = 0;
   while (true) {
     (count)++;
-    (std::cout) << ("\x1b[H\x1b[J");
-    (std::cout) << (count);
+    if (!(count % 12)) {
+      usleep(16000);
+      (std::cout) << ("\x1b[H\x1b[J");
+    }
+    (std::cout) << (count) << (std::endl);
   }
   return 0;
 }

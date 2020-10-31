@@ -158,7 +158,8 @@
 			       <math.h>
 			       <complex>
 			       <fftw3.h>
-			       ;<omp.h>
+					;<omp.h>
+			       <unistd.h>
 			       )
 
 		      #+gui (include "imtui/imtui.h"
@@ -247,8 +248,10 @@
 			       (incf count)
 			      ;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 			      ;; https://en.wikipedia.org/wiki/ANSI_escape_code
-			      (<< std--cout (string "\\x1b[H\\x1b[J"))
-			      (<< std--cout count)
+			       (unless (% count 12)
+				 (usleep 16000)
+				 (<< std--cout (string "\\x1b[H\\x1b[J")))
+			      (<< std--cout count std--endl)
 			     
 			      #+nil (let ((wstr (curly 9474 "L'\0'")))
 				      (declare (type (array wchar_t 2) wstr))

@@ -13,6 +13,7 @@
 #include <fftw3.h>
 #include <iio.h>
 #include <math.h>
+#include <unistd.h>
 ;
 #include "locale.h"
 #include "ncurses.h"
