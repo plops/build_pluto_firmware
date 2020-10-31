@@ -627,8 +627,10 @@
 				(<= x (- w 4))
 				(incf x 4))
 			       (let ((charData
-				      (findCharData img w h x y xoffset)
-				      #+nil (createCharData_simple img w h x y (hex #x2584) (hex #x0000ffff))))
+				      #+nil (findCharData img w h x y xoffset)
+				      #-nil
+				      (createCharData_simple img w h x y (hex #x2584) (hex #x0000ffff)
+							     xoffset)))
 				 (when (or (== 0 x)
 					   (!= charData.bgColor
 					       lastCharData.bgColor))
