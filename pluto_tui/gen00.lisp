@@ -293,7 +293,7 @@
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    (let (("const nbuf" 320)
+			    (let (("const nbuf" (* 200 4))
 				  (input ;("std::array<std::complex<float>,nbuf>")
 				    (static_cast<fftwf_complex*> (fftwf_malloc (* nbuf (sizeof fftwf_complex)))))
 				  (output 
@@ -303,7 +303,7 @@
 				  (plan_start (dot ("std::chrono::high_resolution_clock::now")
 					    (time_since_epoch)
 					    )))
-			      (declare (type (array uint8_t (* 3 8 320)) uoutput))
+			      (declare (type (array uint8_t (* 3 8 nbuf)) uoutput))
 			      (let ((plan (fftwf_plan_dft_1d nbuf input output
 							     FFTW_FORWARD
 					;FFTW_EXHAUSTIVE
@@ -373,15 +373,15 @@
 						  )
 					     (fftwf_execute plan)
 					     (dotimes (i nbuf)
-					       (let ((v (std--log (+ (* (aref (aref output i) 0)
-								 (aref (aref output i) 0))
-							      (* (aref (aref output i) 1)
-								 (aref (aref output i) 1))
-							      ))))
+					       (let ((v (* (/ 255 15s0) (std--log (+ (* (aref (aref output i) 0)
+										 (aref (aref output i) 0))
+									      (* (aref (aref output i) 1)
+										 (aref (aref output i) 1))
+									      )))))
 						(setf ;(aref (aref aoutput (% count 8)) i)
-						 (aref uoutput (+ 0 (* 3 (+ i (* 320 (% count 8)))))) v
-						 (aref uoutput (+ 1 (* 3 (+ i (* 320 (% count 8)))))) v
-						 (aref uoutput (+ 2 (* 3 (+ i (* 320 (% count 8)))))) v
+						 (aref uoutput (+ 0 (* 3 (+ i (* nbuf (% count 8)))))) v
+						 (aref uoutput (+ 1 (* 3 (+ i (* nbuf (% count 8)))))) v
+						 (aref uoutput (+ 2 (* 3 (+ i (* nbuf (% count 8)))))) v
 						 ))))
 					    (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 								    (time_since_epoch)
@@ -400,11 +400,12 @@
 					       (incf count)
 
 					       (when (== 0 (% count 8))
-						 (emit_image uoutput 320 8))
+						 (usleep 16000)
+						 (emit_image uoutput nbuf 8))
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
-						(when (== 0 (% count (* 8 12)))
-						  (usleep 8000)
+						(when (== 0 (% count (* 8 30)))
+						  (usleep 16000)
 						  (<< std--cout (string "\\x1b[H\\x1b[J")))
 						 #+nil ,(logprint "" `(compute_perc
 								    sample_perc
