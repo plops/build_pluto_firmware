@@ -4,9 +4,6 @@
 #include "globals.h"
 
 extern State state;
-#include "imtui-demo.h"
-#include "imtui/imtui-impl-ncurses.h"
-#include "imtui/imtui.h"
 #include "locale.h"
 #include "ncurses.h"
 #include "wchar.h"
@@ -34,12 +31,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "9d209cfb6b17db19df14878a5be81dc99c59750a";
+  state._code_version = "3398c018a9475b82284cb03edea15f04590feca8";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "22:12:52 of Tuesday, 2020-10-27 (GMT+1)";
+  state._code_generation_time = "15:26:09 of Saturday, 2020-10-31 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -98,14 +95,8 @@ int main(int argc, char **argv) {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("'") << (std::endl) << (std::flush);
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  auto screen = ImTui_ImplNcurses_Init(true);
-  ImTui_ImplText_Init();
   while (true) {
-    wchar_t wstr[2] = {9474, L'0'};
-    mvaddwstr(0, 0, wstr);
-    refresh();
+    (std::cout) << ("");
   }
   return 0;
 }

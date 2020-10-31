@@ -11,10 +11,10 @@
 
 
 
-(setf *features* (union *features* `()))
+(setf *features* (union *features* `(:gui)))
 
 (setf *features* (set-difference *features*
-				 '()))
+				 '(:gui)))
 
 (progn
   (defparameter *source-dir* #P"/home/martin/stage/build_pluto_firmware/pluto_tui/source/")
@@ -161,7 +161,7 @@
 			       ;<omp.h>
 			       )
 
-		      (include "imtui/imtui.h"
+		      #+gui (include "imtui/imtui.h"
 			       "imtui/imtui-impl-ncurses.h"
 			       "imtui-demo.h")
 
@@ -236,14 +236,16 @@
 			      (logprint ""
 					`(,(g e))))
 
-		      #-nil (do0
+		      #+gui (do0
 		       (IMGUI_CHECKVERSION)
 		       (ImGui--CreateContext)
 		       (let ((screen (ImTui_ImplNcurses_Init true)))
 			 (ImTui_ImplText_Init) )
 		       )
 		      (while true
-		       (let ((wstr (curly 9474 "L'\0'")))
+			     (<< std--cout (string ""))
+			     
+		      #+nil (let ((wstr (curly 9474 "L'\0'")))
 			 (declare (type (array wchar_t 2) wstr))
 			 (mvaddwstr 0 0 wstr)
 			 (refresh)))
@@ -380,7 +382,7 @@
 							    compute_samp_dur)))
 					
 
-					(do0 
+				#+gui	(do0 
 			       (ImTui_ImplNcurses_NewFrame)
 			       (ImTui_ImplText_NewFrame)
 			       (do0
@@ -419,7 +421,7 @@
 				  (fftwf_free input)
 				  (fftwf_free output))))))
 
-			  #-nil (do0
+			  #+gui (do0
 			   (ImTui_ImplText_Shutdown)
 			   (ImTui_ImplNcurses_Shutdown))
 			  
@@ -431,6 +433,504 @@
 		      
 		      (return 0)))))
 
+
+    (define-module
+       `(simple ()
+	      (do0
+	       
+	    
+		    (include <iostream>
+			     <chrono>
+			     <thread>
+			     <sys/mman.h>
+			     <fcntl.h>
+			     <unistd.h>
+			     <array>
+			     <bitset>
+			     <cmath>
+			     <map>
+			     )
+
+
+		    
+		    "using namespace std::chrono_literals;"
+		    " "
+
+		     (split-header-and-code
+		     (do0
+		      "// header"
+
+		      " "
+
+		      )
+		     (do0
+		      "// implementation"
+		      (include "vis_00_base.hpp")
+		      (include "vis_01_complex.hpp")
+		      ))
+
+
+	       
+  
+		(do0
+		 "uint8_t *img;"
+
+		  (defclass CharData ()
+		    "public:"
+		    (defmethod CharData (codepoint)
+		      (declare
+		       (type int codepoint)
+		       (construct (codePoint codepoint))
+		       (values :constructor)))
+		    "std::array<int,3> fgColor = std::array<int,3>{0,0,0};"
+		   "std::array<int,3> bgColor = std::array<int,3>{0,0,0};"
+					 "int codePoint;"
+		    
+					 ))
+
+		(defun createCharData_simple (img w h x0 y0 codepoint pattern
+					      )
+		  (declare (type uint8_t* img)
+			   (type int w h x0 y0 codepoint pattern)
+			   (values CharData))
+		  (let ((result (CharData codepoint))
+			(fg_count (* 4 4))
+			(bg_count (* 4 4))
+			(mask (hex #x80000000)))
+		    (declare (type "const int" fg_count bg_count))
+		    (let ((*avg (result.bgColor.data)))
+		     (dotimes (y 4)
+		       (dotimes (x 4)
+			 (dotimes (i 3)
+			   (incf (aref avg i)
+				 (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y)))))))))))
+		    (let ((*avg1 (result.fgColor.data)))
+		     (dotimes (y 4)
+		       (dotimes (x 4)
+			 (dotimes (i 3)
+			   (incf (aref avg1 i)
+				 (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y 4)))))))))))
+		    (do0 (comments "average color for each bucket")
+			 
+			 (dotimes (i 3)
+			   (setf (aref result.bgColor i)
+				 (/ (aref result.bgColor i)
+				    bg_count)
+				 ))
+			 (dotimes (i 3)
+			   (setf (aref result.fgColor i)
+				 (/ (aref result.fgColor i)
+				    fg_count)
+				 )))
+		    (return result)))
+		
+
+		(do0
+		 (defun sqr (x)
+		   (declare (values float)
+			    (type float x))
+		   (return (* x x)))
+	
+		 (defun clamp_byte (value)
+		   (declare (inline)
+			    (type int value)
+			    (values int))
+		   (if (< 0 value)
+		       (if (< value 255)
+			   (return value)
+			   (return 255))
+		       (return 0)))
+		 (defun emit_color (r g b bg)
+		   (declare (type int r g b)
+			    (type bool bg)
+			    )
+		   (if bg
+		       (<< std--cout (string
+				      "\\x1b[48;2;")
+			   r (string ";")
+			   g (string ";")
+			   b (string "m"))
+		       (<< std--cout (string
+				      "\\x1b[38;2;")
+			   r (string ";")
+			   g (string ";")
+			   b (string "m")))
+		)
+
+		 
+
+		 (defun emitCodepoint (codepoint)
+		   (declare (type int codepoint)
+			    )
+		   (when (< codepoint 128)
+		     (<< std--cout (static_cast<char> codepoint))
+		     return)
+		   (when (< codepoint 0x7ff)
+		     (<< std--cout (static_cast<char> (logior #xc0 (>> codepoint 6))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand codepoint #x3f))))
+		     return)
+		   (when (< codepoint 0xffff)
+		     (<< std--cout (static_cast<char> (logior #xe0 (>> codepoint 12))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand (>> codepoint 6) #x3f))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand codepoint #x3f))))
+		     return)
+		   (when (< codepoint 0x10ffff)
+		     (<< std--cout (static_cast<char> (logior #xf0 (>> codepoint 18))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand (>> codepoint 12) #x3f))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand (>> codepoint 6) #x3f))))
+		     (<< std--cout (static_cast<char> (logior #x80 (logand codepoint #x3f))))
+		     return)
+		   (<< std--cerr (string "error")))
+		 (defun emit_image (img w h)
+		   (declare (type uint8_t* img)
+			    (type int w h))
+		   (let ((lastCharData (CharData 0)))
+		     (for ((= "int y" 0)
+			   (<= y (- h 8))
+			   (incf y 8))
+			  (for ((= "int x" 0)
+				(<= x (- w 4))
+				(incf x 4))
+			       (let ((charData
+				      (findCharData img w h x y)
+				      #+nil (createCharData_simple img w h x y (hex #x2584) (hex #x0000ffff))))
+				 (when (or (== 0 x)
+					   (!= charData.bgColor
+					       lastCharData.bgColor))
+				   (emit_color (aref charData.bgColor 0)
+					       (aref charData.bgColor 1)
+					       (aref charData.bgColor 2)
+					       true))
+				 (when (or (== 0 x)
+					   (!= charData.fgColor
+					       lastCharData.fgColor))
+				   (emit_color (aref charData.fgColor 0)
+					       (aref charData.fgColor 1)
+					       (aref charData.fgColor 2)
+					       false))
+				 (emitCodepoint charData.codePoint)
+				 (setf lastCharData charData)
+				 
+				 )
+			       )
+			  (<< std--cout (string "\\x1b[0m")
+			      std--endl)
+			  ))))
+
+		    
+		    (defun main2 (argc argv
+				 )
+		      (declare (type int argc)
+			       (type char** argv)
+			       (values int))
+		      ;,(logprint "start" `(argc (aref argv 0)))
+		      (let ((fd (--open (string "img.raw")
+					O_RDONLY))
+			    ("const w" 300)
+			    ("const h" 200)
+			    (img (reinterpret_cast<uint8_t*>
+				  (mmap nullptr
+					(* w h 3)
+					PROT_READ
+					(logior MAP_FILE MAP_SHARED)
+					fd 0))))
+			(dotimes (i 10)
+			  (emit_image img w h))
+			(munmap img (* w h 3)
+				)
+			(--close fd)
+			)
+		      (return 0)))))
+
+    (define-module
+       `(complex (
+	       )
+	      (do0
+	       
+	    
+		    (include <iostream>
+			     <chrono>
+			     <thread>
+			     <sys/mman.h>
+			     <fcntl.h>
+			     <unistd.h>
+			     <array>
+			     <bitset>
+			     <cmath>
+			     <map>
+			     )
+
+
+		    
+		    "using namespace std::chrono_literals;"
+		    " "
+
+		     (split-header-and-code
+		     (do0
+		      "// header"
+
+		      " "
+
+		      )
+		     (do0
+		      "// implementation"
+		      (include "vis_00_base.hpp")
+		      ))
+
+
+	       
+		     #-nil
+		     ,(let ((l `((#x00000000 #x00a0)
+				       (#x0000000f #x2581) ;; lower 1/8
+				       (#x000000ff #x2582)
+			       (#x00000fff #x2583)
+			       (#x0000ffff #x2584)
+			       (#x000fffff #x2585)
+			       (#x00ffffff #x2586)
+			       (#x0fffffff #x2587)
+			       (#xeeeeeeee #x258a)
+			       (#xcccccccc #x258c)
+			       (#x88888888 #x258e)
+			       (#x0000cccc #x2596)
+			       (#x00003333 #x2597)
+			       (#xcccc0000 #x2598)
+			       (#xcccc3333 #x259a)
+			       (#x33330000 #x259d)
+			       (#x3333cccc #x259e)
+			       (#x3333ffff #x259f)
+			       (#x000ff000 #x2501)
+			       (#x66666666 #x2503)
+			       (#x00077666 #x250f)
+			       (#x000ee666 #x2513)
+			       (#x66677000 #x2517)
+			       (#x666ee000 #x251b)
+			       (#x66677666 #x2523)
+			       (#x666ee666 #x252b)
+			       (#x000ff666 #x2533)
+			       (#x666ff000 #x253b)
+			       (#x666ff666 #x254b)
+			       (#x000cc000 #x2578)
+			       (#x00066000 #x2579)
+			       (#x00033000 #x257a)
+			       (#x00066000 #x257b)
+			       (#x06600660 #x254f)
+			        (#x000f0000 #x2500)
+			        (#x0000f000 #x2500)
+			       (#x44444444 #x2502)
+			       (#x22222222 #x2502)
+			       (#x000e0000 #x2574)
+			       (#x0000e000 #x2574)
+			       (#x44440000 #x2575)
+			       (#x22220000 #x2575)
+			       (#x00030000 #x2576)
+			       (#x00003000 #x2576)
+			       (#x00004444 #x2577)
+			       (#x00002222 #x2577)
+			       (#x44444444 #x23a2)
+			       (#x22222222 #x23a5)
+			        (#x0f000000 #x23ba)
+			       (#x00f00000 #x23bb)
+			        (#x00000f00 #x23bc)
+			        (#x000000f0 #x23bd)
+			        	 (#x00066000 #x25aa)
+				 ))
+			  )
+
+		       `(do0
+			 (let ((BITMAPS (curly ,@(loop for (e f) in l
+						       appending
+						       `((hex ,e)
+							 (hex ,f)))))
+			       (BITMAPS_COUNT ,(* 2 (length l))))
+			   (declare (type (array "const unsigned int" ,(* 2 (length l))) BITMAPS)
+				    (type "const int" BITMAPS_COUNT))))
+
+		      )
+	
+
+		(defun createCharData (img w h x0 y0 codepoint pattern)
+		  (declare (type uint8_t* img)
+			   (type int w h x0 y0 codepoint pattern)
+			   (values CharData))
+		  (let ((result (CharData codepoint))
+			(fg_count 0)
+			(bg_count 0)
+			(mask (hex #x80000000)))
+		    (dotimes (y 8)
+		      (dotimes (x 4)
+			(let ((avg))
+			  (declare (type int* avg))
+			  (if (logand pattern mask)
+			      (do0 (setf avg (result.fgColor.data))
+				   (incf fg_count))
+			      (do0 (setf avg (result.bgColor.data))
+				   (incf bg_count)))
+			  (dotimes (i 3)
+			    (incf  (aref avg i)
+				  (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y)))))))
+
+			    )
+			  (setf mask (>> mask 1)))))
+		   (do0 (comments "average color for each bucket")
+			 
+			 (unless (== 0 bg_count)
+			   (dotimes (i 3)
+			     (setf (aref result.bgColor i)
+				   (/ (aref result.bgColor i)
+				      bg_count)
+				   )))
+			 (unless (== 0 fg_count)
+			   (dotimes (i 3)
+			     (setf (aref result.fgColor i)
+				   (/ (aref result.fgColor i)
+				      fg_count)
+				   ))))
+		    (return result)))
+
+		(defun findCharData (img w h x0 y0 )
+		  (declare (values CharData)
+			   (type uint8_t* img)
+			   (type int w h x0 y0))
+		  (let ((min (curly 255 255 255))
+			(max (curly  0 0 0))
+			(count_per_color ("std::map<long,int>")))
+		    (declare (type (array int 3) min max))
+		    (do0
+		     (comments "max and min value for each color channel")
+		     (dotimes (y 8)
+		       (dotimes (x 4)
+			 (let ((color 0))
+			   (dotimes (i 3)
+			     (let ((d (static_cast<int> (aref img (+ i (* 3 (+ x0 x (* w (+ y0 y)))))))))
+			       (setf (aref min i)
+				     (std--min (aref min i)
+					       d))
+			       (setf (aref max i)
+				     (std--max (aref max i)
+					       d))
+			       ;; create 32bit rgb value
+			       (setf color (logior (<< color 8)
+						   d))))
+			   (incf (aref count_per_color color))))))
+
+		    (do0
+		     (let ((color_per_count ("std::multimap<int,long>")))
+		       (for-range (;(kv :type "const auto&")
+				   ("[k,v]" :type "const auto&")
+				   count_per_color)
+				  (color_per_count.insert
+				   #+nil("std::pair<int,long>"
+				    kv->second
+				    kv->first)
+				   ("std::pair<int,long>"
+				    v k)))))
+
+		    (do0
+		     ;; what is this? some kind of histogram?
+		     (let ((iter (color_per_count.rbegin))
+			   (count2 iter->first)
+			   (max_count_color1 iter->second)
+			   (max_count_color2 max_count_color1))
+		       (unless (== "(++iter)"
+				   (color_per_count.rend))
+			 (incf count2 iter->first)
+			 (setf max_count_color2 iter->second))))
+
+		    (do0
+		     (let ((bits 0)
+			   (direct (< (/ (* 8 4) 2) count2)))
+		       (if direct
+			   (dotimes (y 8)
+			     (dotimes (x 4)
+			       (setf bits (<< bits 1))
+			       (let ((d1 0)
+				     (d2 0))
+				 (dotimes (i 3)
+				   (let ((shift (- 16 (* 8 i)))
+					 (c1 (logand (>> max_count_color1
+							 shift)
+						     255))
+					 (c2 (logand (>> max_count_color2
+							 shift)
+						     255))
+					 (c (aref img (+ i (* 3 (+ x0 x
+								   (* w (+ y0 y))) ))))
+					 )
+				     (incf d1 (* (- c1 c)
+						 (- c1 c)))
+				     (incf d2 (* (- c2 c)
+						 (- c2 c)))))
+				 (when (< d2 d1)
+				   (setf bits (logior bits 1))))))
+			   (do0
+			    (comments "determine channel with greatest range")
+			    (let ((splitIndex 0)
+				  (bestSplit 0))
+			      (dotimes (i 3)
+				(let ((delta (- (aref max i)
+						       (aref min i))))
+				 (when (< bestSplit delta)
+				   (setf bestSplit delta
+					 splitIndex i))))
+			      (comments "split at middle instead of median")
+			      (let ((splitValue
+				      (+ (aref min splitIndex)
+					 (/ bestSplit 2))))
+				(comments "bitmap using split and sum the color for both buckets")
+				(dotimes (y 8)
+				  (dotimes (x 4)
+				    (setf bits (<< bits 1))
+				    (when (< splitValue
+					     (aref img (+ splitIndex
+							  (* 3 (+ x0 x
+								  (* w (+ y0 y)))))))
+				      (setf bits (logior 1 bits)))))))))))
+
+		    (do0
+		     (comments "find the best bitmap match by counting bits that don't match, including the inverted bitmaps")
+		     (let ((best_diff (int 8))
+			   (best_pattern ("static_cast<unsigned int>" (hex #xffff)))
+			   (codepoint (hex #x2584))
+			   (inverted false))
+		       
+		       (dotimes (ii (/ BITMAPS_COUNT 2))
+			 (let ((i (* 2 ii))
+			       (pattern (aref BITMAPS i)))
+			   (dotimes (j 2)
+			     (let ((diff (int (dot (std--bitset<32>
+						(logxor pattern
+							bits))
+					       (count)))))
+			       (when (< diff best_diff)
+				 (comments "pattern might be inverted")
+				 (setf best_pattern (aref BITMAPS i)
+				       codepoint (aref BITMAPS (+ i 1))
+				       best_diff diff
+				       inverted (!= best_pattern pattern)))
+			       (setf pattern ~pattern)))
+			   ))
+		       (when direct
+			 (let ((result (CharData 0)))
+			   (when inverted
+			     (let ((tmp max_count_color1))
+			       (setf max_count_color1 max_count_color2
+				     max_count_color2 tmp))
+			     )
+			   (dotimes (i 3)
+			     (let ((shift (- 16 (* 8 i))))
+			       (setf (dot result (aref fgColor i))
+				     (logand (>> max_count_color2 shift) 255))
+			       (setf (dot result (aref bgColor i))
+				     (logand (>> max_count_color1 shift) 255))
+			       ))
+			   (setf result.codePoint codepoint)
+			   (return result)))
+		       (return (createCharData img w h x0 y0 codepoint best_pattern))
+		       ))
+		    ))
+		
+
+	)))
     
     
   )

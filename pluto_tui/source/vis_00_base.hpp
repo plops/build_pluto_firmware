@@ -14,10 +14,6 @@
 #include <iio.h>
 #include <math.h>
 ;
-#include "imtui-demo.h"
-#include "imtui/imtui-impl-ncurses.h"
-#include "imtui/imtui.h"
-;
 #include "locale.h"
 #include "ncurses.h"
 #include "wchar.h"
