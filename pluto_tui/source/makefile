@@ -28,9 +28,9 @@ CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -Wno-error=sign-compare \
 -pipe \
 --sysroot=${SDK} \
-${GUI_INCLUDES} \
 -I. \
 -D_GNU_SOURCE -D_DEFAULT_SOURCE
+# ${GUI_INCLUDES} 
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 
@@ -39,7 +39,9 @@ LDFLAGS= \
 -Wl,--print-gc-sections \
 --sysroot=${SDK} \
 -L${SDK}/usr/lib \
--liio -lfftw3f -lm -lncursesw
+-liio -lfftw3f -lm
+
+#-lncursesw
 
 #-L${SDK}/lib \
 #-L${SDK}/usr/lib \
@@ -57,7 +59,7 @@ all: vis
 #$(shell ls libmems/*.cc | grep .cc$)
 #LIBMEMS_OBJ:=$(LIBMEMS_FILES:%.cc=%.o2)
 
-CFILES=$(shell ls *.cpp| grep .cpp$)
+CFILES=$(shell ls *.cpp|grep ^vis|grep .cpp$)
 OBJ:=$(CFILES:%.cpp=%.o)
 
 GUI_FILES=third-party/imgui/imgui/imgui.cpp \
@@ -67,7 +69,7 @@ third-party/imgui/imgui/imgui_widgets.cpp \
 src/imtui-impl-text.cpp \
 src/imtui-impl-ncurses.cpp \
 examples/imtui-demo.cpp 
-
+GUI_FILES=
 
 %.o: %.cpp globals.h
 	$(CXX) -c -o $@ $< $(CXXFLAGS)

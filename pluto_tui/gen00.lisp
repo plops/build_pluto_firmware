@@ -1,4 +1,4 @@
-cd(declaim (optimize 
+(declaim (optimize 
 	  (safety 3)
 	  (speed 0)
 	  (debug 3)))
@@ -401,14 +401,15 @@ cd(declaim (optimize
 
 					       (when (== 0 (% count 8))
 						 ;(usleep 2000)
+						 #-nil (emit_image uoutput nbuf 8 0)
+						 #+nil (do0 (emit_image uoutput (/ nbuf 2) 8 (/ nbuf 2))
+							    (emit_image uoutput (/ nbuf 2) 8 0))
 						 
-						 (emit_image uoutput (/ nbuf 2) 8 (/ nbuf 2))
-						 (emit_image uoutput (/ nbuf 2) 8 0)
 						 )
 						;; https://stackoverflow.com/questions/23864446/terminal-animation-is-clearing-screen-right-approach
 						;; https://en.wikipedia.org/wiki/ANSI_escape_code
 						(when (== 0 (% count (* 8 30)))
-						  ;(usleep 16000)
+						  (usleep 16000)
 						  (<< std--cout ;(string "\\x1b[H\\x1b[J")
 						      (string "\\x1b[H")))
 						 #+nil ,(logprint "" `(compute_perc
@@ -627,8 +628,8 @@ cd(declaim (optimize
 				(<= x (- w 4))
 				(incf x 4))
 			       (let ((charData
-				      #+nil (findCharData img w h x y xoffset)
-				      #-nil
+				      #-nil (findCharData img w h x y xoffset)
+				      #+nil
 				      (createCharData_simple img w h x y (hex #x2584) (hex #x0000ffff)
 							     xoffset)))
 				 (when (or (== 0 x)
