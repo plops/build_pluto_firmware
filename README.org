@@ -187,7 +187,13 @@ device_persistent_keys
 
 - create key on pluto
 #+begin_example
-dropbearconvert dropbear openssh id_pluto2.^Copbear id_pluto2
+
+dropbearkey -f id_pluto2 -t ecdsa -s 256
+# Generating 256 bit ecdsa key, this may take a while...
+# Public key portion is:
+# ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBE5tGMUUZhn2hljzdcYE4uhJjWlYlwHtuYobpv/c8fFOmP1PyGcU+5mZyLJo6W1x7lt6DIJTVsOyTk4qwMCfbrY= root@pluto
+# Fingerprint: sha1!! ea:f7:55:0d:f8:c0:2a:91:c5:5f:3d:0c:a6:2c:3e:bd:85:a5:c3:a3
+
 # copy paste the public key into /root/.ssh/authorized_keys
 device_persistent_keys
 # copy private key to laptop and convert to openssh
