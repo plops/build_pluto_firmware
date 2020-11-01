@@ -185,6 +185,18 @@ chmod og-rwx /root/.ssh/authorized_keys
 device_persistent_keys
 #+end_example  
 
+- create key on pluto
+#+begin_example
+dropbearconvert dropbear openssh id_pluto2.^Copbear id_pluto2
+# copy paste the public key into /root/.ssh/authorized_keys
+device_persistent_keys
+# copy private key to laptop and convert to openssh
+sudo dnf install dropbear
+dropbearconvert dropbear openssh id_pluto2.dropbear id_pluto2
+
+#+end_example
+
+
 - install sdrangel
 
 #+begin_example

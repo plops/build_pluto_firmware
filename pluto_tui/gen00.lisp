@@ -1,4 +1,4 @@
-(declaim (optimize 
+cd(declaim (optimize 
 	  (safety 3)
 	  (speed 0)
 	  (debug 3)))
