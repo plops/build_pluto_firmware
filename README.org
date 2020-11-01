@@ -484,3 +484,7 @@ cd /home/martin/src/plutosdr-fw/buildroot/output/build/ncurses-6.1
 
 - it should have --enable-widec but i don't see this here
 - look how BR2_PACKAGE_NCURSES_WCHAR propagates through buildroot
+
+
+* hdl
+- installed 2019.1 vivado. seems to build the hdl file
