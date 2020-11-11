@@ -29,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "740bbc925aa67bb2646dc16eacfd2c626e3fcfed";
+  state._code_version = "0857109e804cb9df61eb394933e6cec17cd2c598";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:28:10 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "18:37:14 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -180,19 +180,13 @@ int main(int argc, char **argv) {
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
       rx_lo_freq);
-  auto rx_rate = 5000000;
-  auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
 
   (std::cout)
       << (std::setw(10))
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("'")
-      << (std::endl) << (std::flush);
-  iio_channel_attr_write_longlong(
-      iio_device_find_channel(phy, "altvoltage0", false), "sampling_frequency",
-      rx_rate);
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("get channels count..")
+      << (" ") << (std::endl) << (std::flush);
   auto n_chan = iio_device_get_channels_count(rx);
 
   (std::cout)
@@ -224,7 +218,21 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
+      << (" ") << (std::endl) << (std::flush);
   auto const nbuf = 4096;
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("create buffer")
+      << (" ") << (std::endl) << (std::flush);
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -232,6 +240,15 @@ int main(int argc, char **argv) {
   auto compute_start = sample_and_compute_start;
   auto count = 0;
   for (auto j = 0; (j) < (100); (j) += (1)) {
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("308") << (" ") << (std::setw(8)) << (" count='") << (count)
+                << ("'") << (std::endl) << (std::flush);
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
@@ -250,6 +267,18 @@ int main(int argc, char **argv) {
     auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
     (count)++;
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("374") << (" ") << (std::setw(8)) << (" count='") << (count)
+                << ("'") << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
+                << (std::setw(8)) << (" compute_perc='") << (compute_perc)
+                << ("'") << (std::setw(8)) << (" sample_perc='")
+                << (sample_perc) << ("'") << (std::endl) << (std::flush);
   }
   iio_context_destroy(ctx);
   return 0;

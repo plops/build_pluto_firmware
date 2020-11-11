@@ -275,7 +275,7 @@
 			       (string "frequency")
 			       rx_lo_freq
 			       ))
-			  (let ((rx_rate 5000000)
+			  #+nil(let ((rx_rate 5000000)
 				(rx_rate_MSps (/ rx_rate 1e6)))
 			   ;(comments "rx baseband rate 5MSPS")
 			   ,(logprint "" `(rx_rate_MSps))
@@ -286,14 +286,18 @@
 			    (string "sampling_frequency")
 			    rx_rate
 			    ))
-			  (let ((n_chan (iio_device_get_channels_count rx)))
+			  ,(logprint "get channels count..")
+			  (let ((n_chan (iio_device_get_channels_count rx))
+				)
 			    ,(logprint "" `(n_chan))
 			    ,@(loop for e in `(rx_i rx_q) and i from 0 collect
 				    `(let ((,e (iio_device_get_channel rx ,i)))
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
+			    ,(logprint "iq channels enabled")
 			    (let (("const nbuf" 4096))
+			      ,(logprint "create buffer")
 			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
 				    (sample_and_compute_start
 				      (dot ("std::chrono::high_resolution_clock::now")
@@ -304,7 +308,9 @@
 				(let ((count 0))
 				  (;;while true ;
 				   dotimes (j 100)
-				   
+
+				    ,(logprint "308" `(count))
+				    
 				   (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)
 							   ))
@@ -368,7 +374,8 @@
 				       )
 				     
 
-				     ))))
+				     )
+				    ,(logprint "374" `(count nbytes compute_perc sample_perc)))))
 			       )))
 
 			  
