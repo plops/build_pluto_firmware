@@ -275,7 +275,9 @@
 			       (string "frequency")
 			       rx_lo_freq
 			       ))
-			  (let ((rx_rate 5000000)
+			  (let ((rx_rate 61440000
+					 ;20000000
+					 )
 				(rx_rate_MSps (/ rx_rate 1e6)))
 			   ;(comments "rx baseband rate 5MSPS")
 			   ,(logprint "" `(rx_rate_MSps))
@@ -309,7 +311,7 @@
 				  (;;while true ;
 				   dotimes (j 100)
 
-				    ,(logprint "308" `(count))
+				   ; ,(logprint "308" `(count))
 				    
 				   (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)

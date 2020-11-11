@@ -29,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "c5a29260df971d3dff1f47c6159fc771a4c33218";
+  state._code_version = "e25e1bf93ee10fcce5dcd77f65b417b8b3003ee5";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:03:10 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "19:09:56 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
       rx_lo_freq);
-  auto rx_rate = 5000000;
+  auto rx_rate = 61440000;
   auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
 
   (std::cout)
@@ -253,15 +253,6 @@ int main(int argc, char **argv) {
   auto compute_start = sample_and_compute_start;
   auto count = 0;
   for (auto j = 0; (j) < (100); (j) += (1)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("308") << (" ") << (std::setw(8)) << (" count='") << (count)
-                << ("'") << (std::endl) << (std::flush);
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
