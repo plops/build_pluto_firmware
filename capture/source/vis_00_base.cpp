@@ -28,7 +28,7 @@ using namespace std::chrono_literals;
 
 // implementation
 State state;
-struct __attribute__ ((packed)) sdriq_header_t {
+struct __attribute__((packed)) sdriq_header_t {
   uint32_t samplerate;
   uint64_t center_frequency;
   uint64_t timestamp;
@@ -36,15 +36,14 @@ struct __attribute__ ((packed)) sdriq_header_t {
   uint32_t padding;
   uint32_t crc32;
 };
-typedef struct sdriq_header_t sdriq_header_t;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "385f513aadc25f3d30a94558f6962c1bd9f3c536";
+  state._code_version = "7b8b5fad991f6040bb85b7e3a20dd4e5650b4305";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:33:51 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "21:12:31 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -276,7 +275,7 @@ int main(int argc, char **argv) {
     // sdriq file format
     // https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput
     ;
-    auto header = sdriq_header_t({rx_rate, rx_lo_freq, 0, 1, 0, 0});
+    auto header = sdriq_header_t({rx_rate, rx_lo_freq, 0, 16, 0, 895232605});
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()

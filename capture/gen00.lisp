@@ -188,6 +188,16 @@
 		      ))
 		    "State state;"
 
+		    (space "struct __attribute__ ((packed)) sdriq_header_t"
+			   (progn
+			     "uint32_t samplerate;"
+			     "uint64_t center_frequency;"
+			     "uint64_t timestamp;"
+			     "uint32_t samplesize;"
+			     "uint32_t padding;"
+			     "uint32_t crc32;"))
+		    
+		    #+nil
 		    (defstruct0 sdriq_header_t 
 		      (samplerate uint32_t)
 		      (center_frequency uint64_t)
@@ -347,9 +357,10 @@
 				      (let ((header (sdriq_header_t (curly rx_rate
 									   rx_lo_freq
 									   0
-									   1
+									   16
 									   0
-									   0))))
+									   895232605  ;; crc computed with rescuesdriq
+									   ))))
 					,(logprint "" `((sizeof header)))
 					(create_server (reinterpret_cast<uint8_t*> &header)
 						       (sizeof header)
