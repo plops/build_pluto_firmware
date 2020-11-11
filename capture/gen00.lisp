@@ -187,6 +187,15 @@
 
 		      ))
 		    "State state;"
+
+		    (defstruct0 sdriq_header_t 
+		      (samplerate uint32_t)
+		      (center_frequency uint64_t)
+		      (timestamp uint64_t)
+		      (samplesize uint32_t)
+		      (padding uint32_t)
+		      (crc32 uint32_t)
+		      )
 		    
 		    (defun main (argc argv
 				 )
@@ -264,7 +273,7 @@
 				     ,(iio e)
 				     ,(logprint (format nil "~a" e)
 						`((iio_device_get_attrs_count ,e)))))
-			  (let ((rx_lo_freq 2420000000)
+			  (let ((rx_lo_freq 2420000000UL)
 				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
 			   ;(comments "rx lo freq to 2.42GHz")
 			   ,(logprint "" `(rx_lo_freq_MHz))
@@ -275,7 +284,7 @@
 			       (string "frequency")
 			       rx_lo_freq
 			       ))
-			  (let ((rx_rate 61440000
+			  (let ((rx_rate 61440000UL
 					 ;20000000
 					 )
 				(rx_rate_MSps (/ rx_rate 1e6)))
@@ -332,8 +341,18 @@
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
 					 )
 				     (do0
-			  (comments "open server and wait for client to obtain rxbuf")
-			  (create_server  start nbytes))
+				      (comments "open server and wait for client to obtain rxbuf"
+						"sdriq file format"
+						"https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput")
+				      (let ((header (sdriq_header_t (curly rx_rate
+									   rx_lo_freq
+									   0
+									   1
+									   0
+									   0))))
+					(create_server (reinterpret_cast<uint8_t*> &header)
+						       (sizeof header)
+						       start nbytes)))
 				     (do0
 				      (setf compute_start
 					    (dot ("std::chrono::high_resolution_clock::now")
@@ -408,9 +427,9 @@
 			     )
 
 		    (comments "http://www.linuxhowtos.org/data/6/server.c")
-		    (defun create_server (buf nbytes)
-		      (declare (type uint8_t* buf)
-			       (type size_t nbytes))
+		    (defun create_server (header nbytes_header buf nbytes)
+		      (declare (type uint8_t* buf header)
+			       (type size_t nbytes_header nbytes))
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
 			    (portno 1234)
 			    (server_addr "{}")
@@ -431,10 +450,15 @@
 					   &client_len)))
 			  (when (< fd1 0)
 			    ,(logprint "accept failed"))
+			  
+			  (let ((nh (write fd1 header nbytes_header)))
+			    (when (< nh 0)
+			      ,(logprint "writing header failed"))
+			    )
 			  (let ((n (write fd1 buf nbytes)))
 			    (when (< n 0)
 			      ,(logprint "write failed"))
-			    )
+			    ) 
 			  (close fd1)
 			  (close fd)
 			  ))))))

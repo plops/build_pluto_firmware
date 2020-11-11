@@ -28,14 +28,23 @@ using namespace std::chrono_literals;
 
 // implementation
 State state;
+struct sdriq_header_t {
+  uint32_t samplerate;
+  uint64_t center_frequency;
+  uint64_t timestamp;
+  uint32_t samplesize;
+  uint32_t padding;
+  uint32_t crc32;
+};
+typedef struct sdriq_header_t sdriq_header_t;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "cc1f9117807de88d4c2fbc6d648809820062e274";
+  state._code_version = "2fb250d867bd44380b78d8da4c3765de06c0a493";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:42:15 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "20:18:39 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -168,7 +177,7 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
       << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
       << (std::flush);
-  auto rx_lo_freq = 2420000000;
+  auto rx_lo_freq = 2420000000UL;
   auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
 
   (std::cout)
@@ -181,7 +190,7 @@ int main(int argc, char **argv) {
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
       rx_lo_freq);
-  auto rx_rate = 61440000;
+  auto rx_rate = 61440000UL;
   auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
 
   (std::cout)
@@ -264,8 +273,12 @@ int main(int argc, char **argv) {
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
     // open server and wait for client to obtain rxbuf
+    // sdriq file format
+    // https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput
     ;
-    create_server(start, nbytes);
+    auto header = sdriq_header_t({rx_rate, rx_lo_freq, 0, 1, 0, 0});
+    create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header), start,
+                  nbytes);
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_end =

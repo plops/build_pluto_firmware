@@ -13,7 +13,8 @@ extern State state;
 #include <unistd.h>
 // http://www.linuxhowtos.org/data/6/server.c
 ;
-void create_server(uint8_t *buf, size_t nbytes) {
+void create_server(uint8_t *header, size_t nbytes_header, uint8_t *buf,
+                   size_t nbytes) {
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
   struct sockaddr_in server_addr = {};
@@ -45,6 +46,18 @@ void create_server(uint8_t *buf, size_t nbytes) {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("accept failed") << (" ") << (std::endl) << (std::flush);
+  }
+  auto nh = write(fd1, header, nbytes_header);
+  if ((nh) < (0)) {
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("writing header failed") << (" ") << (std::endl)
+                << (std::flush);
   }
   auto n = write(fd1, buf, nbytes);
   if ((n) < (0)) {
