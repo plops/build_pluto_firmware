@@ -264,24 +264,28 @@
 				     ,(iio e)
 				     ,(logprint (format nil "~a" e)
 						`((iio_device_get_attrs_count ,e)))))
-			  (do0
-			   (comments "rx lo freq to 2.42GHz")
+			  (let ((rx_lo_freq 2420000000)
+				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
+			   ;(comments "rx lo freq to 2.42GHz")
+			   ,(logprint "" `(rx_lo_freq_MHz))
 			   (iio_channel_attr_write_longlong
 			       (iio_device_find_channel phy
 							(string "altvoltage0")
 							true)
 			       (string "frequency")
-			       2400000000
+			       rx_lo_freq
 			       ))
-			  (do0
-			   (comments "rx baseband rate 5MSPS")
+			  (let ((rx_rate 5000000)
+				(rx_rate_MSps (/ rx_rate 1e6)))
+			   ;(comments "rx baseband rate 5MSPS")
+			   ,(logprint "" `(rx_rate_MSps))
 			   (iio_channel_attr_write_longlong
-			       (iio_device_find_channel phy
-							(string "altvoltage0")
-							false)
-			       (string "sampling_frequency")
-			       5000000
-			       ))
+			    (iio_device_find_channel phy
+						     (string "altvoltage0")
+						     false)
+			    (string "sampling_frequency")
+			    rx_rate
+			    ))
 			  (let ((n_chan (iio_device_get_channels_count rx)))
 			    ,(logprint "" `(n_chan))
 			    ,@(loop for e in `(rx_i rx_q) and i from 0 collect
@@ -289,19 +293,14 @@
 				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    (let (("const nbuf" (* 128 4))
-				  )
-			      
-			     (let (
-				   (rxbuf (iio_device_create_buffer rx nbuf false))
-				   (sample_and_compute_start
-				     (dot ("std::chrono::high_resolution_clock::now")
-					  (time_since_epoch)
-					  ))
+			    (let (("const nbuf" 4096))
+			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
+				    (sample_and_compute_start
+				      (dot ("std::chrono::high_resolution_clock::now")
+					   (time_since_epoch)))
 				   (sample_start sample_and_compute_start)
 				   (compute_start sample_and_compute_start))
 			       (do0
-				
 				(let ((count 0))
 				  (;;while true ;
 				   dotimes (j 100)

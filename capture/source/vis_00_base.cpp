@@ -29,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "ecb2406977db67fa052b8fbdee2c9fc7757370f8";
+  state._code_version = "740bbc925aa67bb2646dc16eacfd2c626e3fcfed";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:19:34 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "18:28:10 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -167,16 +167,32 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
       << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
       << (std::flush);
-  // rx lo freq to 2.42GHz
-  ;
+  auto rx_lo_freq = 2420000000;
+  auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" rx_lo_freq_MHz='") << (rx_lo_freq_MHz) << ("'")
+      << (std::endl) << (std::flush);
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
-      2400000000);
-  // rx baseband rate 5MSPS
-  ;
+      rx_lo_freq);
+  auto rx_rate = 5000000;
+  auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("'")
+      << (std::endl) << (std::flush);
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", false), "sampling_frequency",
-      5000000);
+      rx_rate);
   auto n_chan = iio_device_get_channels_count(rx);
 
   (std::cout)
@@ -208,7 +224,7 @@ int main(int argc, char **argv) {
       << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
-  auto const nbuf = ((128) * (4));
+  auto const nbuf = 4096;
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
