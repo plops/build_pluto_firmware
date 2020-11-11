@@ -29,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "737301b2f63ad8eb0d7ce12274fa721b30711576";
+  state._code_version = "f783339e9702994af739724d4fe210415bb6c916";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:12:22 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "19:14:05 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -238,7 +238,7 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
       << (" ") << (std::endl) << (std::flush);
-  auto const nbuf = ((128) * (4096));
+  auto const nbuf = ((12) * (128) * (4096));
 
   (std::cout)
       << (std::setw(10))
