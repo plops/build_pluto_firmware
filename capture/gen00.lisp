@@ -298,7 +298,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 12 128 4096)))
+			    (let (("const nbuf" (* 48 64 4096)))
 			      ,(logprint "create buffer")
 			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
 				    (sample_and_compute_start
