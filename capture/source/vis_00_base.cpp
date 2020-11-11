@@ -39,12 +39,12 @@ struct sdriq_header_t {
 typedef struct sdriq_header_t sdriq_header_t;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "2fb250d867bd44380b78d8da4c3765de06c0a493";
+  state._code_version = "385f513aadc25f3d30a94558f6962c1bd9f3c536";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:18:39 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "20:33:51 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -177,7 +177,7 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
       << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
       << (std::flush);
-  auto rx_lo_freq = 2420000000UL;
+  auto rx_lo_freq = 2420000000ULL;
   auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
 
   (std::cout)
@@ -277,6 +277,15 @@ int main(int argc, char **argv) {
     // https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput
     ;
     auto header = sdriq_header_t({rx_rate, rx_lo_freq, 0, 1, 0, 0});
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
+                << (" ") << (std::setw(8)) << (" sizeof(header)='")
+                << (sizeof(header)) << ("'") << (std::endl) << (std::flush);
     create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header), start,
                   nbytes);
     compute_start =

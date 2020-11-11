@@ -273,7 +273,7 @@
 				     ,(iio e)
 				     ,(logprint (format nil "~a" e)
 						`((iio_device_get_attrs_count ,e)))))
-			  (let ((rx_lo_freq 2420000000UL)
+			  (let ((rx_lo_freq 2420000000ULL)
 				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
 			   ;(comments "rx lo freq to 2.42GHz")
 			   ,(logprint "" `(rx_lo_freq_MHz))
@@ -350,6 +350,7 @@
 									   1
 									   0
 									   0))))
+					,(logprint "" `((sizeof header)))
 					(create_server (reinterpret_cast<uint8_t*> &header)
 						       (sizeof header)
 						       start nbytes)))
