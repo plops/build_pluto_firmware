@@ -4,6 +4,7 @@
 #include "globals.h"
 
 extern State state;
+#include "vis_01_server.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -29,12 +30,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "95556483f9a4be5ea77ddc5357502d5c87117e2d";
+  state._code_version = "cc1f9117807de88d4c2fbc6d648809820062e274";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:15:13 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "19:42:15 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -262,6 +263,9 @@ int main(int argc, char **argv) {
     auto end = iio_buffer_end(rxbuf);
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
+    // open server and wait for client to obtain rxbuf
+    ;
+    create_server(start, nbytes);
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_end =

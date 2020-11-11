@@ -15,6 +15,8 @@
 #include <math.h>
 #include <unistd.h>
 ;
+#include "vis_01_server.hpp"
+;
 // header;
 int main(int argc, char **argv);
 #endif

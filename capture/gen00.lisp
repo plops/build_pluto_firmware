@@ -164,7 +164,7 @@
 
 		      
 
-		      
+		      (include "vis_01_server.hpp")
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -331,7 +331,9 @@
 					 (i 0)
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
 					 )
-				     
+				     (do0
+			  (comments "open server and wait for client to obtain rxbuf")
+			  (create_server  start nbytes))
 				     (do0
 				      (setf compute_start
 					    (dot ("std::chrono::high_resolution_clock::now")
@@ -383,11 +385,59 @@
 			  
 			  )
 
+			 
+			 
 			 (iio_context_destroy ctx)
 
 			 			 ))
 		      
 		      (return 0)))))
+
+    (define-module
+       `(server ()
+	      (do0
+	       (include <sys/types.h>
+			<sys/socket.h>
+			<netinet/in.h>
+			<unistd.h>)
+	    
+		    (include <iostream>
+			     <chrono>
+			     <thread>
+			     
+			     )
+
+		    (comments "http://www.linuxhowtos.org/data/6/server.c")
+		    (defun create_server (buf nbytes)
+		      (declare (type uint8_t* buf)
+			       (type size_t nbytes))
+		      (let ((fd (socket AF_INET SOCK_STREAM 0))
+			    (portno 1234)
+			    (server_addr "{}")
+			    (client_addr "{}"))
+			(declare (type "struct sockaddr_in" server_addr client_addr))
+			(setf server_addr.sin_family AF_INET
+			      server_addr.sin_addr.s_addr INADDR_ANY
+			      server_addr.sin_port (htons portno))
+			(when (<  (bind fd
+					("reinterpret_cast<struct sockaddr*>" &server_addr)
+					(sizeof server_addr))
+				  0)
+			  ,(logprint "bind failed"))
+			(listen fd 5)
+			(let ((client_len (sizeof client_addr))
+			      (fd1 (accept fd
+					   ("reinterpret_cast<struct sockaddr*>" &client_addr)
+					   &client_len)))
+			  (when (< fd1 0)
+			    ,(logprint "accept failed"))
+			  (let ((n (write fd1 buf nbytes)))
+			    (when (< n 0)
+			      ,(logprint "write failed"))
+			    )
+			  (close fd1)
+			  (close fd)
+			  ))))))
 
 
 
