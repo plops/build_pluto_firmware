@@ -1,0 +1,5 @@
+- i don't compute checksum
+- use the go program that comes with sdrangel 
+#+begin_example
+rescuesdriq -in o.sdriq -out bla.sdriq
+#+end_example
