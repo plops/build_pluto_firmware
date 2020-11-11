@@ -28,7 +28,7 @@ using namespace std::chrono_literals;
 
 // implementation
 State state;
-struct sdriq_header_t {
+struct __attribute__ ((packed)) sdriq_header_t {
   uint32_t samplerate;
   uint64_t center_frequency;
   uint64_t timestamp;
