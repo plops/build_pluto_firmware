@@ -488,3 +488,4 @@ cd /home/martin/src/plutosdr-fw/buildroot/output/build/ncurses-6.1
 
 * hdl
 - installed 2019.1 vivado. seems to build the hdl file
+- i can open pluto.xpr in vivado and look at the rtl schematic and the synthesis results (floor plan)

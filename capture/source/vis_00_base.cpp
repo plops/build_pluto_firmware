@@ -4,7 +4,6 @@
 #include "globals.h"
 
 extern State state;
-#include "vis_01_simple.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -30,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "ed2ceaf0447eecd3ce891cd959f2ada3c4864f72";
+  state._code_version = "ecb2406977db67fa052b8fbdee2c9fc7757370f8";
   state._code_repository =
-      "https://github.com/plops/build_pluto_firmware/tree/master/pluto_tui";
+      "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "17:50:50 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "18:19:34 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -168,6 +167,16 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
       << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
       << (std::flush);
+  // rx lo freq to 2.42GHz
+  ;
+  iio_channel_attr_write_longlong(
+      iio_device_find_channel(phy, "altvoltage0", true), "frequency",
+      2400000000);
+  // rx baseband rate 5MSPS
+  ;
+  iio_channel_attr_write_longlong(
+      iio_device_find_channel(phy, "altvoltage0", false), "sampling_frequency",
+      5000000);
   auto n_chan = iio_device_get_channels_count(rx);
 
   (std::cout)
@@ -200,34 +209,11 @@ int main(int argc, char **argv) {
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
   auto const nbuf = ((128) * (4));
-  auto input = static_cast<fftwf_complex *>(
-      fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
-  auto output = static_cast<fftwf_complex *>(
-      fftwf_malloc(((nbuf) * (sizeof(fftwf_complex)))));
-  uint8_t uoutput[((3) * (8) * (nbuf))];
-  auto plan_start =
-      std::chrono::high_resolution_clock::now().time_since_epoch();
-  auto plan =
-      fftwf_plan_dft_1d(nbuf, input, output, FFTW_FORWARD, FFTW_ESTIMATE);
-  auto plan_end = std::chrono::high_resolution_clock::now().time_since_epoch();
-  auto plan_duration = ((plan_end) - (plan_start)).count();
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" nbuf='") << (nbuf) << ("'") << (std::setw(8))
-      << (" plan_duration='") << (plan_duration) << ("'") << (std::setw(8))
-      << (" ((8)*(sizeof(fftwf_complex)))='")
-      << (((8) * (sizeof(fftwf_complex)))) << ("'") << (std::endl)
-      << (std::flush);
   auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
-  bool demo = true;
   auto count = 0;
   for (auto j = 0; (j) < (100); (j) += (1)) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -241,24 +227,6 @@ int main(int argc, char **argv) {
     auto i = 0;
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
-#pragma GCC ivdep
-    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
-      auto si = reinterpret_cast<int16_t *>(p)[0];
-      auto sq = reinterpret_cast<int16_t *>(p)[1];
-      input[i][0] = si;
-      input[i][1] = sq;
-      (i)++;
-    }
-    fftwf_execute(plan);
-    for (auto i = 0; (i) < (nbuf); (i) += (1)) {
-      auto v = std::min((255.f),
-                        ((((255) / ((18.f)))) *
-                         (std::log(((((output[i][0]) * (output[i][0]))) +
-                                    (((output[i][1]) * (output[i][1]))))))));
-      uoutput[((0) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
-      uoutput[((1) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
-      uoutput[((2) + (((3) * (((i) + (((nbuf) * (count % 8))))))))] = v;
-    }
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
@@ -266,17 +234,7 @@ int main(int argc, char **argv) {
     auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
     auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
     (count)++;
-    if ((0) == (count % 8)) {
-      emit_image(uoutput, nbuf, 8, 0);
-    }
-    if ((0) == (count % ((8) * (30)))) {
-      usleep(16000);
-      (std::cout) << ("\x1b[H");
-    }
   }
-  fftwf_destroy_plan(plan);
-  fftwf_free(input);
-  fftwf_free(output);
   iio_context_destroy(ctx);
   return 0;
 }
