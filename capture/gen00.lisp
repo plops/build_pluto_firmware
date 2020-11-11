@@ -275,13 +275,13 @@
 			       (string "frequency")
 			       rx_lo_freq
 			       ))
-			  #+nil(let ((rx_rate 5000000)
+			  (let ((rx_rate 5000000)
 				(rx_rate_MSps (/ rx_rate 1e6)))
 			   ;(comments "rx baseband rate 5MSPS")
 			   ,(logprint "" `(rx_rate_MSps))
 			   (iio_channel_attr_write_longlong
 			    (iio_device_find_channel phy
-						     (string "altvoltage0")
+						     (string "voltage0")
 						     false)
 			    (string "sampling_frequency")
 			    rx_rate

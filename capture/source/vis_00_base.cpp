@@ -29,12 +29,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "0857109e804cb9df61eb394933e6cec17cd2c598";
+  state._code_version = "c5a29260df971d3dff1f47c6159fc771a4c33218";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:37:14 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "19:03:10 of Wednesday, 2020-11-11 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -180,6 +180,19 @@ int main(int argc, char **argv) {
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
       rx_lo_freq);
+  auto rx_rate = 5000000;
+  auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
+      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("'")
+      << (std::endl) << (std::flush);
+  iio_channel_attr_write_longlong(
+      iio_device_find_channel(phy, "voltage0", false), "sampling_frequency",
+      rx_rate);
 
   (std::cout)
       << (std::setw(10))
