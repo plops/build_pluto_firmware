@@ -319,6 +319,7 @@
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
 			    (let (("const nbuf" (* 48 64 4096)
+						;4096
 						))
 			      ,(logprint "create buffer")
 			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
@@ -330,7 +331,7 @@
 			       (do0
 				(let ((count 0))
 				  (;;while true ;
-				   dotimes (j 12)
+				   dotimes (j 1)
 
 				   ; ,(logprint "308" `(count))
 				    
@@ -364,9 +365,7 @@
 									   895232605  ;; crc computed with rescuesdriq
 									   ))))
 					,(logprint "" `((sizeof header)))
-					#+nil (create_server (reinterpret_cast<uint8_t*> &header)
-						       (sizeof header)
-						       start nbytes)))
+					))
 				     (do0
 				      (setf compute_start
 					    (dot ("std::chrono::high_resolution_clock::now")
@@ -375,6 +374,7 @@
 				      (let ((ma 0)
 					    (old 0s0)
 					    (trig 0)
+					    (trig1 0)
 					    )
 				       (do0
 				       
@@ -389,18 +389,27 @@
 						   (sq (aref (reinterpret_cast<int16_t*> p) 1))
 						   (m (+ (* si si)
 							 (* sq sq)))
-						   (mlow (filter_2_low_10_real m))))
+						   (mlow (filter_2_low_01_real m))))
 					     (when (< ma mlow)
 					       (setf ma mlow))
-					     (when (and (< 4000 old)
-							      (<= mlow 4000))
+					     (when (and (< old 4000) ;; trigger on positive edge
+							(<= 4000 mlow))
 					       (setf trig i))
+					     (unless (== trig 0)
+					      (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
+							 (<= mlow 2000))
+						(setf trig1 i)))
 					     (incf i)
 					     (setf old mlow)
 					     ))
 					
-					,(logprint "" `(ma trig)))
-				      
+					,(logprint "" `(ma trig trig1)))
+				      (create_server (reinterpret_cast<uint8_t*> &header)
+						       (sizeof header)
+						       (+ (* 4 trig) start) (* 4 (- trig1 trig))
+						       #+nil (- nbytes
+									       (* 4 trig)
+									       ))
 				     )
 				     (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							     (time_since_epoch)

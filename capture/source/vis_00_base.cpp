@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "cc56aeceb6d49b30fefaffb263bf8c59af01d792";
+  state._code_version = "6d9fcbff450e743d28c0c77420f2b23004457e53";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:03:23 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "21:17:29 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
   auto count = 0;
-  for (auto j = 0; (j) < (12); (j) += (1)) {
+  for (auto j = 0; (j) < (1); (j) += (1)) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
@@ -291,17 +291,23 @@ int main(int argc, char **argv) {
     auto ma = 0;
     auto old = (0.f);
     auto trig = 0;
+    auto trig1 = 0;
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
       auto m = ((((si) * (si))) + (((sq) * (sq))));
-      auto mlow = filter_2_low_10_real(m);
+      auto mlow = filter_2_low_01_real(m);
       if ((ma) < (mlow)) {
         ma = mlow;
       }
-      if ((((4000) < (old)) && ((mlow) <= (4000)))) {
+      if ((((old) < (4000)) && ((4000) <= (mlow)))) {
         trig = i;
+      }
+      if (!((trig) == (0))) {
+        if ((((2000) < (old)) && ((mlow) <= (2000)))) {
+          trig1 = i;
+        }
       }
       (i)++;
       old = mlow;
@@ -315,7 +321,10 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
                 << (" ") << (std::setw(8)) << (" ma='") << (ma) << ("'")
                 << (std::setw(8)) << (" trig='") << (trig) << ("'")
+                << (std::setw(8)) << (" trig1='") << (trig1) << ("'")
                 << (std::endl) << (std::flush);
+    create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header),
+                  ((((4) * (trig))) + (start)), ((4) * (((trig1) - (trig)))));
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
