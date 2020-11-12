@@ -15,6 +15,7 @@ extern State state;
 #include <math.h>
 #include <thread>
 #include <unistd.h>
+#include <vector>
 #define MHz(x) ((long long)(x * 1000000.0 + .5))
 #define GHz(x) ((long long)(x * 1000000000.0 + .5))
 enum iodev { RX, TX };
@@ -39,12 +40,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "6d9fcbff450e743d28c0c77420f2b23004457e53";
+  state._code_version = "5790ec37d3d112bfad17966d2afee29457c56b4b";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:17:29 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "21:56:24 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -292,6 +293,7 @@ int main(int argc, char **argv) {
     auto old = (0.f);
     auto trig = 0;
     auto trig1 = 0;
+    auto outiq = std::vector<int16_t>();
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
@@ -301,30 +303,46 @@ int main(int argc, char **argv) {
       if ((ma) < (mlow)) {
         ma = mlow;
       }
-      if ((((old) < (4000)) && ((4000) <= (mlow)))) {
+      if ((((trig) == (0)) && ((old) < (4000)) && ((4000) <= (mlow)))) {
         trig = i;
       }
-      if (!((trig) == (0))) {
+      if ((trig) < (0)) {
+        outiq.push_back(si);
+        outiq.push_back(sq);
+        (trig)++;
+        if ((trig) == (0)) {
+          for (auto i = 0; (i) < (((16) * (4096))); (i) += (1)) {
+            outiq.push_back(0);
+            outiq.push_back(0);
+          }
+        }
+      }
+      if ((0) < (trig)) {
+        outiq.push_back(si);
+        outiq.push_back(sq);
         if ((((2000) < (old)) && ((mlow) <= (2000)))) {
           trig1 = i;
+
+          (std::cout) << (std::setw(10))
+                      << (std::chrono::high_resolution_clock::now()
+                              .time_since_epoch()
+                              .count())
+                      << (" ") << (std::this_thread::get_id()) << (" ")
+                      << (__FILE__) << (":") << (__LINE__) << (" ")
+                      << (__func__) << (" ") << ("") << (" ") << (std::setw(8))
+                      << (" ma='") << (ma) << ("'") << (std::setw(8))
+                      << (" trig='") << (trig) << ("'") << (std::setw(8))
+                      << (" trig1='") << (trig1) << ("'") << (std::endl)
+                      << (std::flush);
+          trig = -2000;
         }
       }
       (i)++;
       old = mlow;
     }
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" ma='") << (ma) << ("'")
-                << (std::setw(8)) << (" trig='") << (trig) << ("'")
-                << (std::setw(8)) << (" trig1='") << (trig1) << ("'")
-                << (std::endl) << (std::flush);
     create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header),
-                  ((((4) * (trig))) + (start)), ((4) * (((trig1) - (trig)))));
+                  reinterpret_cast<uint8_t *>(outiq.data()),
+                  ((2) * (outiq.size())));
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();

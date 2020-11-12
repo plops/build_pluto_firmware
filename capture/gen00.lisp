@@ -160,7 +160,8 @@
 			       ;<fftw3.h>
 					;<omp.h>
 			       <unistd.h>
-			       <algorithm>)
+			       <algorithm>
+			       <vector>)
 
 		      
 
@@ -375,7 +376,7 @@
 					    (old 0s0)
 					    (trig 0)
 					    (trig1 0)
-					    )
+					    (outiq (std--vector<int16_t>)))
 				       (do0
 				       
 					;"#pragma omp parallel"
@@ -392,21 +393,40 @@
 						   (mlow (filter_2_low_01_real m))))
 					     (when (< ma mlow)
 					       (setf ma mlow))
-					     (when (and (< old 4000) ;; trigger on positive edge
+					     (when (and (== trig 0)
+							(< old 4000) ;; trigger on positive edge
 							(<= 4000 mlow))
 					       (setf trig i))
-					     (unless (== trig 0)
+					     (when (< trig 0)
+					       (do0
+						(outiq.push_back si)
+						(outiq.push_back sq)
+						(incf trig)
+						(when (== trig 0)
+						  (dotimes (i (* 16 4096))
+						    (outiq.push_back 0)
+						    (outiq.push_back 0)
+						))))
+					     (when (< 0 trig)
+					       (do0
+						(outiq.push_back si)
+						(outiq.push_back sq))
 					      (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
 							 (<= mlow 2000))
-						(setf trig1 i)))
+						(setf trig1 i)
+						,(logprint "" `(ma trig trig1))
+						;; read a few more samples
+						(setf trig -2000)))
 					     (incf i)
 					     (setf old mlow)
 					     ))
 					
-					,(logprint "" `(ma trig trig1)))
+					)
 				      (create_server (reinterpret_cast<uint8_t*> &header)
 						       (sizeof header)
-						       (+ (* 4 trig) start) (* 4 (- trig1 trig))
+						       (reinterpret_cast<uint8_t*> (outiq.data))
+						       (* 2 (outiq.size))
+					;(+ (* 4 trig) start) (* 4 (- trig1 trig))
 						       #+nil (- nbytes
 									       (* 4 trig)
 									       ))

@@ -14,6 +14,7 @@
 #include <iio.h>
 #include <math.h>
 #include <unistd.h>
+#include <vector>
 ;
 #include "vis_01_server.hpp"
 #include "vis_02_filters.hpp"
