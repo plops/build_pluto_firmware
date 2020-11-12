@@ -371,7 +371,8 @@
 					    (dot ("std::chrono::high_resolution_clock::now")
 						 (time_since_epoch)
 						 ))
-				      (let ((ma 0))
+				      (let ((ma 0)
+					    (old 0))
 				       (do0
 				       
 					;"#pragma omp parallel"
@@ -384,12 +385,15 @@
 							 (sq (aref (reinterpret_cast<int16_t*> p) 1))
 							 (m (+ (* si si)
 							       (* sq sq)))))
-						   (when (< ma m)
-						     (setf ma m)) 
+						   #+nil (when (< ma m)
+							   (setf ma m))
+						   (when (and (< 10000 old)
+							      (< m 1000))
+						     break)
 						   (incf i)
-						    
+						    (setf old m)
 						   ))
-					,(logprint "" `(ma)))
+					,(logprint "" `(ma i)))
 				      
 				     )
 				     (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
@@ -479,6 +483,27 @@
 			  (close fd1)
 			  (close fd)
 			  ))))))
+
+    (define-module
+       `(filters ()
+	      (do0
+	
+	    
+		    (include <iostream>
+			     <chrono>
+			     <thread>
+			     
+			     )
+		    ,(let ((l `((low 2 0.01
+				     :a (8.66487e-4 1.732678e-3 8.663387e-4)
+				     :b (1.919129e0 -9.225943e-1))
+				(low 2 0.1
+				     :a (6.372802e-2 1.274560e-1 6.372802e-2)
+				     :b (1.194365e0 -4.492774e-1))
+				(low 2 0.4
+				     :a (6.362308e-1 1.272462e0 6.362308e-1)
+				     :b (-1.125379e0 -4.195441e-1))))))
+		  )))
 
 
 

@@ -38,12 +38,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "e78526754d3770ef662d8fe2308eb7fb20678136";
+  state._code_version = "1606fc4802fb0e93e0847297c6b9101c7e6aa122";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:40:59 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "18:44:27 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -288,15 +288,17 @@ int main(int argc, char **argv) {
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto ma = 0;
+    auto old = 0;
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
       auto m = ((((si) * (si))) + (((sq) * (sq))));
-      if ((ma) < (m)) {
-        ma = m;
+      if ((((10000) < (old)) && ((m) < (1000)))) {
+        break;
       }
       (i)++;
+      old = m;
     }
 
     (std::cout) << (std::setw(10))
@@ -306,7 +308,8 @@ int main(int argc, char **argv) {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
                 << (" ") << (std::setw(8)) << (" ma='") << (ma) << ("'")
-                << (std::endl) << (std::flush);
+                << (std::setw(8)) << (" i='") << (i) << ("'") << (std::endl)
+                << (std::flush);
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
