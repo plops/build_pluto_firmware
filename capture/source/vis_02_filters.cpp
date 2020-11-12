@@ -83,7 +83,7 @@ float filter_2_high_40_real(float xn) {
   yn1 = yn;
   return yn;
 }
-std-- complex<float> filter_2_low_01_complex(std::complex<float> xn) {
+std::complex<float> filter_2_low_01_complex(std::complex<float> xn) {
   auto yn1 = std::complex<float>((0.f), (0.f));
   auto yn2 = std::complex<float>((0.f), (0.f));
   auto xn1 = std::complex<float>((0.f), (0.f));
@@ -98,7 +98,7 @@ std-- complex<float> filter_2_low_01_complex(std::complex<float> xn) {
   yn1 = yn;
   return yn;
 }
-std-- complex<float> filter_2_low_10_complex(std::complex<float> xn) {
+std::complex<float> filter_2_low_10_complex(std::complex<float> xn) {
   auto yn1 = std::complex<float>((0.f), (0.f));
   auto yn2 = std::complex<float>((0.f), (0.f));
   auto xn1 = std::complex<float>((0.f), (0.f));
@@ -113,7 +113,7 @@ std-- complex<float> filter_2_low_10_complex(std::complex<float> xn) {
   yn1 = yn;
   return yn;
 }
-std-- complex<float> filter_2_low_40_complex(std::complex<float> xn) {
+std::complex<float> filter_2_low_40_complex(std::complex<float> xn) {
   auto yn1 = std::complex<float>((0.f), (0.f));
   auto yn2 = std::complex<float>((0.f), (0.f));
   auto xn1 = std::complex<float>((0.f), (0.f));
@@ -128,7 +128,7 @@ std-- complex<float> filter_2_low_40_complex(std::complex<float> xn) {
   yn1 = yn;
   return yn;
 }
-std-- complex<float> filter_2_high_01_complex(std::complex<float> xn) {
+std::complex<float> filter_2_high_01_complex(std::complex<float> xn) {
   auto yn1 = std::complex<float>((0.f), (0.f));
   auto yn2 = std::complex<float>((0.f), (0.f));
   auto xn1 = std::complex<float>((0.f), (0.f));
@@ -143,7 +143,7 @@ std-- complex<float> filter_2_high_01_complex(std::complex<float> xn) {
   yn1 = yn;
   return yn;
 }
-std-- complex<float> filter_2_high_40_complex(std::complex<float> xn) {
+std::complex<float> filter_2_high_40_complex(std::complex<float> xn) {
   auto yn1 = std::complex<float>((0.f), (0.f));
   auto yn2 = std::complex<float>((0.f), (0.f));
   auto xn1 = std::complex<float>((0.f), (0.f));

@@ -5,6 +5,7 @@
 
 extern State state;
 #include "vis_01_server.hpp"
+#include "vis_02_filters.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -38,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "f6bd870ba7c76df7bcf3c5ef810c7705ccaf6d06";
+  state._code_version = "98975e8b162f8c38b715f2d857cc2750a330f5f9";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:49:15 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "20:57:10 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -288,17 +289,18 @@ int main(int argc, char **argv) {
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto ma = 0;
-    auto old = 0;
+    auto old = (0.f);
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
       auto m = ((((si) * (si))) + (((sq) * (sq))));
-      if ((((10000) < (old)) && ((m) < (1000)))) {
+      auto mlow = filter_2_low_10_real(m);
+      if ((((10000) < (old)) && ((mlow) <= (10000)))) {
         break;
       }
       (i)++;
-      old = m;
+      old = mlow;
     }
 
     (std::cout) << (std::setw(10))

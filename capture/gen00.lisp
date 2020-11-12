@@ -164,7 +164,8 @@
 
 		      
 
-		      (include "vis_01_server.hpp")
+		      (include "vis_01_server.hpp"
+			       "vis_02_filters.hpp")
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -372,7 +373,7 @@
 						 (time_since_epoch)
 						 ))
 				      (let ((ma 0)
-					    (old 0))
+					    (old 0s0))
 				       (do0
 				       
 					;"#pragma omp parallel"
@@ -384,14 +385,15 @@
 						   (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
 							 (sq (aref (reinterpret_cast<int16_t*> p) 1))
 							 (m (+ (* si si)
-							       (* sq sq)))))
+							       (* sq sq)))
+							 (mlow (filter_2_low_10_real m))))
 						   #+nil (when (< ma m)
 							   (setf ma m))
 						   (when (and (< 10000 old)
-							      (< m 1000))
+							      (<= mlow 10000))
 						     break)
 						   (incf i)
-						    (setf old m)
+						    (setf old mlow)
 						   ))
 					,(logprint "" `(ma i)))
 				      
@@ -486,10 +488,8 @@
 
     (define-module
        `(filters ()
-	      (do0
-	
-	    
-		    (include <iostream>
+		 (do0
+		  (include <iostream>
 			     <chrono>
 			     <thread>
 			     <complex>
@@ -543,7 +543,7 @@
 				 (destructuring-bind (pass poles fc &key a b) e
 				     `(defun ,(format nil "filter_~a_~a_~2,'0d_complex" poles pass (floor (* 100 fc))) (xn)
 					(declare (type std--complex<float> xn)
-						 (values std--complex<float>))
+						 (values "std::complex<float>"))
 					(let ,(loop for f in `(yn1 yn2 xn1 xn2 yn) collect
 						    `(,f (std--complex<float> 0s0 0s0)))
 					  
@@ -563,14 +563,7 @@
 						xn1 xn
 						yn2 yn1
 						yn1 yn)
-					  (return yn)))))))
-		  )))
-
-
-
-    
-    
-  )
+					  (return yn)))))))))))
   
   (progn
     (progn ;with-open-file
