@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "98975e8b162f8c38b715f2d857cc2750a330f5f9";
+  state._code_version = "cc56aeceb6d49b30fefaffb263bf8c59af01d792";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:57:10 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "21:03:23 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -290,14 +290,18 @@ int main(int argc, char **argv) {
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto ma = 0;
     auto old = (0.f);
+    auto trig = 0;
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
       auto m = ((((si) * (si))) + (((sq) * (sq))));
       auto mlow = filter_2_low_10_real(m);
-      if ((((10000) < (old)) && ((mlow) <= (10000)))) {
-        break;
+      if ((ma) < (mlow)) {
+        ma = mlow;
+      }
+      if ((((4000) < (old)) && ((mlow) <= (4000)))) {
+        trig = i;
       }
       (i)++;
       old = mlow;
@@ -310,8 +314,8 @@ int main(int argc, char **argv) {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
                 << (" ") << (std::setw(8)) << (" ma='") << (ma) << ("'")
-                << (std::setw(8)) << (" i='") << (i) << ("'") << (std::endl)
-                << (std::flush);
+                << (std::setw(8)) << (" trig='") << (trig) << ("'")
+                << (std::endl) << (std::flush);
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();
