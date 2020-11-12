@@ -492,8 +492,9 @@
 		    (include <iostream>
 			     <chrono>
 			     <thread>
-			     
+			     <complex>
 			     )
+		    ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
 		    ,(let ((l `((low 2 0.01
 				     :a (8.66487e-4 1.732678e-3 8.663387e-4)
 				     :b (1.919129e0 -9.225943e-1))
@@ -502,7 +503,67 @@
 				     :b (1.194365e0 -4.492774e-1))
 				(low 2 0.4
 				     :a (6.362308e-1 1.272462e0 6.362308e-1)
-				     :b (-1.125379e0 -4.195441e-1))))))
+				     :b (-1.125379e0 -4.195441e-1))
+				(high 2 0.01
+				      :a (9.567529e-1 -1.913506e0 9.567529e-1)
+				      :b (1.911437e0 -9.155749e-1))
+				(high 2 0.40
+				      :a (6.372801e-2 -1.274560e-1 6.372801e-2)
+				      :b (-1.194365e0 -4.492774e-1)))))
+		       `(do0
+			 ,@(loop for e in l
+				 collect
+				 (destructuring-bind (pass poles fc &key a b) e
+				     `(defun ,(format nil "filter_~a_~a_~2,'0d_real" poles pass (floor (* 100 fc))) (xn)
+					(declare (type float xn)
+						 (values float))
+					(let (
+					      (yn1 0s0)
+					      (yn2 0s0)
+					      
+					      (xn1 0s0)
+					      (xn2 0s0)
+					      
+					      (yn 0s0))
+					  (declare (type "static float" yn1 yn2 xn1 xn2 xn3)
+						   (type float yn))
+
+					  (setf yn (+ (* ,(elt a 0) xn)
+						      (* ,(elt a 1) xn1)
+						      (* ,(elt a 2) xn2)
+						      (* ,(elt b 0) yn1)
+						      (* ,(elt b 1) yn2))
+						xn2 xn1
+						xn1 xn
+						yn2 yn1
+						yn1 yn)
+					  (return yn)))))
+			 ,@(loop for e in l
+				 collect
+				 (destructuring-bind (pass poles fc &key a b) e
+				     `(defun ,(format nil "filter_~a_~a_~2,'0d_complex" poles pass (floor (* 100 fc))) (xn)
+					(declare (type std--complex<float> xn)
+						 (values std--complex<float>))
+					(let ,(loop for f in `(yn1 yn2 xn1 xn2 yn) collect
+						    `(,f (std--complex<float> 0s0 0s0)))
+					  
+					  #+nil (declare (type "static std::complex<float>"
+							 ,@(loop for f in `(yn1 yn2 xn1 xn2) collect
+								 `((,f 0s0 0s0))))
+						   (type std--complex<float>
+							 ,@(loop for f in `(yn) collect
+								 `((,f 0s0 0s0)))))
+
+					  (setf yn (+ (* ,(elt a 0) xn)
+						      (* ,(elt a 1) xn1)
+						      (* ,(elt a 2) xn2)
+						      (* ,(elt b 0) yn1)
+						      (* ,(elt b 1) yn2))
+						xn2 xn1
+						xn1 xn
+						yn2 yn1
+						yn1 yn)
+					  (return yn)))))))
 		  )))
 
 
