@@ -38,12 +38,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "7b8b5fad991f6040bb85b7e3a20dd4e5650b4305";
+  state._code_version = "e78526754d3770ef662d8fe2308eb7fb20678136";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:12:31 of Wednesday, 2020-11-11 (GMT+1)";
+  state._code_generation_time = "18:40:59 of Thursday, 2020-11-12 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -261,7 +261,7 @@ int main(int argc, char **argv) {
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
   auto count = 0;
-  for (auto j = 0; (j) < (1); (j) += (1)) {
+  for (auto j = 0; (j) < (12); (j) += (1)) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
@@ -285,10 +285,28 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
                 << (" ") << (std::setw(8)) << (" sizeof(header)='")
                 << (sizeof(header)) << ("'") << (std::endl) << (std::flush);
-    create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header), start,
-                  nbytes);
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
+    auto ma = 0;
+#pragma GCC ivdep
+    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
+      auto si = reinterpret_cast<int16_t *>(p)[0];
+      auto sq = reinterpret_cast<int16_t *>(p)[1];
+      auto m = ((((si) * (si))) + (((sq) * (sq))));
+      if ((ma) < (m)) {
+        ma = m;
+      }
+      (i)++;
+    }
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
+                << (" ") << (std::setw(8)) << (" ma='") << (ma) << ("'")
+                << (std::endl) << (std::flush);
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();

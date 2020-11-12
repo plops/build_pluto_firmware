@@ -317,7 +317,8 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 48 64 4096)))
+			    (let (("const nbuf" (* 48 64 4096)
+						))
 			      ,(logprint "create buffer")
 			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
 				    (sample_and_compute_start
@@ -328,7 +329,7 @@
 			       (do0
 				(let ((count 0))
 				  (;;while true ;
-				   dotimes (j 1)
+				   dotimes (j 12)
 
 				   ; ,(logprint "308" `(count))
 				    
@@ -362,7 +363,7 @@
 									   895232605  ;; crc computed with rescuesdriq
 									   ))))
 					,(logprint "" `((sizeof header)))
-					(create_server (reinterpret_cast<uint8_t*> &header)
+					#+nil (create_server (reinterpret_cast<uint8_t*> &header)
 						       (sizeof header)
 						       start nbytes)))
 				     (do0
@@ -370,22 +371,26 @@
 					    (dot ("std::chrono::high_resolution_clock::now")
 						 (time_since_epoch)
 						 ))
+				      (let ((ma 0))
+				       (do0
+				       
 					;"#pragma omp parallel"
-				      #+nil "#pragma GCC ivdep"
-				      #+nil (for ((= "uint8_t* p" start)
-					    (< p end)
-					    (incf p step))
-					   (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
-						 (sq (aref (reinterpret_cast<int16_t*> p) 1))))
-					   (setf (aref (aref input i) 0)
-						 
-						 si)
-					   (setf (aref (aref input i) 1)
-						 
-						 sq)
-					   (incf i)
-					   
-					   )
+
+					"#pragma GCC ivdep"
+					#-nil (for ((= "uint8_t* p" start)
+						    (< p end)
+						    (incf p step))
+						   (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+							 (sq (aref (reinterpret_cast<int16_t*> p) 1))
+							 (m (+ (* si si)
+							       (* sq sq)))))
+						   (when (< ma m)
+						     (setf ma m)) 
+						   (incf i)
+						    
+						   ))
+					,(logprint "" `(ma)))
+				      
 				     )
 				     (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
 							     (time_since_epoch)
