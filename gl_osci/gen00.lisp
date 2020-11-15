@@ -168,6 +168,15 @@
     (let ((l `((low 2 0.01
 		   :a (8.66487e-4 1.732678e-3 8.663387e-4)
 		   :b (1.919129e0 -9.225943e-1))
+	       (low 2 0.025
+		   :a (5.112374e-3 1.022475e-2 5.112374e-3)
+		   :b (1.797154 -8.176033e-1))
+	       (low 2 0.05
+		   :a (1.868823e-2 3.737647e-2 1.868823e-2)
+		   :b (1.593937 -6.686903e-1))
+	       (low 2 0.075
+		   :a (3.869430e-2 7.738860e-2 3.869430e-2)
+		   :b (1.392667 -5.474446e-1))
 	      (low 2 0.1
 		   :a (6.372802e-2 1.274560e-1 6.372802e-2)
 		   :b (1.194365e0 -4.492774e-1))
@@ -814,8 +823,8 @@
 			 (do0 (setf x (* q i)
 				    )
 
-			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.1) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
-				    (smooth_q (* s (,(make-filter 'low :fc 0.1) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
+			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
+				    (smooth_q (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
 				    (di_dt (- smooth_i old_i))
 				    (dq_dt (- smooth_q old_q))
 				    (bot (+ (* smooth_i smooth_i)
