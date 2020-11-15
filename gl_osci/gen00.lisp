@@ -743,13 +743,26 @@
 		     
 		     
 		     (do0 ;; plot Q data
-		      (glColor3f .3s0 1s0 .3s0)
+		      (glColor3f .1s0 .7s0 .1s0)
 		      (glBegin GL_LINE_STRIP)
 		      (dotimes (i n)
 			
 			
 			(do0 (setf x (* q i)
 				   y (* s (aref ,(g `_iqdata) (+ 1 (* 2 i)))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))
+
+		     (do0 ;; plot smoothed Q data
+		      (glColor3f .3s0 1s0 .3s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			(do0 (setf x (* q i)
+				   y (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
 			     (world_to_screen (curly x y)
 					      sx sy)
 			     
@@ -789,7 +802,39 @@
 			     
 			     (glVertex2f sx sy)
 			     ))
-		      (glEnd))))
+		      (glEnd))
+
+		     (do0 ;; plot time derivative of phase data
+		      (glColor3f .9s0 1s0 .9s0)
+		      (glBegin GL_LINE_STRIP)
+		      (let ((old_i 0s0)
+			    (old_q 0s0))
+		       (dotimes (i n)
+			 (do0 (setf x (* q i)
+				    )
+
+			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
+				    (smooth_q (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
+				    (di_dt (- smooth_i old_i))
+				    (dq_dt (- smooth_q old_q))
+				    (bot (+ (* smooth_i smooth_i)
+					    (* smooth_q smooth_q)))
+				    ;; imaginary part of complex division
+				    (dphase (/ (- (* dq_dt smooth_i)
+						  (* di_dt smooth_q))
+					       bot)))
+			       
+				)
+			      (setf old_i smooth_i
+				    old_q smooth_q)
+			      (world_to_screen (curly x (+ 3 (* -30 dphase)))
+					       sx sy)
+			     
+			      (glVertex2f sx sy)
+			      )))
+		      (glEnd))
+
+		     ))
 		 )))))
 
 

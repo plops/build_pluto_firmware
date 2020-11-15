@@ -2422,11 +2422,36 @@ void drawFrame() {
       glVertex2f(sx, sy);
     }
     glEnd();
-    glColor3f((0.30f), (1.0f), (0.30f));
+    glColor3f((0.10f), (0.70f), (0.10f));
     glBegin(GL_LINE_STRIP);
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));
       y = ((s) * (state._iqdata[((1) + (((2) * (i))))]));
+      world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((0.30f), (1.0f), (0.30f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = ((s) * (([](float xn) -> float {
+             // filter_2_low_01_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
+                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
+                  ((((-0.9225943f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((1) + (((2) * (i))))])));
       world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
@@ -2452,6 +2477,59 @@ void drawFrame() {
              (((M_PI) + (atan2(state._iqdata[((1) + (((2) * (i))))],
                                state._iqdata[((0) + (((2) * (i))))])))))));
       world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((0.90f), (1.0f), (0.90f));
+    glBegin(GL_LINE_STRIP);
+    auto old_i = (0.f);
+    auto old_q = (0.f);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      auto smooth_i =
+          ((s) * (([](float xn) -> float {
+             // filter_2_low_01_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
+                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
+                  ((((-0.9225943f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((0) + (((2) * (i))))])));
+      auto smooth_q =
+          ((s) * (([](float xn) -> float {
+             // filter_2_low_01_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
+                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
+                  ((((-0.9225943f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((1) + (((2) * (i))))])));
+      auto di_dt = ((smooth_i) - (old_i));
+      auto dq_dt = ((smooth_q) - (old_q));
+      auto bot = ((((smooth_i) * (smooth_i))) + (((smooth_q) * (smooth_q))));
+      auto dphase =
+          ((((((dq_dt) * (smooth_i))) - (((di_dt) * (smooth_q))))) / (bot));
+      old_i = smooth_i;
+      old_q = smooth_q;
+      world_to_screen({x, ((3) + (((-30) * (dphase))))}, sx, sy);
       glVertex2f(sx, sy);
     }
     glEnd();
