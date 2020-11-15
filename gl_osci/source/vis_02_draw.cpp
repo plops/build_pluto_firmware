@@ -2480,7 +2480,7 @@ void drawFrame() {
       glVertex2f(sx, sy);
     }
     glEnd();
-    glColor3f((0.90f), (1.0f), (0.90f));
+    glColor3f((0.20f), (1.0f), (0.60f));
     glBegin(GL_LINE_STRIP);
     auto old_i = (0.f);
     auto old_q = (0.f);
@@ -2530,6 +2530,18 @@ void drawFrame() {
       old_i = smooth_i;
       old_q = smooth_q;
       world_to_screen({x, ((3) + (((-30) * (dphase))))}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((0.90f), (1.0f), (0.90f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = (0.f);
+      if ((0) == (static_cast<int>(round(((i) / ((61.440f))))) % 2)) {
+        y = (7.0f);
+      }
+      world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
     glEnd();

@@ -815,7 +815,7 @@
 		      (glEnd))
 
 		     (do0 ;; plot time derivative of phase data
-		      (glColor3f .9s0 1s0 .9s0)
+		      (glColor3f .2s0 1s0 .6s0)
 		      (glBegin GL_LINE_STRIP)
 		      (let ((old_i 0s0)
 			    (old_q 0s0))
@@ -842,6 +842,23 @@
 			     
 			      (glVertex2f sx sy)
 			      )))
+		      (glEnd))
+
+		     (do0 ;; plot 1MSPS lines
+		      (glColor3f .9s0 1s0 .9s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			(do0 (setf x (* q i))
+
+			     (setf y 0s0)
+			     (when (== 0 (% (static_cast<int> (round (/ i 61.44))) 2))
+			       (setf y 7s0))
+			     
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
 		      (glEnd))
 
 		     ))
