@@ -668,7 +668,7 @@
 		      (glBegin GL_LINE_STRIP)
 		      (dotimes (i n)
 			(do0 (setf x (* q i)
-				   y (* s (aref ,(g `_iqdata) (+ 1 (* 2 i)))))
+				   y (* s (aref ,(g `_iqdata) (+ 0 (* 2 i)))))
 			     (world_to_screen (curly x y)
 					      sx sy)
 			     

@@ -2392,7 +2392,7 @@ void drawFrame() {
     glBegin(GL_LINE_STRIP);
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));
-      y = ((s) * (state._iqdata[((1) + (((2) * (i))))]));
+      y = ((s) * (state._iqdata[((0) + (((2) * (i))))]));
       world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
