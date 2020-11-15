@@ -2488,16 +2488,16 @@ void drawFrame() {
       x = ((q) * (i));
       auto smooth_i =
           ((s) * (([](float xn) -> float {
-             // filter_2_low_01_real
+             // filter_2_low_10_real
              ;
              static float yn1 = (0.f);
              static float yn2 = (0.f);
              static float xn1 = (0.f);
              static float xn2 = (0.f);
              float yn =
-                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
-                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
-                  ((((-0.9225943f)) * (yn2))));
+                 (((((6.37280e-2f)) * (xn))) + ((((0.1274560f)) * (xn1))) +
+                  ((((6.37280e-2f)) * (xn2))) + ((((1.1943650f)) * (yn1))) +
+                  ((((-0.4492774f)) * (yn2))));
              xn2 = xn1;
              xn1 = xn;
              yn2 = yn1;
@@ -2506,16 +2506,16 @@ void drawFrame() {
            })(state._iqdata[((0) + (((2) * (i))))])));
       auto smooth_q =
           ((s) * (([](float xn) -> float {
-             // filter_2_low_01_real
+             // filter_2_low_10_real
              ;
              static float yn1 = (0.f);
              static float yn2 = (0.f);
              static float xn1 = (0.f);
              static float xn2 = (0.f);
              float yn =
-                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
-                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
-                  ((((-0.9225943f)) * (yn2))));
+                 (((((6.37280e-2f)) * (xn))) + ((((0.1274560f)) * (xn1))) +
+                  ((((6.37280e-2f)) * (xn2))) + ((((1.1943650f)) * (yn1))) +
+                  ((((-0.4492774f)) * (yn2))));
              xn2 = xn1;
              xn1 = xn;
              yn2 = yn1;

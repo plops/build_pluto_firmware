@@ -164,7 +164,8 @@
 	))
 
   (defun make-filter (pass &key (poles 2) (fc 0.01))
-   (let ((l `((low 2 0.01
+    ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
+    (let ((l `((low 2 0.01
 		   :a (8.66487e-4 1.732678e-3 8.663387e-4)
 		   :b (1.919129e0 -9.225943e-1))
 	      (low 2 0.1
@@ -813,8 +814,8 @@
 			 (do0 (setf x (* q i)
 				    )
 
-			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
-				    (smooth_q (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
+			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.1) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
+				    (smooth_q (* s (,(make-filter 'low :fc 0.1) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
 				    (di_dt (- smooth_i old_i))
 				    (dq_dt (- smooth_q old_q))
 				    (bot (+ (* smooth_i smooth_i)
