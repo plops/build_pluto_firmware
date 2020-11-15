@@ -296,7 +296,7 @@
 		    )
 		(declare (type "std::stringstream" label))
 		(<< label
-		    (string "glfw lua example [")
+		    (string "glfw oscilloscope [")
 		    ,(g `_code_generation_time)
 		    (string "] git:")
 		    "std::fixed"

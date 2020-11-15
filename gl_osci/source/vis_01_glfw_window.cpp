@@ -42,7 +42,7 @@ void initWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     std::stringstream label;
-    (label) << ("glfw lua example [") << (state._code_generation_time)
+    (label) << ("glfw oscilloscope [") << (state._code_generation_time)
             << ("] git:") << (std::fixed) << (std::setprecision(3))
             << (state._main_version);
     state._window = glfwCreateWindow(930, 930, label.str().c_str(), NULL, NULL);

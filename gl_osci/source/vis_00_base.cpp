@@ -27,7 +27,7 @@ void mainLoop() {
 }
 int main(int argc, char **argv) {
   state._code_repository = "github.com/plops/build_pluto_firmware";
-  state._code_generation_time = "14:52:19 of Sunday, 2020-11-15 (GMT+1)";
+  state._code_generation_time = "14:55:22 of Sunday, 2020-11-15 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 

@@ -1,3 +1,7 @@
+- this program runs on the adalm pluto, captures with 61.44MSPS
+- a trigger can be configured (for now based on amplitude) and it will
+  provide the samples on network port 1234
+
 - i don't compute checksum
 - use the go program that comes with sdrangel 
 #+begin_example
