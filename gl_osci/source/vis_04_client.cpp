@@ -52,7 +52,10 @@ void initClient() {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("read returned") << (" ") << (std::setw(8)) << (" n='")
-                << (n) << ("'") << (std::endl) << (std::flush);
+                << (n) << ("'") << (std::setw(8)) << (" bytes_remaining='")
+                << (bytes_remaining) << ("'") << (std::setw(8))
+                << (" offset_bytes='") << (offset_bytes) << ("'") << (std::endl)
+                << (std::flush);
     if ((n) == (0)) {
 
       (std::cout) << (std::setw(10))

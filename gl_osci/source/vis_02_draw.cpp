@@ -2384,4 +2384,27 @@ void drawFrame() {
   glVertex2d(((0) * (w)), y);
   glVertex2d(((1) * (w)), y);
   glEnd();
+  if (state._iqdata_bytes) {
+    auto n = ((state._iqdata_bytes) / (((2) * (2))));
+    auto q = (1.0 / ((1.00e+2f)));
+    auto s = (((1.00e+2f)) / ((4.00e+4f)));
+    glColor3f((1.0f), (0.30f), (0.30f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = ((s) * (state._iqdata[((1) + (((2) * (i))))]));
+      world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((0.30f), (1.0f), (0.30f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = ((s) * (state._iqdata[((1) + (((2) * (i))))]));
+      world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+  }
 }

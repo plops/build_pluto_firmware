@@ -634,8 +634,6 @@
 		       (do0 (glLineStipple 1 (hex #xFFFF))
 			    (glDisable GL_LINE_STIPPLE))
 
-		  
-
 		       (do0
 			"// draw snapped cursor circle"
 			(world_to_screen ,(g `_snapped_world_cursor) sx sy)
@@ -658,7 +656,40 @@
 		     (glVertex2d x (* 1 h))
 		     (glVertex2d (* 0 w) y)
 		     (glVertex2d (* 1 w) y)))
-		  (glEnd)))))))
+		  (glEnd)))
+		(do0
+		 ;; draw graph
+		 (when ,(g `_iqdata_bytes)
+		   (let ((n (/ ,(g `_iqdata_bytes) (* 2 2)))
+			 (q (/ 1s2))
+			 (s (/ 100s0 40s3)))
+		     (do0 ;; plot I data
+		      (glColor3f 1s0 .3s0 .3s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			(do0 (setf x (* q i)
+				   y (* s (aref ,(g `_iqdata) (+ 1 (* 2 i)))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))
+		     (do0 ;; plot Q data
+		      (glColor3f .3s0 1s0 .3s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			
+			
+			(do0 (setf x (* q i)
+				   y (* s (aref ,(g `_iqdata) (+ 1 (* 2 i)))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))))
+		 )))))
 
 
     (define-module
@@ -771,19 +802,21 @@
 										     (data)))
 						    offset_bytes)
 						 bytes_remaining)))
-				 ,(logprint "read returned" `(n))
+				 ,(logprint "read returned" `(n bytes_remaining offset_bytes))
 				 (when (== n 0)
 				   ,(logprint "socket empty?")
 				   break)
 				    (when (< n 0)
 				      ,(logprint "socket read failed")
 				      break)
-				 (do0 (decf bytes_remaining n)
+				 (do0 
+				      (decf bytes_remaining n)
 				      (incf offset_bytes n)
 					;(decf retries)
 				      (setf ,(g `_iqdata_bytes) (- (* 2 (dot ,(g `_iqdata)
 									     (size)))
-								   bytes_remaining)))))
+								   bytes_remaining))
+				      )))
 			(close fd))))))
 
  )
