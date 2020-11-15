@@ -37,18 +37,14 @@ void initClient() {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("connect failed") << (" ") << (std::endl) << (std::flush);
   }
-  auto n = read(fd, reinterpret_cast<uint8_t *>(state._iqdata.data()),
-                ((2) * (state._iqdata.size())));
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("read returned")
-      << (" ") << (std::setw(8)) << (" n='") << (n) << ("'") << (std::endl)
-      << (std::flush);
-  state._iqdata_bytes = n;
-  if ((n) < (0)) {
+  auto bytes_remaining = ((2) * (state._iqdata.size()));
+  auto offset_bytes = 0;
+  auto retries = 4;
+  while (((bytes_remaining) && (retries))) {
+    auto n = read(
+        fd,
+        ((reinterpret_cast<uint8_t *>(state._iqdata.data())) + (offset_bytes)),
+        bytes_remaining);
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -56,8 +52,24 @@ void initClient() {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("socket read failed") << (" ") << (std::endl)
-                << (std::flush);
+                << ("read returned") << (" ") << (std::setw(8)) << (" n='")
+                << (n) << ("'") << (std::endl) << (std::flush);
+    (bytes_remaining) -= (n);
+    (offset_bytes) += (n);
+    (retries)--;
+    state._iqdata_bytes =
+        ((((2) * (state._iqdata.size()))) - (bytes_remaining));
+    if ((n) < (0)) {
+
+      (std::cout) << (std::setw(10))
+                  << (std::chrono::high_resolution_clock::now()
+                          .time_since_epoch()
+                          .count())
+                  << (" ") << (std::this_thread::get_id()) << (" ")
+                  << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
+                  << (" ") << ("socket read failed") << (" ") << (std::endl)
+                  << (std::flush);
+    }
   }
   close(fd);
 }
