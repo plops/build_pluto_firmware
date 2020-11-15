@@ -423,8 +423,7 @@
 	      (_sample_threshold :type float)
 	      (_sample_data :type "std::vector<float>")
 	      (_sample_binary :type "std::vector<uint8_t>")
-	      (_sample_valid :type "std::vector<uint8_t>")
-	)
+	      (_sample_valid :type "std::vector<uint8_t>"))
 	     (do0
 					;,(emit-global :code `(include <glm/vec2.hpp>))
 	      (include <algorithm>)
@@ -1036,6 +1035,50 @@
 		  (ImGui--Text (string "sample_binary size: %zu")
 			       (dot ,(g `_sample_binary)
 				    (size)))
+		   (do0 ;; state machine to search for a run of at
+		       ;; least 8 invalid bytes. the valid bits behind
+		       ;; this are payload
+		   (let ((first_valid_byte 0)
+			 (first_valid_bit 0)
+			 (zero_count 0)
+			 (byte_count 0)
+			 (fsm_state 0))
+		     ;; 0 .. search for zero (if found go to 1, else stay in 0)
+		     ;; 1 .. search for 8 or more zeros (if 8 zeros found goto 2, if zero count it and stay in 1,  if non-zero goto 0)
+		     ;; 2 .. cross remaining zeros (if non-zero goto 3, if zero stay in 2)
+		     ;; 3 .. payload starts (return payload byte and bit)
+		     (when (< 12 (dot ,(g `_sample_valid)
+				      (size)))
+		       (dotimes (i (dot ,(g `_sample_valid)
+					(size)))
+			 ; for-range (v ,(g `_sample_valid))
+			 (let ((v (aref ,(g `_sample_valid ) i)))
+			   (case fsm_state
+				   (0 (progn
+					(when (== 0 v)
+					  (setf fsm_state 1
+						zero_count 1))
+					break))
+				   (1 (progn
+					(if (== 0 v)
+					    (incf zero_count)
+					    (setf fsm_state 0))
+					(when (== zero_count 8)
+					  (setf fsm_state 2))
+					break))
+				   (2 (progn
+					(when (< 0 v)
+					  (setf fsm_state 3))
+					break))
+				   ))
+			 
+			 (incf byte_count)
+			 (when (== 3 fsm_state)
+			   break))))
+		   (ImGui--Text (string "first valid byte: %d")
+				byte_count)
+		   )
+
 		  ,@(loop for j below n-lines collect
 			  `(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
 					,@(loop for i below 16 collect
@@ -1049,42 +1092,7 @@
 						`(aref ,(g `_sample_valid)
 						       ,(+ (* j 16) i)))))
 
-		  (do0 ;; state machine to search for a run of at
-		       ;; least 8 invalid bytes. the valid bits behind
-		       ;; this are payload
-		   (let ((first_valid_byte 0)
-			 (first_valid_bit 0)
-			 (zero_count 0)
-			 (byte_count 0)
-			 (state 0))
-		     ;; 0 .. search for zero (if found go to 1, else stay in 0)
-		     ;; 1 .. search for 8 or more zeros (if 8 zeros found goto 2, if zero count it and stay in 1,  if non-zero goto 0)
-		     ;; 2 .. cross remaining zeros (if non-zero goto 3, if zero stay in 2)
-		     ;; 3 .. payload starts (return payload byte and bit)
-		     
-		     (for-range (v ,(g `_sample_valid))
-				(case state
-				  (0 (progn
-				       (when (== 0 v)
-					 (setf state 1
-					       zero_count 1))
-				       break))
-				  (1 (progn
-				       (if (== 0 v)
-					   (incf zero_count)
-					   (setf state 0))
-				       (when (== zero_count 8)
-					   (setf state 2))
-				       break))
-				  (2 (progn
-				       (when (< 0 v)
-					 (setf state 3))
-				       break))
-				  )
-				(when (== 3 state)
-				  break)
-				(incf byte_count)))
-		   )
+		 
 		  (ImGui--End)))	       
 	       
 	       (let ((b true))

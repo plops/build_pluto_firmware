@@ -44,6 +44,47 @@ void drawGui() {
   ImGui::Text("sample_offset: %f", state._sample_offset);
   ImGui::Text("sample_threshold: %f", state._sample_threshold);
   ImGui::Text("sample_binary size: %zu", state._sample_binary.size());
+  auto first_valid_byte = 0;
+  auto first_valid_bit = 0;
+  auto zero_count = 0;
+  auto byte_count = 0;
+  auto fsm_state = 0;
+  if ((12) < (state._sample_valid.size())) {
+    for (auto i = 0; (i) < (state._sample_valid.size()); (i) += (1)) {
+      auto v = state._sample_valid[i];
+      switch (fsm_state) {
+      case 0: {
+        if ((0) == (v)) {
+          fsm_state = 1;
+          zero_count = 1;
+        }
+        break;
+      }
+      case 1: {
+        if ((0) == (v)) {
+          (zero_count)++;
+        } else {
+          fsm_state = 0;
+        }
+        if ((zero_count) == (8)) {
+          fsm_state = 2;
+        }
+        break;
+      }
+      case 2: {
+        if ((0) < (v)) {
+          fsm_state = 3;
+        }
+        break;
+      }
+      }
+      (byte_count)++;
+      if ((3) == (fsm_state)) {
+        break;
+      }
+    }
+  }
+  ImGui::Text("first valid byte: %d", byte_count);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
       state._sample_binary[0], state._sample_binary[1], state._sample_binary[2],
