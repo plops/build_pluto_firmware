@@ -162,6 +162,57 @@
 		 
 		 (cl-cpp-generator2::emit-c :code code))
 	))
+
+  (defun make-filter (pass &key (poles 2) (fc 0.01))
+   (let ((l `((low 2 0.01
+		   :a (8.66487e-4 1.732678e-3 8.663387e-4)
+		   :b (1.919129e0 -9.225943e-1))
+	      (low 2 0.1
+		   :a (6.372802e-2 1.274560e-1 6.372802e-2)
+		   :b (1.194365e0 -4.492774e-1))
+	      (low 2 0.4
+		   :a (6.362308e-1 1.272462e0 6.362308e-1)
+		   :b (-1.125379e0 -4.195441e-1))
+	      (high 2 0.01
+		    :a (9.567529e-1 -1.913506e0 9.567529e-1)
+		    :b (1.911437e0 -9.155749e-1))
+	      (high 2 0.40
+		    :a (6.372801e-2 -1.274560e-1 6.372801e-2)
+		    :b (-1.194365e0 -4.492774e-1)))))
+     `(lambda (xn)
+	(declare (type float xn)
+		 (values float))
+	,@(remove-if #'null
+		     (loop for e in l
+			   collect
+			   (destructuring-bind (pass_ poles_ fc_ &key a b) e
+			     (when (and (eq pass pass_)
+					(eq poles poles_)
+					(eq fc fc_))
+			      `(do0
+				(comments ,(format nil "filter_~a_~a_~2,'0d_real" poles pass (floor (* 100 fc))))
+				
+				(let ((yn1 0s0)
+				      (yn2 0s0)
+				      
+				      (xn1 0s0)
+				      (xn2 0s0)
+				      
+				      (yn (+ (* ,(elt a 0) xn)
+					      (* ,(elt a 1) xn1)
+					      (* ,(elt a 2) xn2)
+					      (* ,(elt b 0) yn1)
+					      (* ,(elt b 1) yn2))))
+				  (declare (type "static float" yn1 yn2 xn1 xn2 xn3)
+					   (type float yn))
+
+				  (setf 
+					xn2 xn1
+					xn1 xn
+					yn2 yn1
+					yn1 yn)
+				  (return yn))))))))))
+  
   (let*  ()
     (define-module
        `(base ((_main_version :type "std::string")
@@ -664,7 +715,7 @@
 			 (q (/ 1s2))
 			 (s (/ -100s0 40s3)))
 		     (do0 ;; plot I data
-		      (glColor3f 1s0 .3s0 .3s0)
+		      (glColor3f .7s0 .1s0 .1s0)
 		      (glBegin GL_LINE_STRIP)
 		      (dotimes (i n)
 			(do0 (setf x (* q i)
@@ -675,6 +726,22 @@
 			     (glVertex2f sx sy)
 			     ))
 		      (glEnd))
+
+		     (do0 ;; plot smoothed I data
+		      (glColor3f 1s0 .3s0 .3s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			(do0 (setf x (* q i)
+				   y (* s (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))
+
+		     
+		     
 		     (do0 ;; plot Q data
 		      (glColor3f .3s0 1s0 .3s0)
 		      (glBegin GL_LINE_STRIP)
@@ -689,6 +756,7 @@
 			     (glVertex2f sx sy)
 			     ))
 		      (glEnd))
+
 		     (do0 ;; plot magnitude data
 		      (glColor3f .8s0 .8s0 1s0)
 		      (glBegin GL_LINE_STRIP)
@@ -700,6 +768,22 @@
 						      (aref ,(g `_iqdata) (+ 1 (* 2 i))))
 						   (* (aref ,(g `_iqdata) (+ 0 (* 2 i)))
 						      (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))
+
+		     (do0 ;; plot phase data
+		      (glColor3f 1s0 .8s0 .4s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			
+			
+			(do0 (setf x (* q i)
+				   y (+ -1 (* (/ -.5s0 M_PI) (+ M_PI (atan2 (aref ,(g `_iqdata) (+ 1 (* 2 i)))
+								       (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
 			     (world_to_screen (curly x y)
 					      sx sy)
 			     
@@ -974,6 +1058,7 @@
 		    " "
 		    "#endif"
 		    " "))))
+
 
 
 

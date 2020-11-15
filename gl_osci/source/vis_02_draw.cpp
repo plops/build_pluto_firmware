@@ -2388,11 +2388,36 @@ void drawFrame() {
     auto n = ((state._iqdata_bytes) / (((2) * (2))));
     auto q = (1.0 / ((1.00e+2f)));
     auto s = (((-1.00e+2f)) / ((4.00e+4f)));
-    glColor3f((1.0f), (0.30f), (0.30f));
+    glColor3f((0.70f), (0.10f), (0.10f));
     glBegin(GL_LINE_STRIP);
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));
       y = ((s) * (state._iqdata[((0) + (((2) * (i))))]));
+      world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((1.0f), (0.30f), (0.30f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = ((s) * (([](float xn) -> float {
+             // filter_2_low_01_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
+                  ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
+                  ((((-0.9225943f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((0) + (((2) * (i))))])));
       world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
@@ -2414,6 +2439,18 @@ void drawFrame() {
                           (state._iqdata[((1) + (((2) * (i))))]))) +
                         (((state._iqdata[((0) + (((2) * (i))))]) *
                           (state._iqdata[((0) + (((2) * (i))))])))))));
+      world_to_screen({x, y}, sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor3f((1.0f), (0.80f), (0.40f));
+    glBegin(GL_LINE_STRIP);
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      y = ((-1) +
+           ((((((-0.50f)) / (M_PI))) *
+             (((M_PI) + (atan2(state._iqdata[((1) + (((2) * (i))))],
+                               state._iqdata[((0) + (((2) * (i))))])))))));
       world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
