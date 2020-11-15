@@ -6,11 +6,11 @@
 extern State state;
 // https://youtu.be/nVaQuNXueFw?t=317
 // https://blog.conan.io/2019/06/26/An-introduction-to-the-Dear-ImGui-library.html
-#include "imgui/examples/imgui_impl_glfw.h"
-#include "imgui/examples/imgui_impl_opengl2.h"
-#include "imgui/imgui.h"
 #include <algorithm>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl2.h>
 #include <fstream>
+#include <imgui.h>
 #include <iostream>
 #include <string>
 void initGui() {

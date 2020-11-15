@@ -7,13 +7,19 @@ extern State state;
 #include <chrono>
 #include <iostream>
 #include <thread>
+
+#include "vis_01_glfw_window.hpp"
+#include "vis_02_draw.hpp"
+#include "vis_03_gui.hpp"
 using namespace std::chrono_literals;
 
 // implementation
-std::vector<char> buffer(20 * 1024);
+State state = {};
 void mainLoop() {
   while (!(glfwWindowShouldClose(state._window))) {
     glfwPollEvents();
+    glfwGetCursorPos(state._window, &(state._cursor_xpos),
+                     &(state._cursor_ypos));
     drawFrame();
     drawGui();
     glfwSwapBuffers(state._window);
@@ -21,7 +27,7 @@ void mainLoop() {
 }
 int main(int argc, char **argv) {
   state._code_repository = "github.com/plops/build_pluto_firmware";
-  state._code_generation_time = "14:31:21 of Sunday, 2020-11-15 (GMT+1)";
+  state._code_generation_time = "14:52:19 of Sunday, 2020-11-15 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 

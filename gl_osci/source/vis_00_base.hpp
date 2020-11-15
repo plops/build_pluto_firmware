@@ -8,6 +8,10 @@
 #include <iostream>
 #include <thread>
 ;
+#include "vis_01_glfw_window.hpp"
+#include "vis_02_draw.hpp"
+#include "vis_03_gui.hpp"
+;
 // header;
 void mainLoop();
 int main(int argc, char **argv);

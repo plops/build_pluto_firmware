@@ -3,3 +3,11 @@
 #+begin_example
 sudo dnf install glm-devel
 #+end_example
+
+- get imgui
+
+#+begin_example
+cd ~/src
+git clone https://github.com/ocornut/imgui
+
+#+end_example

@@ -4,9 +4,9 @@
 ;
 #include "globals.h"
 ;
-#include "imgui/examples/imgui_impl_glfw.h"
-#include "imgui/examples/imgui_impl_opengl2.h"
-#include "imgui/imgui.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl2.h>
+#include <imgui.h>
 ;
 #include <algorithm>
 #include <string>

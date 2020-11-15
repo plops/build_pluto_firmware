@@ -14,7 +14,8 @@ CXXFLAGS=-Og -g3 -ggdb \
 -Wno-error=unused-parameter \
 -Wno-error=double-promotion \
 -pipe \
--march=native -mtune=native 
+-march=native -mtune=native \
+-I/home/martin/src/imgui
 
 LDFLAGS= \
 -lglfw -lGL \
@@ -24,13 +25,22 @@ LDFLAGS= \
 CFILES:=$(shell find .| grep .cpp$)
 OBJ:=$(CFILES:%.cpp=%.o)
 
+IMGUI_FILES=imgui.cpp \
+imgui_draw.cpp \
+imgui_demo.cpp \
+imgui_widgets.cpp \
+backends/imgui_impl_glfw.cpp \
+backends/imgui_impl_opengl2.cpp
+
+IMGUI_OBJ:=$(IMGUI_FILES:%.cpp=/home/martin/src/imgui/%.o)
+
 all: vis
 
 %.o: %.cpp globals.h
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-vis: $(OBJ)
+vis: $(OBJ) $(IMGUI_OBJ)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 clean:
-	rm vis *.o
+	rm vis $(OBJ) $(IMGUI_OBJ)

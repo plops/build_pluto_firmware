@@ -2,6 +2,14 @@
 
 #define GLOBALS_H
 
+#include <mutex>
+#include <thread>
+
+#include <GLFW/glfw3.h>
+#include <glm/geometric.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
+
 #include <chrono>
 struct State {
   typeof(std::chrono::high_resolution_clock::now().time_since_epoch().count())
@@ -24,6 +32,8 @@ struct State {
   GLuint _fontTex;
   bool _framebufferResized;
   GLFWwindow *_window;
+  double _cursor_ypos;
+  double _cursor_xpos;
   std::string _code_generation_time;
   std::string _code_repository;
   std::string _main_version;

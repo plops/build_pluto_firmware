@@ -125,12 +125,50 @@
 		     *module-global-parameters*))))))
   (defun g (arg)
     `(dot state ,arg))
+  (defun guard (code &key (debug t))
+      `(do0
+	#+lock-debug ,(if debug
+			  (logprint (format nil "hold guard on ~a" (cl-cpp-generator2::emit-c :code code))
+				    `())
+			  "// no debug")
+	#+eou ,(if debug
+		   `(if (dot ,code ("std::mutex::try_lock"))
+			(do0
+			 (dot ,code (unlock)))
+			(do0
+			 ,(logprint (format nil "have to wait on ~a" (cl-cpp-generator2::emit-c :code code))
+				    `())))
+		   "// no debug")
+	"// no debug"
+	,(format nil
+		 "std::lock_guard<std::mutex> guard(~a);"
+		 (cl-cpp-generator2::emit-c :code code))))
+  (defun lock (code &key (debug t))
+      `(do0
+	#+lock-debug ,(if debug
+			  (logprint (format nil "hold lock on ~a" (cl-cpp-generator2::emit-c :code code))
+				    `())
+			  "// no debug")
 
+	#+nil (if (dot ,code ("std::mutex::try_lock"))
+		  (do0
+		   (dot ,code (unlock)))
+		  (do0
+		   ,(logprint (format nil "have to wait on ~a" (cl-cpp-generator2::emit-c :code code))
+			      `())))
+	
+	,(format nil
+		 "std::unique_lock<std::mutex> lk(~a);"
+		 
+		 (cl-cpp-generator2::emit-c :code code))
+	))
   (let*  ()
     (define-module
        `(base ((_main_version :type "std::string")
 		    (_code_repository :type "std::string")
-		    (_code_generation_time :type "std::string")
+	       (_code_generation_time :type "std::string")
+	        (_cursor_xpos :type double)
+	      (_cursor_ypos :type double)
 		 )
 	      (do0
 	       
@@ -140,6 +178,11 @@
 			     <thread>
 			     
 			     )
+
+		    " "
+		    (include "vis_01_glfw_window.hpp"
+			     "vis_02_draw.hpp"
+			     "vis_03_gui.hpp")
 
 
 		    "using namespace std::chrono_literals;"
@@ -155,17 +198,518 @@
 
 		      ))
 
-		    "std::vector<char> buffer(20*1024);"
+		     (let ((state ,(emit-globals :init t)))
+		       (declare (type "State" state)))
+		     
+		    ;"std::vector<char> buffer(20*1024);"
 
+		    (defun mainLoop ()
+		      (while (not (glfwWindowShouldClose ,(g `_window)))
+			     (glfwPollEvents)
+			     (glfwGetCursorPos ,(g `_window)
+					       (ref ,(g `_cursor_xpos))
+					       (ref ,(g `_cursor_ypos)))
+			     (drawFrame)
+			     (drawGui)
+			     (glfwSwapBuffers ,(g `_window))
+			     ))
+		    
 
 		    (defun main (argc argv
 				 )
 		      (declare (type int argc)
 			       (type char** argv)
 			       (values int))
+		      (setf
+		 
+		 
+                 ,(g `_code_repository) (string ,(format nil "github.com/plops/build_pluto_firmware"))
+		 
+                 ,(g `_code_generation_time) 
+                 (string ,(multiple-value-bind
+                                (second minute hour date month year day-of-week dst-p tz)
+                              (get-decoded-time)
+                            (declare (ignorable dst-p))
+			    (format nil "~2,'0d:~2,'0d:~2,'0d of ~a, ~d-~2,'0d-~2,'0d (GMT~@d)"
+				    hour
+				    minute
+				    second
+				    (nth day-of-week *day-names*)
+				    year
+				    month
+				    date
+				    (- tz)))))
+		      (setf ,(g `_start_time) (dot ("std::chrono::high_resolution_clock::now")
+					     (time_since_epoch)
+					     (count)))
 		      ,(logprint "start" `(argc (aref argv 0)))
-	       
+		      (do0
+		       (do0
+			(initWindow)
+			(initGui)
+			(initDraw)
+			(mainLoop))
+		       (do0
+			(cleanupDraw)
+			(cleanupGui)
+			(cleanupWindow)))
+		      
 		      (return 0)))))
+
+    (define-module
+      `(glfw_window
+	((_window :direction 'out :type GLFWwindow* )
+	 (_framebufferResized :direction 'out :type bool))
+	(do0
+	 (defun keyCallback (window key scancode action mods)
+	   (declare (type GLFWwindow* window)
+		    (type int key scancode action mods))
+	   (when (and (or (== key GLFW_KEY_ESCAPE)
+			  (== key GLFW_KEY_Q))
+		      (== action GLFW_PRESS))
+	     (glfwSetWindowShouldClose window GLFW_TRUE))
+	   )
+	 (defun errorCallback (err description)
+	   (declare (type int err)
+		    (type "const char*" description))
+	   ,(logprint "error" `(err description)))
+	 (defun framebufferResizeCallback (window width height)
+	   (declare (values "static void")
+		    ;; static because glfw doesnt know how to call a member function with a this pointer
+		    (type GLFWwindow* window)
+		    (type int width height))
+	   ,(logprint "resize" `(width height))
+	   (let ((app ("(State*)" (glfwGetWindowUserPointer window))))
+	     (setf app->_framebufferResized true)))
+	 (defun initWindow ()
+	   (declare (values void))
+	   (when (glfwInit)
+	     (do0
+	      
+	      (glfwSetErrorCallback errorCallback)
+	      
+	      (glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR 2)
+	      (glfwWindowHint GLFW_CONTEXT_VERSION_MINOR 0)
+	      
+	      (glfwWindowHint GLFW_RESIZABLE GLFW_TRUE)
+	      (let ((label)
+		    )
+		(declare (type "std::stringstream" label))
+		(<< label
+		    (string "glfw lua example [")
+		    ,(g `_code_generation_time)
+		    (string "] git:")
+		    "std::fixed"
+		    ("std::setprecision" 3)
+		    ,(g `_main_version)
+		    ))
+	      
+	      (setf ,(g `_window) (glfwCreateWindow 930 930
+						    (dot label (str) (c_str))
+						    
+						    NULL
+						    NULL))
+	      ,(logprint "initWindow" `(,(g `_window)
+					 (glfwGetVersionString)))
+	      ;; store this pointer to the instance for use in the callback
+	      (glfwSetKeyCallback ,(g `_window) keyCallback)
+	      (glfwSetWindowUserPointer ,(g `_window) (ref state))
+	      (glfwSetFramebufferSizeCallback ,(g `_window)
+					      framebufferResizeCallback)
+	      (glfwMakeContextCurrent ,(g `_window))
+	      (glfwSwapInterval 1)
+	      )))
+	 (defun cleanupWindow ()
+	   (declare (values void))
+	   (glfwDestroyWindow ,(g `_window))
+	   (glfwTerminate)
+	   ))))
+    
+    (define-module
+      `(draw ((_fontTex :direction 'out :type GLuint)
+	      (_draw_mutex :type "std::mutex")
+	      (_draw_display_log :type bool)
+	      ,@(loop for e in `(offset_x offset_y scale_x scale_y alpha marker_x)
+		   collect
+		     `(,(format nil "_draw_~a" e) :type float))
+	      (_screen_offset :type glm--vec2)
+	      (_screen_start_pan :type glm--vec2)
+	      (_screen_scale :type float)
+	      (_screen_grid :type float)
+	      (_snapped_world_cursor :type glm--vec2)
+	)
+	     (do0
+					;,(emit-global :code `(include <glm/vec2.hpp>))
+	      (include <algorithm>)
+
+	      
+	      
+	      #+nil (do0 "// initialize static varibles"
+			 (setf "float Shape::world_scale" 1s0
+			       "glm::vec2 Shape::world_offset" (curly 0 0)))
+	      
+	      (defun uploadTex (image w h)
+		(declare (type "const void*" image)
+			 (type int w h))
+		(glGenTextures 1 (ref ,(g `_fontTex)))
+		(glBindTexture GL_TEXTURE_2D ,(g `_fontTex))
+		(glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR)
+		(glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR)
+		(glTexImage2D GL_TEXTURE_2D 0 GL_RGBA w h 0 GL_RGBA GL_UNSIGNED_BYTE image))
+
+	      (defun screen_width ()
+		(declare (values int))
+		(let ((width 0)
+		      (height 0))
+		  (declare (type int width height))
+		  (glfwGetFramebufferSize ,(g `_window)
+					  &width
+					  &height)
+		  (return width)))
+	      (defun screen_height ()
+		(declare (values int))
+		(let ((width 0)
+		      (height 0))
+		  (declare (type int width height))
+		  (glfwGetFramebufferSize ,(g `_window)
+					  &width
+					  &height)
+		  (return height)))
+
+	      (defun get_mouse_position ()
+		(declare (values "glm::vec2"))
+		(let ((x 0d0)
+		      (y 0d0))
+		  (glfwGetCursorPos ,(g `_window)
+				    &x &y)
+		  (return (glm--vec2 (curly (static_cast<float> x)
+					    (static_cast<float> y))))))
+	      (defun draw_circle (sx sy rad)
+		(declare (type float sx sy rad))
+		(glBegin GL_LINE_LOOP)
+		,@(let ((n 113))
+		    (loop for i upto n collect
+			 `(progn
+			    (let ((arg ,(/ (* 1s0 i) (+ n 1)))
+				  )
+			      (glVertex2f (+ sx (* rad (sinf (* 2 M_PI arg))))
+					  (+ sy (* rad (cosf (* 2 M_PI arg)))))))))
+		(glEnd))
+	      (defun initDraw ()
+
+		(progn
+		  ,(guard (g `_draw_mutex))
+		  (setf ,(g `_draw_display_log) true)
+		  ,@(loop for (e f) in `((offset_x -.03)
+					 (offset_y -.44)
+					 (scale_x .22s0)
+					 (scale_y .23s0)
+					 (alpha .19s0)
+					 (marker_x 100s0))
+		       collect
+			 `(setf ,(g (format nil "_draw_~a" e)) ,f)))
+					;(glEnable GL_TEXTURE_2D)
+		#+nil (glEnable GL_DEPTH_TEST)
+		(do0 (glHint GL_LINE_SMOOTH GL_NICEST)
+		     (do0 (glEnable GL_BLEND)
+			  (glBlendFunc GL_SRC_ALPHA
+				       GL_ONE_MINUS_SRC_ALPHA)))
+		(glClearColor 0 0 0 1)
+		(setf ,(g `_framebufferResized) true)
+		(setf ,(g `_screen_offset) (curly 0s0 0s0)
+		      ,(g `_screen_start_pan) (curly 0s0 0s0)
+		      ,(g `_screen_scale) 10s0
+		      ,(g `_screen_grid) 1s0
+		      
+		      )
+
+		(do0
+		 "// default offset to middle of screen"
+		 (setf ,(g `_screen_offset) (curly (/ (static_cast<float> (/ (screen_width) -2))
+						      ,(g `_screen_scale))
+						   (/ (static_cast<float> (/ (screen_height) -2))
+						      ,(g `_screen_scale)))
+		       )
+                 )
+		,(logprint "screen"
+			   `(,@(loop for e in `((aref _screen_offset 0)
+						(aref _screen_offset 1)
+						(aref _screen_start_pan 0)
+						(aref _screen_start_pan 1)
+						_screen_scale
+						_screen_grid) collect
+				    (g e))))
+		)
+
+	      (defun world_to_screen (v screeni screenj)
+		(declare (type "const glm::vec2 &" v)
+			 (type "int&" screeni screenj))
+		(setf screeni (static_cast<int> (* (- (aref v 0)
+						      (aref ,(g `_screen_offset) 0))
+						   ,(g `_screen_scale)))
+		      screenj (static_cast<int> (* (- (aref v 1)
+						      (aref ,(g `_screen_offset) 1))
+						   ,(g `_screen_scale)))))
+
+	      (defun screen_to_world (screeni screenj v)
+		(declare (type "glm::vec2 &" v)
+			 (type "int" screeni screenj))
+		
+		(setf (aref v 0) (+ (/ (static_cast<float> screeni)
+				       ,(g `_screen_scale))
+				    (aref ,(g `_screen_offset) 0))
+		      (aref v 1) (+ (/ (static_cast<float> screenj)
+				       ,(g `_screen_scale))
+				    (aref ,(g `_screen_offset) 1))
+		      ))
+	      
+	      (defun cleanupDraw ()
+		(glDeleteTextures 1 (ref ,(g `_fontTex))))
+	      (defun drawFrame ()
+
+		(when ,(g `_framebufferResized)
+		  (do0
+		   (setf ,(g `_framebufferResized) false)
+		   (let ((width 0)
+			 (height 0))
+		     (declare (type int width height))
+		     (while (or (== 0 width)
+				(== 0 height))
+		       (glfwGetFramebufferSize ,(g `_window)
+					       &width
+					       &height)
+                       
+		       (glViewport 0 0 width height)
+		       
+		       (do0 (glMatrixMode GL_PROJECTION)
+			    (glPushMatrix)
+			    (glLoadIdentity)
+			    (glOrtho 0s0 width height 0s0 -1s0 1s0)
+					;(glOrtho -1s0 1s0 -1s0 1s0 -1s0 1s0)
+			    )
+
+		       (do0
+			#+nil ,(logprint "drawFrame resize" `((screen_width) width
+							(screen_height) height))
+			"// default offset to middle of screen"
+			(setf ,(g `_screen_offset) (curly (/ (static_cast<float> (/ (screen_width) -2))
+							     ,(g `_screen_scale))
+							  (/ (static_cast<float> (/ (screen_height) -2))
+							     ,(g `_screen_scale)))))
+		       
+		       (do0 (glMatrixMode GL_MODELVIEW)
+			    (glPushMatrix)
+			    (glLoadIdentity))))))
+
+		
+		(glClear (logior GL_COLOR_BUFFER_BIT
+				 GL_DEPTH_BUFFER_BIT))
+
+		(do0
+		 (let ((mouse_state (glfwGetMouseButton ,(g `_window)
+							GLFW_MOUSE_BUTTON_MIDDLE))
+		       (old_mouse_state GLFW_RELEASE)
+		       (mouse_pos (get_mouse_position)))
+		   (declare (type "static int" old_mouse_state))
+		   
+		   (when (and (== mouse_state GLFW_PRESS) ;; new press
+			      (== old_mouse_state GLFW_RELEASE))
+					;,(logprint "left mouse is pressed")
+		     (setf ,(g `_screen_start_pan) mouse_pos))
+
+		   (when (and (== mouse_state GLFW_PRESS) ;; button is being held
+			      (== old_mouse_state GLFW_PRESS))
+		     ;;,(logprint "left mouse is held")
+		     (decf ,(g `_screen_offset)
+			   (/ (- mouse_pos ,(g `_screen_start_pan))
+			      ,(g `_screen_scale)))
+		     (setf ,(g `_screen_start_pan) mouse_pos))
+
+		   (do0
+		    ;; zoom
+		    (let ((mouse_before_zoom (glm--vec2))
+			  (zoom_speed .05s0))
+		      (screen_to_world (static_cast<int> (aref mouse_pos 0))
+				       (static_cast<int> (aref mouse_pos 1))
+				       mouse_before_zoom)
+
+		      (progn
+			(let ((key_state (glfwGetKey ,(g `_window)
+						     GLFW_KEY_PERIOD)))
+			  (when (== key_state GLFW_PRESS)
+			    ;; zoom out with .
+			    (setf ,(g `_screen_scale)
+				  (* (- 1s0 zoom_speed)  ,(g `_screen_scale))))))
+		      (progn
+			(let ((key_state (glfwGetKey ,(g `_window)
+						     GLFW_KEY_COMMA)))
+			  (when (== key_state GLFW_PRESS)
+			    ;; zoom in with ,
+			    (setf ,(g `_screen_scale)
+				  (* (+ 1s0 zoom_speed) ,(g `_screen_scale))))))
+		      (let ((mouse_after_zoom (glm--vec2)))
+			(screen_to_world (static_cast<int> (aref mouse_pos 0))
+					 (static_cast<int> (aref mouse_pos 1))
+					 mouse_after_zoom)
+			(incf ,(g `_screen_offset)
+			      (- mouse_before_zoom
+				 mouse_after_zoom))
+
+			(do0
+			 "// compute snapped world cursor"
+			 ,@(loop for i below 2 collect
+				`(setf (aref ,(g `_snapped_world_cursor ) ,i)
+				       (floorf (* (+ .5s0 (aref mouse_after_zoom ,i))
+						  ,(g `_screen_grid)))))))))
+
+		  
+		   
+		   (setf old_mouse_state mouse_state)))
+
+
+		(do0
+		 ;; get visible world
+		 (let ((world_top_left (glm--vec2))
+		       (world_bottom_right (glm--vec2)))
+		   (screen_to_world 0 0 world_top_left)
+		   (screen_to_world (screen_width)
+				    (screen_height)
+				    world_bottom_right)
+		   ,@(loop for (edge op) in `((world_top_left floor)
+					      (world_bottom_right ceil))
+			append
+			  (loop for i below 2 collect
+			       `(setf (aref ,edge ,i)
+				      (,op (aref ,edge ,i)))))
+		   (do0
+		    ;; world axes
+		    (let ((sx 0)
+			  (sy 0)
+			  (ex 0)
+			  (ey 0))
+		      (do0 ;; y axis
+		       (world_to_screen (curly 0 (aref world_top_left 1)) sx sy)
+		       (world_to_screen (curly 0 (aref world_bottom_right 1)) ex ey)
+		       (glColor4f .8 .3 .3 1)
+		       (glEnable GL_LINE_STIPPLE)
+		       (glLineStipple 1 (hex #xF0F0))
+		       (glBegin GL_LINES)
+		       (glVertex2f sx sy)
+		       (glVertex2f ex ey)
+		       (glEnd)
+					;(glLineStipple 1 (hex #xFFFF))
+		       )
+		      (do0 ;; x axis
+		       (world_to_screen (curly (aref world_top_left 0) 0) sx sy)
+		       (world_to_screen (curly (aref world_bottom_right 0) 0) ex ey)
+		       (glColor4f .8 .3 .3 1)
+					;(glLineStipple 1 (hex #xF0F0))
+		       (glBegin GL_LINES)
+		       (glVertex2f sx sy)
+		       (glVertex2f ex ey)
+		       (glEnd))
+		      
+		      (do0
+		       ;; grid axes
+		       (glColor4f .3 .3 .3 1)
+		       (glLineStipple 1 (hex #xAAAA))
+		       (glBegin GL_LINES)
+		       
+		       ,@(loop for i from -100 upto 100 collect
+			    ;; parallel to x axis
+			      `(do0 (world_to_screen (curly (aref world_top_left 0) ,i) sx sy)
+				    (world_to_screen (curly (aref world_bottom_right 0) ,i) ex ey)
+				    (glVertex2f sx sy)
+				    (glVertex2f ex ey)))
+		       ,@(loop for i from -100 upto 100 collect
+			    ;; parallel to y axis
+			      `(do0 (world_to_screen (curly ,i (aref world_top_left 1)) sx sy)
+				    (world_to_screen (curly ,i (aref world_bottom_right 1)) ex ey)
+				    (glVertex2f sx sy)
+				    (glVertex2f ex ey)))
+		       (glEnd)
+		       (do0 (glLineStipple 1 (hex #xFFFF))
+			    (glDisable GL_LINE_STIPPLE))
+
+		  
+
+		       (do0
+			"// draw snapped cursor circle"
+			(world_to_screen ,(g `_snapped_world_cursor) sx sy)
+			(glColor3f 1s0 1s0 0s0)
+			(draw_circle sx sy 3)
+			))))))
+
+		(do0 ;; mouse cursor
+		 (glColor4f 1 1 1 1)
+		 
+		 (do0
+		  (glBegin GL_LINES)
+		  (let ((x ,(g `_cursor_xpos))
+			(y ,(g `_cursor_ypos))
+			(h (screen_height))
+			(w (screen_width)))
+	
+		    (do0
+		     (glVertex2d x (* 0 h))
+		     (glVertex2d x (* 1 h))
+		     (glVertex2d (* 0 w) y)
+		     (glVertex2d (* 1 w) y)))
+		  (glEnd)))))))
+
+
+    (define-module
+      `(gui ((_gui_mutex :type "std::mutex")
+	     (_gui_request_diff_reset :type bool))
+	    (do0
+	     "// https://youtu.be/nVaQuNXueFw?t=317"
+	     "// https://blog.conan.io/2019/06/26/An-introduction-to-the-Dear-ImGui-library.html"
+	     (include <imgui.h>
+		      <backends/imgui_impl_glfw.h>
+		      <backends/imgui_impl_opengl2.h>)
+	     (include <algorithm>
+		      <string>)
+	     (include <iostream>
+		      <fstream>)
+	     (defun initGui ()
+	       ,(logprint "initGui" '())
+	       (IMGUI_CHECKVERSION)
+	       ("ImGui::CreateContext")
+	       
+	       (ImGui_ImplGlfw_InitForOpenGL ,(g `_window)
+					     true)
+	       (ImGui_ImplOpenGL2_Init)
+	       ("ImGui::StyleColorsDark"))
+	     (defun cleanupGui ()
+	       (ImGui_ImplOpenGL2_Shutdown)
+	       (ImGui_ImplGlfw_Shutdown)
+	       ("ImGui::DestroyContext"))
+	    
+	     
+	     (defun drawGui ()
+	       #+nil (<< "std::cout"
+			 (string "g")
+			 "std::flush")
+	       
+	       (ImGui_ImplOpenGL2_NewFrame)
+	       (ImGui_ImplGlfw_NewFrame)
+	       ("ImGui::NewFrame")
+	       
+	       (do0
+		(ImGui--Begin (string "snapped_cursor"))
+		(ImGui--Text (string "x: %04d y: %04d")
+			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 0))
+			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 1)))
+		(ImGui--End))	       
+	       
+	       (let ((b true))
+		 ("ImGui::ShowDemoWindow" &b))
+	       ("ImGui::Render")
+	       (ImGui_ImplOpenGL2_RenderDrawData
+		("ImGui::GetDrawData"))
+	       ))))
+    
+    
 
   )
   
@@ -282,12 +826,16 @@
 		    #+nil (include <deque>
 			     <map>
 			     <string>)
-		    #+nil (include <thread>
-			     <mutex>
-			     <queue>
-			     <condition_variable>
+		     (include <thread>
+			      <mutex>
+			     ;<queue>
+			     ;<condition_variable>
 			     )
-		    " "
+		     " "
+		     (include <GLFW/glfw3.h>
+			      <glm/geometric.hpp>
+			      <glm/vec2.hpp>
+			      <glm/vec4.hpp>)
 
 		    " "
 		    ;(include "proto2.h")
