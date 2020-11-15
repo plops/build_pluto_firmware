@@ -14,6 +14,8 @@
 struct State {
   typeof(std::chrono::high_resolution_clock::now().time_since_epoch().count())
       _start_time;
+  int _iqdata_bytes;
+  std::array<int16_t, 1024 * 128 * 2> _iqdata;
   bool _gui_request_diff_reset;
   std::mutex _gui_mutex;
   glm::vec2 _snapped_world_cursor;

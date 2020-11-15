@@ -40,6 +40,7 @@ void drawGui() {
   ImGui::Text("x: %04d y: %04d",
               static_cast<int>(state._snapped_world_cursor[0]),
               static_cast<int>(state._snapped_world_cursor[1]));
+  ImGui::Text("iqdata_bytes: %d", state._iqdata_bytes);
   ImGui::End();
   auto b = true;
   ImGui::ShowDemoWindow(&b);

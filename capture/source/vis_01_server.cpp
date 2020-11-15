@@ -46,6 +46,14 @@ void create_server(uint8_t *buf, size_t nbytes) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("accept failed") << (" ") << (std::endl) << (std::flush);
   }
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("attempt to write")
+      << (" ") << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
+      << (std::endl) << (std::flush);
   auto n = write(fd1, buf, nbytes);
   if ((n) < (0)) {
 
@@ -57,6 +65,14 @@ void create_server(uint8_t *buf, size_t nbytes) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("write failed") << (" ") << (std::endl) << (std::flush);
   }
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("bytes written: ")
+      << (" ") << (std::setw(8)) << (" n='") << (n) << ("'") << (std::endl)
+      << (std::flush);
   close(fd1);
   close(fd);
 }

@@ -319,7 +319,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 48 64 4096) ;; 48
+			    (let (("const nbuf" (* 16 64 4096) ;; 48
 						;4096
 						))
 			      ,(logprint "create buffer")
@@ -422,7 +422,7 @@
 					     (incf i)
 					     (setf old mlow)
 					     )
-					,(logprint "finished" `(ma trig trig1)))
+					,(logprint "finished" `(ma trig trig1 (outiq.size))))
 					
 					)
 				      (create_server ;(reinterpret_cast<uint8_t*> &header)
@@ -516,10 +516,12 @@
 			    (when (< nh 0)
 			      ,(logprint "writing header failed"))
 			    )
+			  ,(logprint "attempt to write" `(nbytes))
 			  (let ((n (write fd1 buf nbytes)))
 			    (when (< n 0)
 			      ,(logprint "write failed"))
-			    ) 
+			    )
+			  ,(logprint "bytes written: " `(n))
 			  (close fd1)
 			  (close fd)
 			  ))))))

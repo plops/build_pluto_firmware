@@ -37,8 +37,17 @@ void initClient() {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("connect failed") << (" ") << (std::endl) << (std::flush);
   }
-  auto buffer = std::array<char, 256>();
-  auto n = read(fd, buffer.data(), 254);
+  auto n = read(fd, reinterpret_cast<uint8_t *>(state._iqdata.data()),
+                ((2) * (state._iqdata.size())));
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("read returned")
+      << (" ") << (std::setw(8)) << (" n='") << (n) << ("'") << (std::endl)
+      << (std::flush);
+  state._iqdata_bytes = n;
   if ((n) < (0)) {
 
     (std::cout) << (std::setw(10))

@@ -700,9 +700,12 @@
 	       
 	       (do0
 		(ImGui--Begin (string "snapped_cursor"))
+
 		(ImGui--Text (string "x: %04d y: %04d")
 			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 0))
 			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 1)))
+		(ImGui--Text (string "iqdata_bytes: %d")
+			     ,(g `_iqdata_bytes))
 		(ImGui--End))	       
 	       
 	       (let ((b true))
@@ -713,7 +716,8 @@
 	       ))))
     
     (define-module
-       `(client ()
+	`(client ((_iqdata :direction 'out :type "std::array<int16_t,1024*128*2>")
+		  (_iqdata_bytes :direction 'out :type int))
 	      (do0
 	       (include <sys/types.h>
 			<sys/socket.h>
@@ -753,8 +757,14 @@
 				  0)
 			  ,(logprint "connect failed"))
 			
-			(let ((buffer ("std::array<char,256>"))
-			      (n (read fd (dot buffer (data)) 254)))
+			(let (;(buffer ("std::array<int16_t,1024*128*2>"))
+			      (n (read fd
+				       (reinterpret_cast<uint8_t*> (dot ,(g `_iqdata)
+									(data)))
+				       (* 2 (dot ,(g `_iqdata)
+						 (size))))))
+			  ,(logprint "read returned" `(n))
+			  (setf ,(g `_iqdata_bytes) n)
 			  (when (< n 0)
 			    ,(logprint "socket read failed")))
 			(close fd))))))
