@@ -19,7 +19,7 @@ extern State state;
 void initClient() {
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
-  auto server = gethostbyname("192.168.2.1");
+  auto server = gethostbyname("localhost");
   struct sockaddr_in server_addr = {};
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(portno);

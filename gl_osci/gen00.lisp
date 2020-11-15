@@ -662,7 +662,7 @@
 		 (when ,(g `_iqdata_bytes)
 		   (let ((n (/ ,(g `_iqdata_bytes) (* 2 2)))
 			 (q (/ 1s2))
-			 (s (/ 100s0 40s3)))
+			 (s (/ -100s0 40s3)))
 		     (do0 ;; plot I data
 		      (glColor3f 1s0 .3s0 .3s0)
 		      (glBegin GL_LINE_STRIP)
@@ -683,6 +683,23 @@
 			
 			(do0 (setf x (* q i)
 				   y (* s (aref ,(g `_iqdata) (+ 1 (* 2 i)))))
+			     (world_to_screen (curly x y)
+					      sx sy)
+			     
+			     (glVertex2f sx sy)
+			     ))
+		      (glEnd))
+		     (do0 ;; plot magnitude data
+		      (glColor3f .8s0 .8s0 1s0)
+		      (glBegin GL_LINE_STRIP)
+		      (dotimes (i n)
+			
+			
+			(do0 (setf x (* q i)
+				   y (* s (sqrt (+ (* (aref ,(g `_iqdata) (+ 1 (* 2 i)))
+						      (aref ,(g `_iqdata) (+ 1 (* 2 i))))
+						   (* (aref ,(g `_iqdata) (+ 0 (* 2 i)))
+						      (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
 			     (world_to_screen (curly x y)
 					      sx sy)
 			     
@@ -770,7 +787,8 @@
 			       (type size_t nbytes_header nbytes))
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
 			    (portno 1234)
-			    (server (gethostbyname (string "192.168.2.1")))
+			    (server (gethostbyname (string "localhost" ;"192.168.2.1"
+						    )))
 			    (server_addr "{}")
 			    ;(client_addr "{}")
 			    )
