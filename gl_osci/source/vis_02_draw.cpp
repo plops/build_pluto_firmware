@@ -2607,10 +2607,18 @@ void drawFrame() {
           sx, sy);
       if (((sample) - (old_sample))) {
         state._sample_data.push_back(dphase);
-        if ((state._sample_threshold) < (std::abs(dphase))) {
-          glColor4f((1.0f), (0.20f), (0.60f), (0.30f));
+        if ((0) == (state._sample_data.size() % 8)) {
+          if ((state._sample_threshold) < (std::abs(dphase))) {
+            glColor4f((1.0f), (0.20f), (0.60f), (0.90f));
+          } else {
+            glColor4f((0.20f), (1.0f), (0.60f), (0.90f));
+          }
         } else {
-          glColor4f((0.20f), (1.0f), (0.60f), (0.30f));
+          if ((state._sample_threshold) < (std::abs(dphase))) {
+            glColor4f((1.0f), (0.20f), (0.60f), (0.30f));
+          } else {
+            glColor4f((0.20f), (1.0f), (0.60f), (0.30f));
+          }
         }
       }
       glVertex2f(sx, sy);

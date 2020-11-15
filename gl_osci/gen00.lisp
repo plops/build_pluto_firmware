@@ -905,10 +905,18 @@
 			      (when (- sample old_sample)
 				(dot ,(g `_sample_data)
 				     (push_back dphase))
-				(if (< ,(g `_sample_threshold)
+				(if (== 0 (% (dot ,(g `_sample_data)
+						  (size))
+					     8))
+				    (if (< ,(g `_sample_threshold)
+				     (std--abs dphase))
+				  (glColor4f 1s0 .2s0 .6s0 .9s0)
+				  (glColor4f .2s0 1s0 .6s0 .9s0))
+				    (if (< ,(g `_sample_threshold)
 				     (std--abs dphase))
 				  (glColor4f 1s0 .2s0 .6s0 .3s0)
 				  (glColor4f .2s0 1s0 .6s0 .3s0)))
+				)
 			      
 			      (glVertex2f sx sy))))
 		      (glEnd)
@@ -1019,7 +1027,7 @@
 	       (ImGui_ImplGlfw_NewFrame)
 	       ("ImGui::NewFrame")
 
-	       ,(let ((n-lines 6))
+	       ,(let ((n-lines 3))
 		 `(do0
 		  (ImGui--Begin (string "snapped_cursor"))
 
@@ -1083,14 +1091,31 @@
 			  `(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
 					,@(loop for i below 16 collect
 						`(aref ,(g `_sample_binary)
-						       ,(+ (* j 16) i)))))
+						       (+ byte_count ,(+ (* j 16) i))))))
 		  (ImGui--Text (string "valid")
 			       )
 		  ,@(loop for j below n-lines collect
 			  `(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
 					,@(loop for i below 16 collect
 						`(aref ,(g `_sample_valid)
-						       ,(+ (* j 16) i)))))
+						       (+ byte_count ,(+ (* j 16) i))))))
+
+		  (do0 
+		   (ImGui--Text (string "ascii")
+				)
+		   ,@(loop for j below n-lines collect
+			   `(ImGui--Text (string " %2c %2c %2c %2c %2c %2c %2c %2c      %2c %2c %2c %2c %2c %2c %2c %2c")
+					 ,@(loop for i below 16 collect
+						 `(aref ,(g `_sample_binary)
+							(+ byte_count ,(+ (* j 16) i)))))))
+		  (do0 
+		   (ImGui--Text (string "ascii~")
+				)
+		   ,@(loop for j below n-lines collect
+			   `(ImGui--Text (string " %2c %2c %2c %2c %2c %2c %2c %2c      %2c %2c %2c %2c %2c %2c %2c %2c")
+					 ,@(loop for i below 16 collect
+						 `(~ (aref ,(g `_sample_binary)
+							 (+ byte_count ,(+ (* j 16) i))))))))
 
 		 
 		  (ImGui--End)))	       
