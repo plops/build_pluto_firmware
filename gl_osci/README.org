@@ -1,3 +1,6 @@
+- opengl based visualization of the sdr packets acquired with
+  ../capture on the adalm pluto
+
 
 - dependencies on fedora
 #+begin_example
