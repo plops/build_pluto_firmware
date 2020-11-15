@@ -2480,7 +2480,8 @@ void drawFrame() {
       glVertex2f(sx, sy);
     }
     glEnd();
-    glColor3f((0.20f), (1.0f), (0.60f));
+    glColor4f((0.20f), (1.0f), (0.60f), (0.30f));
+    glLineWidth(2);
     glBegin(GL_LINE_STRIP);
     auto old_i = (0.f);
     auto old_q = (0.f);
@@ -2533,7 +2534,71 @@ void drawFrame() {
       glVertex2f(sx, sy);
     }
     glEnd();
-    glColor3f((0.90f), (1.0f), (0.90f));
+    glColor3f((0.20f), (1.0f), (0.60f));
+    glLineWidth(3);
+    glBegin(GL_LINE_STRIP);
+    auto sample = 0;
+    auto old_sample = 0;
+    for (auto i = 0; (i) < (n); (i) += (1)) {
+      x = ((q) * (i));
+      if ((0) == (static_cast<int>(round(((i) / ((61.440f))))) % 2)) {
+        old_sample = sample;
+        sample = 1;
+      } else {
+        old_sample = sample;
+        sample = 0;
+      }
+      auto smooth_i =
+          ((s) * (([](float xn) -> float {
+             // filter_2_low_02_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((5.112374e-3f)) * (xn))) + ((((1.0224751e-2f)) * (xn1))) +
+                  ((((5.112374e-3f)) * (xn2))) + ((((1.7971540f)) * (yn1))) +
+                  ((((-0.8176033f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((0) + (((2) * (i))))])));
+      auto smooth_q =
+          ((s) * (([](float xn) -> float {
+             // filter_2_low_02_real
+             ;
+             static float yn1 = (0.f);
+             static float yn2 = (0.f);
+             static float xn1 = (0.f);
+             static float xn2 = (0.f);
+             float yn =
+                 (((((5.112374e-3f)) * (xn))) + ((((1.0224751e-2f)) * (xn1))) +
+                  ((((5.112374e-3f)) * (xn2))) + ((((1.7971540f)) * (yn1))) +
+                  ((((-0.8176033f)) * (yn2))));
+             xn2 = xn1;
+             xn1 = xn;
+             yn2 = yn1;
+             yn1 = yn;
+             return yn;
+           })(state._iqdata[((1) + (((2) * (i))))])));
+      auto di_dt = ((smooth_i) - (old_i));
+      auto dq_dt = ((smooth_q) - (old_q));
+      auto bot = ((((smooth_i) * (smooth_i))) + (((smooth_q) * (smooth_q))));
+      auto dphase =
+          ((((((dq_dt) * (smooth_i))) - (((di_dt) * (smooth_q))))) / (bot));
+      old_i = smooth_i;
+      old_q = smooth_q;
+      world_to_screen(
+          {x, ((3) + (((-30) * (abs(((sample) - (old_sample)))) * (dphase))))},
+          sx, sy);
+      glVertex2f(sx, sy);
+    }
+    glEnd();
+    glColor4f((0.90f), (1.0f), (0.90f), (0.30f));
+    glLineWidth(1);
     glBegin(GL_LINE_STRIP);
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));

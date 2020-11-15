@@ -802,27 +802,25 @@
 		      (glColor3f 1s0 .8s0 .4s0)
 		      (glBegin GL_LINE_STRIP)
 		      (dotimes (i n)
-			
-			
 			(do0 (setf x (* q i)
 				   y (+ -1 (* (/ -.5s0 M_PI) (+ M_PI (atan2 (aref ,(g `_iqdata) (+ 1 (* 2 i)))
-								       (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
+									    (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
 			     (world_to_screen (curly x y)
 					      sx sy)
-			     
-			     (glVertex2f sx sy)
-			     ))
+			     (glVertex2f sx sy)))
 		      (glEnd))
 
 		     (do0 ;; plot time derivative of phase data
-		      (glColor3f .2s0 1s0 .6s0)
+		      (glColor4f .2s0 1s0 .6s0 .3s0)
+		      (glLineWidth 2)
 		      (glBegin GL_LINE_STRIP)
 		      (let ((old_i 0s0)
-			    (old_q 0s0))
+			    (old_q 0s0)
+			    )
 		       (dotimes (i n)
 			 (do0 (setf x (* q i)
 				    )
-
+			    
 			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
 				    (smooth_q (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
 				    (di_dt (- smooth_i old_i))
@@ -840,12 +838,55 @@
 			      (world_to_screen (curly x (+ 3 (* -30 dphase)))
 					       sx sy)
 			     
-			      (glVertex2f sx sy)
-			      )))
+			      (glVertex2f sx sy))
+			 )
+			)
+		      (glEnd))
+
+		     (do0 ;; plot time derivative of phase data sampled
+		      (glColor3f .2s0 1s0 .6s0)
+		      (glLineWidth 3)
+		      (glBegin GL_LINE_STRIP)
+		      (let (
+			    (sample 0)
+			    (old_sample 0))
+		       (dotimes (i n)
+			 (do0 (setf x (* q i)
+				    )
+			      (do0
+			       
+			       (if (== 0 (% (static_cast<int> (round (/ i 61.44))) 2))
+				   (do0 (setf old_sample sample)
+					(setf sample 1))
+				   (do0 (setf old_sample sample)
+					(setf sample 0)))
+			       
+			       )
+			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
+				    (smooth_q (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
+				    (di_dt (- smooth_i old_i))
+				    (dq_dt (- smooth_q old_q))
+				    (bot (+ (* smooth_i smooth_i)
+					    (* smooth_q smooth_q)))
+				    ;; imaginary part of complex division
+				    (dphase (/ (- (* dq_dt smooth_i)
+						  (* di_dt smooth_q))
+					       bot)))
+			       
+				)
+			      (setf old_i smooth_i
+				    old_q smooth_q)
+			      (world_to_screen (curly x (+ 3 (* -30 (abs (- sample old_sample)) dphase)))
+					       sx sy)
+			     
+			      (glVertex2f sx sy))
+			 )
+			)
 		      (glEnd))
 
 		     (do0 ;; plot 1MSPS lines
-		      (glColor3f .9s0 1s0 .9s0)
+		      (glColor4f .9s0 1s0 .9s0 .3s0)
+		      (glLineWidth 1)
 		      (glBegin GL_LINE_STRIP)
 		      (dotimes (i n)
 			(do0 (setf x (* q i))
