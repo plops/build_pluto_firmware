@@ -18,6 +18,7 @@ struct State {
   std::array<int16_t, 1024 * 128 * 2> _iqdata;
   bool _gui_request_diff_reset;
   std::mutex _gui_mutex;
+  std::vector<uint8_t> _sample_valid;
   std::vector<uint8_t> _sample_binary;
   std::vector<float> _sample_data;
   float _sample_threshold;

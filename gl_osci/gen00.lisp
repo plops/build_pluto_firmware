@@ -423,6 +423,7 @@
 	      (_sample_threshold :type float)
 	      (_sample_data :type "std::vector<float>")
 	      (_sample_binary :type "std::vector<uint8_t>")
+	      (_sample_valid :type "std::vector<uint8_t>")
 	)
 	     (do0
 					;,(emit-global :code `(include <glm/vec2.hpp>))
@@ -483,7 +484,7 @@
 		(glEnd))
 	      (defun initDraw ()
 		(setf ,(g `_sample_offset) 0s0
-		      ,(g `_sample_threshold) 1s0)
+		      ,(g `_sample_threshold) .01s0)
 		(progn
 		  ,(guard (g `_draw_mutex))
 		  (setf ,(g `_draw_display_log) true)
@@ -914,16 +915,22 @@
 		      (glEnd)
 		      (let ((bit_count 0)
 			    ;(byte_count 0)
-			    (byte (uint8_t 0)))
+			    (byte (uint8_t 0))
+			    (byte_valid (uint8_t 0))
+			    )
 		       (dot ,(g `_sample_binary)
+			    (clear))
+			(dot ,(g `_sample_valid)
 			    (clear))
 			
 			(for-range (v ,(g `_sample_data)
 				   )
 				   (let (
-					 (current_bit 0))
+					 (current_bit 0)
+					 (current_valid 0))
 				     (when (< ,(g `_sample_threshold)
 					      (std--abs v))
+				       (setf current_valid 1)
 				       (if (< 0 v)
 					    (do0
 					     (setf current_bit 0))
@@ -936,12 +943,20 @@
 					     (* current_bit
 						(<< 1 bit_count)))
 				     )
+				     (setf byte_valid
+				     (logior byte_valid
+					     (* current_valid
+						(<< 1 bit_count)))
+				     )
 			       (incf bit_count)
 			       (when (== bit_count 8)
 				 (setf bit_count 0)
 				 (dot ,(g `_sample_binary)
 				      (push_back byte))
-				 (setf byte 0))
+				 (dot ,(g `_sample_valid)
+				      (push_back byte_valid))
+				 (setf byte 0
+				       byte_valid 0))
 				     ))
 			)
 		      )
@@ -1004,28 +1019,73 @@
 	       (ImGui_ImplOpenGL2_NewFrame)
 	       (ImGui_ImplGlfw_NewFrame)
 	       ("ImGui::NewFrame")
-	       
-	       (do0
-		(ImGui--Begin (string "snapped_cursor"))
 
-		(ImGui--Text (string "x: %04d y: %04d")
-			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 0))
-			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 1)))
-		(ImGui--Text (string "iqdata_bytes: %d")
-			     ,(g `_iqdata_bytes))
-		(ImGui--Text (string "sample_offset: %f")
-			     ,(g `_sample_offset))
-		(ImGui--Text (string "sample_threshold: %f")
-			     ,(g `_sample_threshold))
-		(ImGui--Text (string "sample_binary size: %zu")
-			     (dot ,(g `_sample_binary)
-				  (size)))
-		,@(loop for j below 12 collect
-			`(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
-				 ,@(loop for i below 16 collect
-					 `(aref ,(g `_sample_binary)
-						,(+ (* j 16) i)))))
-		(ImGui--End))	       
+	       ,(let ((n-lines 6))
+		 `(do0
+		  (ImGui--Begin (string "snapped_cursor"))
+
+		  (ImGui--Text (string "x: %04d y: %04d")
+			       (static_cast<int> (aref ,(g `_snapped_world_cursor) 0))
+			       (static_cast<int> (aref ,(g `_snapped_world_cursor) 1)))
+		  (ImGui--Text (string "iqdata_bytes: %d")
+			       ,(g `_iqdata_bytes))
+		  (ImGui--Text (string "sample_offset: %f")
+			       ,(g `_sample_offset))
+		  (ImGui--Text (string "sample_threshold: %f")
+			       ,(g `_sample_threshold))
+		  (ImGui--Text (string "sample_binary size: %zu")
+			       (dot ,(g `_sample_binary)
+				    (size)))
+		  ,@(loop for j below n-lines collect
+			  `(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
+					,@(loop for i below 16 collect
+						`(aref ,(g `_sample_binary)
+						       ,(+ (* j 16) i)))))
+		  (ImGui--Text (string "valid")
+			       )
+		  ,@(loop for j below n-lines collect
+			  `(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
+					,@(loop for i below 16 collect
+						`(aref ,(g `_sample_valid)
+						       ,(+ (* j 16) i)))))
+
+		  (do0 ;; state machine to search for a run of at
+		       ;; least 8 invalid bytes. the valid bits behind
+		       ;; this are payload
+		   (let ((first_valid_byte 0)
+			 (first_valid_bit 0)
+			 (zero_count 0)
+			 (byte_count 0)
+			 (state 0))
+		     ;; 0 .. search for zero (if found go to 1, else stay in 0)
+		     ;; 1 .. search for 8 or more zeros (if 8 zeros found goto 2, if zero count it and stay in 1,  if non-zero goto 0)
+		     ;; 2 .. cross remaining zeros (if non-zero goto 3, if zero stay in 2)
+		     ;; 3 .. payload starts (return payload byte and bit)
+		     
+		     (for-range (v ,(g `_sample_valid))
+				(case state
+				  (0 (progn
+				       (when (== 0 v)
+					 (setf state 1
+					       zero_count 1))
+				       break))
+				  (1 (progn
+				       (if (== 0 v)
+					   (incf zero_count)
+					   (setf state 0))
+				       (when (== zero_count 8)
+					   (setf state 2))
+				       break))
+				  (2 (progn
+				       (when (< 0 v)
+					 (setf state 3))
+				       break))
+				  )
+				(when (== 3 state)
+				  break)
+				(incf byte_count)))
+		   )
+		  (ImGui--End)))	       
 	       
 	       (let ((b true))
 		 ("ImGui::ShowDemoWindow" &b))

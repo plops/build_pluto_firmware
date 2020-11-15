@@ -103,66 +103,55 @@ void drawGui() {
       state._sample_binary[90], state._sample_binary[91],
       state._sample_binary[92], state._sample_binary[93],
       state._sample_binary[94], state._sample_binary[95]);
+  ImGui::Text("valid");
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[96], state._sample_binary[97],
-      state._sample_binary[98], state._sample_binary[99],
-      state._sample_binary[100], state._sample_binary[101],
-      state._sample_binary[102], state._sample_binary[103],
-      state._sample_binary[104], state._sample_binary[105],
-      state._sample_binary[106], state._sample_binary[107],
-      state._sample_binary[108], state._sample_binary[109],
-      state._sample_binary[110], state._sample_binary[111]);
+      state._sample_valid[0], state._sample_valid[1], state._sample_valid[2],
+      state._sample_valid[3], state._sample_valid[4], state._sample_valid[5],
+      state._sample_valid[6], state._sample_valid[7], state._sample_valid[8],
+      state._sample_valid[9], state._sample_valid[10], state._sample_valid[11],
+      state._sample_valid[12], state._sample_valid[13], state._sample_valid[14],
+      state._sample_valid[15]);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[112], state._sample_binary[113],
-      state._sample_binary[114], state._sample_binary[115],
-      state._sample_binary[116], state._sample_binary[117],
-      state._sample_binary[118], state._sample_binary[119],
-      state._sample_binary[120], state._sample_binary[121],
-      state._sample_binary[122], state._sample_binary[123],
-      state._sample_binary[124], state._sample_binary[125],
-      state._sample_binary[126], state._sample_binary[127]);
+      state._sample_valid[16], state._sample_valid[17], state._sample_valid[18],
+      state._sample_valid[19], state._sample_valid[20], state._sample_valid[21],
+      state._sample_valid[22], state._sample_valid[23], state._sample_valid[24],
+      state._sample_valid[25], state._sample_valid[26], state._sample_valid[27],
+      state._sample_valid[28], state._sample_valid[29], state._sample_valid[30],
+      state._sample_valid[31]);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[128], state._sample_binary[129],
-      state._sample_binary[130], state._sample_binary[131],
-      state._sample_binary[132], state._sample_binary[133],
-      state._sample_binary[134], state._sample_binary[135],
-      state._sample_binary[136], state._sample_binary[137],
-      state._sample_binary[138], state._sample_binary[139],
-      state._sample_binary[140], state._sample_binary[141],
-      state._sample_binary[142], state._sample_binary[143]);
+      state._sample_valid[32], state._sample_valid[33], state._sample_valid[34],
+      state._sample_valid[35], state._sample_valid[36], state._sample_valid[37],
+      state._sample_valid[38], state._sample_valid[39], state._sample_valid[40],
+      state._sample_valid[41], state._sample_valid[42], state._sample_valid[43],
+      state._sample_valid[44], state._sample_valid[45], state._sample_valid[46],
+      state._sample_valid[47]);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[144], state._sample_binary[145],
-      state._sample_binary[146], state._sample_binary[147],
-      state._sample_binary[148], state._sample_binary[149],
-      state._sample_binary[150], state._sample_binary[151],
-      state._sample_binary[152], state._sample_binary[153],
-      state._sample_binary[154], state._sample_binary[155],
-      state._sample_binary[156], state._sample_binary[157],
-      state._sample_binary[158], state._sample_binary[159]);
+      state._sample_valid[48], state._sample_valid[49], state._sample_valid[50],
+      state._sample_valid[51], state._sample_valid[52], state._sample_valid[53],
+      state._sample_valid[54], state._sample_valid[55], state._sample_valid[56],
+      state._sample_valid[57], state._sample_valid[58], state._sample_valid[59],
+      state._sample_valid[60], state._sample_valid[61], state._sample_valid[62],
+      state._sample_valid[63]);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[160], state._sample_binary[161],
-      state._sample_binary[162], state._sample_binary[163],
-      state._sample_binary[164], state._sample_binary[165],
-      state._sample_binary[166], state._sample_binary[167],
-      state._sample_binary[168], state._sample_binary[169],
-      state._sample_binary[170], state._sample_binary[171],
-      state._sample_binary[172], state._sample_binary[173],
-      state._sample_binary[174], state._sample_binary[175]);
+      state._sample_valid[64], state._sample_valid[65], state._sample_valid[66],
+      state._sample_valid[67], state._sample_valid[68], state._sample_valid[69],
+      state._sample_valid[70], state._sample_valid[71], state._sample_valid[72],
+      state._sample_valid[73], state._sample_valid[74], state._sample_valid[75],
+      state._sample_valid[76], state._sample_valid[77], state._sample_valid[78],
+      state._sample_valid[79]);
   ImGui::Text(
       " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x",
-      state._sample_binary[176], state._sample_binary[177],
-      state._sample_binary[178], state._sample_binary[179],
-      state._sample_binary[180], state._sample_binary[181],
-      state._sample_binary[182], state._sample_binary[183],
-      state._sample_binary[184], state._sample_binary[185],
-      state._sample_binary[186], state._sample_binary[187],
-      state._sample_binary[188], state._sample_binary[189],
-      state._sample_binary[190], state._sample_binary[191]);
+      state._sample_valid[80], state._sample_valid[81], state._sample_valid[82],
+      state._sample_valid[83], state._sample_valid[84], state._sample_valid[85],
+      state._sample_valid[86], state._sample_valid[87], state._sample_valid[88],
+      state._sample_valid[89], state._sample_valid[90], state._sample_valid[91],
+      state._sample_valid[92], state._sample_valid[93], state._sample_valid[94],
+      state._sample_valid[95]);
   ImGui::End();
   auto b = true;
   ImGui::ShowDemoWindow(&b);

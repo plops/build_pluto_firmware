@@ -607,7 +607,7 @@ void draw_circle(float sx, float sy, float rad) {
 }
 void initDraw() {
   state._sample_offset = (0.f);
-  state._sample_threshold = (1.0f);
+  state._sample_threshold = (1.00e-2f);
   {
     // no debug
     std::lock_guard<std::mutex> guard(state._draw_mutex);
@@ -2618,10 +2618,14 @@ void drawFrame() {
     glEnd();
     auto bit_count = 0;
     auto byte = uint8_t(0);
+    auto byte_valid = uint8_t(0);
     state._sample_binary.clear();
+    state._sample_valid.clear();
     for (auto v : state._sample_data) {
       auto current_bit = 0;
+      auto current_valid = 0;
       if ((state._sample_threshold) < (std::abs(v))) {
+        current_valid = 1;
         if ((0) < (v)) {
           current_bit = 0;
         } else {
@@ -2629,11 +2633,14 @@ void drawFrame() {
         }
       }
       byte = ((byte) | (((current_bit) * ((1) << (bit_count)))));
+      byte_valid = ((byte_valid) | (((current_valid) * ((1) << (bit_count)))));
       (bit_count)++;
       if ((bit_count) == (8)) {
         bit_count = 0;
         state._sample_binary.push_back(byte);
+        state._sample_valid.push_back(byte_valid);
         byte = 0;
+        byte_valid = 0;
       }
     }
   }
