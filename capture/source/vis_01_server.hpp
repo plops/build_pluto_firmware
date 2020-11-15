@@ -13,6 +13,5 @@
 #include <iostream>
 #include <thread>
 ;
-void create_server(uint8_t *header, size_t nbytes_header, uint8_t *buf,
-                   size_t nbytes);
+void create_server(uint8_t *buf, size_t nbytes);
 #endif

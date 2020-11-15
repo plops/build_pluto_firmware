@@ -319,7 +319,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 48 64 4096)
+			    (let (("const nbuf" (* 48 64 4096) ;; 48
 						;4096
 						))
 			      ,(logprint "create buffer")
@@ -398,32 +398,35 @@
 							(<= 4000 mlow))
 					       (setf trig i))
 					     (when (< trig 0)
+					       ;; get a few more samples after trig1
 					       (do0
 						(outiq.push_back si)
 						(outiq.push_back sq)
 						(incf trig)
-						(when (== trig 0)
-						  (dotimes (i (* 16 4096))
-						    (outiq.push_back 0)
-						    (outiq.push_back 0)
-						))))
+						#+nil (when (== trig 0)
+							(dotimes (i (* 16 4096))
+							  (outiq.push_back 0)
+							  (outiq.push_back 0)
+							  ))))
+					     
 					     (when (< 0 trig)
 					       (do0
 						(outiq.push_back si)
 						(outiq.push_back sq))
-					      (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
-							 (<= mlow 2000))
-						(setf trig1 i)
-						,(logprint "" `(ma trig trig1))
-						;; read a few more samples
-						(setf trig -2000)))
+					       (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
+							  (<= mlow 2000))
+						 (setf trig1 i)
+						 ,(logprint "" `(ma trig trig1))
+						 ;; read a few more samples
+						 (setf trig -2000)))
 					     (incf i)
 					     (setf old mlow)
-					     ))
+					     )
+					,(logprint "finished" `(ma trig trig1)))
 					
 					)
-				      (create_server (reinterpret_cast<uint8_t*> &header)
-						       (sizeof header)
+				      (create_server ;(reinterpret_cast<uint8_t*> &header)
+						      ; (sizeof header)
 						       (reinterpret_cast<uint8_t*> (outiq.data))
 						       (* 2 (outiq.size))
 					;(+ (* 4 trig) start) (* 4 (- trig1 trig))
@@ -483,7 +486,8 @@
 			     )
 
 		    (comments "http://www.linuxhowtos.org/data/6/server.c")
-		    (defun create_server (header nbytes_header buf nbytes)
+		    (defun create_server (;header nbytes_header
+					  buf nbytes)
 		      (declare (type uint8_t* buf header)
 			       (type size_t nbytes_header nbytes))
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
@@ -506,7 +510,8 @@
 					   &client_len)))
 			  (when (< fd1 0)
 			    ,(logprint "accept failed"))
-			  
+
+			  #+nil
 			  (let ((nh (write fd1 header nbytes_header)))
 			    (when (< nh 0)
 			      ,(logprint "writing header failed"))

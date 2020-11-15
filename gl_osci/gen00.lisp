@@ -182,7 +182,8 @@
 		    " "
 		    (include "vis_01_glfw_window.hpp"
 			     "vis_02_draw.hpp"
-			     "vis_03_gui.hpp")
+			     "vis_03_gui.hpp"
+			     "vis_04_client.hpp")
 
 
 		    "using namespace std::chrono_literals;"
@@ -247,7 +248,9 @@
 		       (do0
 			(initWindow)
 			(initGui)
-			(initDraw)
+			(initDraw
+			 )
+			(initClient)
 			(mainLoop))
 		       (do0
 			(cleanupDraw)
@@ -709,9 +712,54 @@
 		("ImGui::GetDrawData"))
 	       ))))
     
-    
+    (define-module
+       `(client ()
+	      (do0
+	       (include <sys/types.h>
+			<sys/socket.h>
+			<netinet/in.h>
+			<unistd.h>
+			<netdb.h>
+			<strings.h>)
+	    
+		    (include <iostream>
+			     <chrono>
+			     <thread>
+			     
+			     )
 
-  )
+		    (comments "http://www.linuxhowtos.org/data/6/server.c"
+			      "http://www.linuxhowtos.org/data/6/client.c")
+		    (defun initClient ()  ;(header nbytes_header buf nbytes)
+		      (declare (type uint8_t* buf header)
+			       (type size_t nbytes_header nbytes))
+		      (let ((fd (socket AF_INET SOCK_STREAM 0))
+			    (portno 1234)
+			    (server (gethostbyname (string "192.168.2.1")))
+			    (server_addr "{}")
+			    ;(client_addr "{}")
+			    )
+			(declare (type "struct sockaddr_in" server_addr client_addr))
+			(setf server_addr.sin_family AF_INET
+			      
+			      server_addr.sin_port (htons portno))
+			(bcopy (static_cast<char*> server->h_addr)
+			       (reinterpret_cast<char*> &server_addr.sin_addr.s_addr
+						   )
+			       server->h_length)
+			(when (<  (connect fd
+					("reinterpret_cast<struct sockaddr*>" &server_addr)
+					(sizeof server_addr))
+				  0)
+			  ,(logprint "connect failed"))
+			
+			(let ((buffer ("std::array<char,256>"))
+			      (n (read fd (dot buffer (data)) 254)))
+			  (when (< n 0)
+			    ,(logprint "socket read failed")))
+			(close fd))))))
+
+ )
   
   (progn
     (progn ;with-open-file

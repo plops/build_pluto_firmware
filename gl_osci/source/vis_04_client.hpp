@@ -4,7 +4,9 @@
 ;
 #include "globals.h"
 ;
+#include <netdb.h>
 #include <netinet/in.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -13,6 +15,5 @@
 #include <iostream>
 #include <thread>
 ;
-void initClient(uint8_t *header, size_t nbytes_header, uint8_t *buf,
-                size_t nbytes);
+void initClient();
 #endif

@@ -11,6 +11,7 @@
 #include "vis_01_glfw_window.hpp"
 #include "vis_02_draw.hpp"
 #include "vis_03_gui.hpp"
+#include "vis_04_client.hpp"
 ;
 // header;
 void mainLoop();

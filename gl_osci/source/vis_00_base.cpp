@@ -11,6 +11,7 @@ extern State state;
 #include "vis_01_glfw_window.hpp"
 #include "vis_02_draw.hpp"
 #include "vis_03_gui.hpp"
+#include "vis_04_client.hpp"
 using namespace std::chrono_literals;
 
 // implementation
@@ -27,7 +28,7 @@ void mainLoop() {
 }
 int main(int argc, char **argv) {
   state._code_repository = "github.com/plops/build_pluto_firmware";
-  state._code_generation_time = "15:09:45 of Sunday, 2020-11-15 (GMT+1)";
+  state._code_generation_time = "15:12:28 of Sunday, 2020-11-15 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 

@@ -1,5 +1,4 @@
-# source /opt/Xilinx/Vivado/2019.1/settings64.sh
-# export PATH=$PATH:/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+# source /opt/Xilinx/Vivado/2019.1/settings64.sh; export PATH=$PATH:/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
 CROSS=arm-linux-gnueabihf-
 CROSS_ROOT=/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-none-eabi/arm-none-eabi/libc/
 SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot

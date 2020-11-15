@@ -6,7 +6,9 @@
 extern State state;
 #include <chrono>
 #include <iostream>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <thread>
@@ -14,8 +16,7 @@ extern State state;
 // http://www.linuxhowtos.org/data/6/server.c
 // http://www.linuxhowtos.org/data/6/client.c
 ;
-void initClient(uint8_t *header, size_t nbytes_header, uint8_t *buf,
-                size_t nbytes) {
+void initClient() {
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
   auto server = gethostbyname("192.168.2.1");
@@ -23,7 +24,8 @@ void initClient(uint8_t *header, size_t nbytes_header, uint8_t *buf,
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(portno);
   bcopy(static_cast<char *>(server->h_addr),
-        static_vast<char *>(&server_addr.sin_addr.s_addr), server->h_length);
+        reinterpret_cast<char *>(&server_addr.sin_addr.s_addr),
+        server->h_length);
   if ((connect(fd, reinterpret_cast<struct sockaddr *>(&server_addr),
                sizeof(server_addr))) < (0)) {
 

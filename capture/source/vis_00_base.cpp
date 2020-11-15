@@ -40,12 +40,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "5790ec37d3d112bfad17966d2afee29457c56b4b";
+  state._code_version = "6b65881dfe1d2f3c3c69cfada47772a24f90e7e3";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:56:24 of Thursday, 2020-11-12 (GMT+1)";
+  state._code_generation_time = "15:54:05 of Sunday, 2020-11-15 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -310,12 +310,6 @@ int main(int argc, char **argv) {
         outiq.push_back(si);
         outiq.push_back(sq);
         (trig)++;
-        if ((trig) == (0)) {
-          for (auto i = 0; (i) < (((16) * (4096))); (i) += (1)) {
-            outiq.push_back(0);
-            outiq.push_back(0);
-          }
-        }
       }
       if ((0) < (trig)) {
         outiq.push_back(si);
@@ -340,8 +334,18 @@ int main(int argc, char **argv) {
       (i)++;
       old = mlow;
     }
-    create_server(reinterpret_cast<uint8_t *>(&header), sizeof(header),
-                  reinterpret_cast<uint8_t *>(outiq.data()),
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("finished") << (" ") << (std::setw(8)) << (" ma='") << (ma)
+                << ("'") << (std::setw(8)) << (" trig='") << (trig) << ("'")
+                << (std::setw(8)) << (" trig1='") << (trig1) << ("'")
+                << (std::endl) << (std::flush);
+    create_server(reinterpret_cast<uint8_t *>(outiq.data()),
                   ((2) * (outiq.size())));
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
