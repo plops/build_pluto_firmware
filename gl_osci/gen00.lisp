@@ -332,12 +332,24 @@
 			  (== key GLFW_KEY_Q))
 		      (== action GLFW_PRESS))
 	     (glfwSetWindowShouldClose window GLFW_TRUE))
-	   (when (and (== key GLFW_KEY_UP)
-		      (== action GLFW_PRESS))
-	     (incf ,(g `_sample_offset)))
-	   (when (and (== key GLFW_KEY_DOWN)
-		      (== action GLFW_PRESS))
-	     (decf ,(g `_sample_offset)))
+	   (do0
+	    (when (and (== key GLFW_KEY_UP)
+		       (== action GLFW_PRESS))
+	      (incf ,(g `_sample_offset)))
+	    (when (and (== key GLFW_KEY_DOWN)
+		       (== action GLFW_PRESS))
+	      (decf ,(g `_sample_offset))))
+
+	   (do0
+	    (when (and (== key GLFW_KEY_1)
+		       (== action GLFW_PRESS))
+	      (setf ,(g `_sample_threshold)
+		    (* ,(g `_sample_threshold) (- 1 .1))))
+	    (when (and (== key GLFW_KEY_2)
+		       (== action GLFW_PRESS))
+	      (setf ,(g `_sample_threshold)
+		    (* ,(g `_sample_threshold) (+ 1 .1)))
+	      ))
 	   )
 	 (defun errorCallback (err description)
 	   (declare (type int err)
@@ -408,6 +420,7 @@
 	      (_screen_grid :type float)
 	      (_snapped_world_cursor :type glm--vec2)
 	      (_sample_offset :type float)
+	      (_sample_threshold :type float)
 	      (_sample_data :type "std::vector<float>")
 	      (_sample_binary :type "std::vector<uint8_t>")
 	)
@@ -469,7 +482,8 @@
 					  (+ sy (* rad (cosf (* 2 M_PI arg)))))))))
 		(glEnd))
 	      (defun initDraw ()
-		(setf ,(g `_sample_offset) 0s0)
+		(setf ,(g `_sample_offset) 0s0
+		      ,(g `_sample_threshold) 1s0)
 		(progn
 		  ,(guard (g `_draw_mutex))
 		  (setf ,(g `_draw_display_log) true)
@@ -796,7 +810,7 @@
 			
 			
 			(do0 (setf x (* q i)
-				   y (* s (sqrt (+ (* (aref ,(g `_iqdata) (+ 1 (* 2 i)))
+				   y (* s (std--sqrt (+ (* (aref ,(g `_iqdata) (+ 1 (* 2 i)))
 						      (aref ,(g `_iqdata) (+ 1 (* 2 i))))
 						   (* (aref ,(g `_iqdata) (+ 0 (* 2 i)))
 						      (aref ,(g `_iqdata) (+ 0 (* 2 i))))))))
@@ -844,6 +858,12 @@
 				)
 			      (setf old_i smooth_i
 				    old_q smooth_q)
+			      
+			      (if (< ,(g `_sample_threshold)
+				     (std--abs dphase))
+				  (glColor4f 1s0 .2s0 .6s0 .3s0)
+				  (glColor4f .2s0 1s0 .6s0 .3s0))
+
 			      (world_to_screen (curly x (+ 3 (* -30 dphase)))
 					       sx sy)
 			     
@@ -880,43 +900,50 @@
 					       bot))))
 			      (setf old_i smooth_i
 				    old_q smooth_q)
-			      (world_to_screen (curly x (+ 3 (* -30 (abs (- sample old_sample)) dphase)))
+			      (world_to_screen (curly x (+ 3 (* -30 (std--abs (- sample old_sample)) dphase)))
 					       sx sy)
 			      (when (- sample old_sample)
 				(dot ,(g `_sample_data)
-				     (push_back dphase)))
+				     (push_back dphase))
+				(if (< ,(g `_sample_threshold)
+				     (std--abs dphase))
+				  (glColor4f 1s0 .2s0 .6s0 .3s0)
+				  (glColor4f .2s0 1s0 .6s0 .3s0)))
+			      
 			      (glVertex2f sx sy))))
 		      (glEnd)
 		      (let ((bit_count 0)
-			    (byte_count 0)
+			    ;(byte_count 0)
 			    (byte (uint8_t 0)))
 		       (dot ,(g `_sample_binary)
 			    (clear))
 			
-			(dotimes (i (dot ,(g `_sample_data)
-				     (size)))
-			     (let ((v (aref ,(g `_sample_data) i))
-				   (current_bit 0))
-			       (if (< 0 v)
-				   (do0
-				    (setf current_bit 0))
-				   (do0
-				    (setf current_bit 1)))
-			       (setf bit_count (% i 8)
-				     byte_count (/ i 8))
-			       (when (< (dot ,(g `_sample_binary)
-					     (size))
-					byte_count)
-				 (dot ,(g `_sample_binary)
-				      (push_back 0)))
-			       (setf (aref ,(g `_sample_binary)
-					   byte_count)
-				     (logior (aref ,(g `_sample_binary)
-						   byte_count)
-					     (& current_bit
+			(for-range (v ,(g `_sample_data)
+				   )
+				   (let (
+					 (current_bit 0))
+				     (when (< ,(g `_sample_threshold)
+					      (std--abs v))
+				       (if (< 0 v)
+					    (do0
+					     (setf current_bit 0))
+					    (do0
+					     (setf current_bit 1))))
+			       
+			       
+			       (setf byte
+				     (logior byte
+					     (* current_bit
 						(<< 1 bit_count)))
 				     )
-			       )))
+			       (incf bit_count)
+			       (when (== bit_count 8)
+				 (setf bit_count 0)
+				 (dot ,(g `_sample_binary)
+				      (push_back byte))
+				 (setf byte 0))
+				     ))
+			)
 		      )
 
 		     #+nil (do0 ;; plot 1MSPS lines
@@ -988,6 +1015,16 @@
 			     ,(g `_iqdata_bytes))
 		(ImGui--Text (string "sample_offset: %f")
 			     ,(g `_sample_offset))
+		(ImGui--Text (string "sample_threshold: %f")
+			     ,(g `_sample_threshold))
+		(ImGui--Text (string "sample_binary size: %zu")
+			     (dot ,(g `_sample_binary)
+				  (size)))
+		,@(loop for j below 12 collect
+			`(ImGui--Text (string " %2x %2x %2x %2x %2x %2x %2x %2x     %2x %2x %2x %2x %2x %2x %2x %2x")
+				 ,@(loop for i below 16 collect
+					 `(aref ,(g `_sample_binary)
+						,(+ (* j 16) i)))))
 		(ImGui--End))	       
 	       
 	       (let ((b true))

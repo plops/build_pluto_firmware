@@ -607,6 +607,7 @@ void draw_circle(float sx, float sy, float rad) {
 }
 void initDraw() {
   state._sample_offset = (0.f);
+  state._sample_threshold = (1.0f);
   {
     // no debug
     std::lock_guard<std::mutex> guard(state._draw_mutex);
@@ -2461,10 +2462,10 @@ void drawFrame() {
     glBegin(GL_LINE_STRIP);
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));
-      y = ((s) * (sqrt(((((state._iqdata[((1) + (((2) * (i))))]) *
-                          (state._iqdata[((1) + (((2) * (i))))]))) +
-                        (((state._iqdata[((0) + (((2) * (i))))]) *
-                          (state._iqdata[((0) + (((2) * (i))))])))))));
+      y = ((s) * (std::sqrt(((((state._iqdata[((1) + (((2) * (i))))]) *
+                               (state._iqdata[((1) + (((2) * (i))))]))) +
+                             (((state._iqdata[((0) + (((2) * (i))))]) *
+                               (state._iqdata[((0) + (((2) * (i))))])))))));
       world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
@@ -2531,6 +2532,11 @@ void drawFrame() {
           ((((((dq_dt) * (smooth_i))) - (((di_dt) * (smooth_q))))) / (bot));
       old_i = smooth_i;
       old_q = smooth_q;
+      if ((state._sample_threshold) < (std::abs(dphase))) {
+        glColor4f((1.0f), (0.20f), (0.60f), (0.30f));
+      } else {
+        glColor4f((0.20f), (1.0f), (0.60f), (0.30f));
+      }
       world_to_screen({x, ((3) + (((-30) * (dphase))))}, sx, sy);
       glVertex2f(sx, sy);
     }
@@ -2596,34 +2602,39 @@ void drawFrame() {
       old_i = smooth_i;
       old_q = smooth_q;
       world_to_screen(
-          {x, ((3) + (((-30) * (abs(((sample) - (old_sample)))) * (dphase))))},
+          {x, ((3) +
+               (((-30) * (std::abs(((sample) - (old_sample)))) * (dphase))))},
           sx, sy);
       if (((sample) - (old_sample))) {
         state._sample_data.push_back(dphase);
+        if ((state._sample_threshold) < (std::abs(dphase))) {
+          glColor4f((1.0f), (0.20f), (0.60f), (0.30f));
+        } else {
+          glColor4f((0.20f), (1.0f), (0.60f), (0.30f));
+        }
       }
       glVertex2f(sx, sy);
     }
     glEnd();
     auto bit_count = 0;
-    auto byte_count = 0;
     auto byte = uint8_t(0);
     state._sample_binary.clear();
-    for (auto i = 0; (i) < (state._sample_data.size()); (i) += (1)) {
-      auto v = state._sample_data[i];
+    for (auto v : state._sample_data) {
       auto current_bit = 0;
-      if ((0) < (v)) {
-        current_bit = 0;
-      } else {
-        current_bit = 1;
+      if ((state._sample_threshold) < (std::abs(v))) {
+        if ((0) < (v)) {
+          current_bit = 0;
+        } else {
+          current_bit = 1;
+        }
       }
-      bit_count = i % 8;
-      byte_count = ((i) / (8));
-      if ((state._sample_binary.size()) < (byte_count)) {
-        state._sample_binary.push_back(0);
+      byte = ((byte) | (((current_bit) * ((1) << (bit_count)))));
+      (bit_count)++;
+      if ((bit_count) == (8)) {
+        bit_count = 0;
+        state._sample_binary.push_back(byte);
+        byte = 0;
       }
-      state._sample_binary[byte_count] =
-          ((state._sample_binary[byte_count]) |
-           (((current_bit) & ((1) << (bit_count)))));
     }
   }
 }

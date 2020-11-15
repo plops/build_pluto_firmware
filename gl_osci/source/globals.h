@@ -20,6 +20,7 @@ struct State {
   std::mutex _gui_mutex;
   std::vector<uint8_t> _sample_binary;
   std::vector<float> _sample_data;
+  float _sample_threshold;
   float _sample_offset;
   glm::vec2 _snapped_world_cursor;
   float _screen_grid;

@@ -16,6 +16,12 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   if ((((key) == (GLFW_KEY_DOWN)) && ((action) == (GLFW_PRESS)))) {
     (state._sample_offset)--;
   }
+  if ((((key) == (GLFW_KEY_1)) && ((action) == (GLFW_PRESS)))) {
+    state._sample_threshold = ((state._sample_threshold) * (((1) - ((0.10f)))));
+  }
+  if ((((key) == (GLFW_KEY_2)) && ((action) == (GLFW_PRESS)))) {
+    state._sample_threshold = ((state._sample_threshold) * (((1) + ((0.10f)))));
+  }
 }
 void errorCallback(int err, const char *description) {
 
