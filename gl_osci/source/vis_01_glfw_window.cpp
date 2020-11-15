@@ -10,6 +10,12 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action,
        ((action) == (GLFW_PRESS)))) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
+  if ((((key) == (GLFW_KEY_UP)) && ((action) == (GLFW_PRESS)))) {
+    (state._sample_offset)++;
+  }
+  if ((((key) == (GLFW_KEY_DOWN)) && ((action) == (GLFW_PRESS)))) {
+    (state._sample_offset)--;
+  }
 }
 void errorCallback(int err, const char *description) {
 

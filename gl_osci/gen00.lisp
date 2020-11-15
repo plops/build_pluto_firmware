@@ -332,6 +332,12 @@
 			  (== key GLFW_KEY_Q))
 		      (== action GLFW_PRESS))
 	     (glfwSetWindowShouldClose window GLFW_TRUE))
+	   (when (and (== key GLFW_KEY_UP)
+		      (== action GLFW_PRESS))
+	     (incf ,(g `_sample_offset)))
+	   (when (and (== key GLFW_KEY_DOWN)
+		      (== action GLFW_PRESS))
+	     (decf ,(g `_sample_offset)))
 	   )
 	 (defun errorCallback (err description)
 	   (declare (type int err)
@@ -401,6 +407,9 @@
 	      (_screen_scale :type float)
 	      (_screen_grid :type float)
 	      (_snapped_world_cursor :type glm--vec2)
+	      (_sample_offset :type float)
+	      (_sample_data :type "std::vector<float>")
+	      (_sample_binary :type "std::vector<uint8_t>")
 	)
 	     (do0
 					;,(emit-global :code `(include <glm/vec2.hpp>))
@@ -460,7 +469,7 @@
 					  (+ sy (* rad (cosf (* 2 M_PI arg)))))))))
 		(glEnd))
 	      (defun initDraw ()
-
+		(setf ,(g `_sample_offset) 0s0)
 		(progn
 		  ,(guard (g `_draw_mutex))
 		  (setf ,(g `_draw_display_log) true)
@@ -847,21 +856,18 @@
 		      (glColor3f .2s0 1s0 .6s0)
 		      (glLineWidth 3)
 		      (glBegin GL_LINE_STRIP)
-		      (let (
-			    (sample 0)
+		      (let ((sample 0)
 			    (old_sample 0))
+			(dot ,(g `_sample_data)
+			     (clear))
 		       (dotimes (i n)
-			 (do0 (setf x (* q i)
-				    )
+			 (do0 (setf x (* q i))
 			      (do0
-			       
-			       (if (== 0 (% (static_cast<int> (round (/ i 61.44))) 2))
+			       (if (== 0 (% (static_cast<int> (round (/ (+ i ,(g `_sample_offset)) 61.44))) 2))
 				   (do0 (setf old_sample sample)
 					(setf sample 1))
 				   (do0 (setf old_sample sample)
-					(setf sample 0)))
-			       
-			       )
+					(setf sample 0))))
 			      (let ((smooth_i (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 0 (* 2 i))))))
 				    (smooth_q (* s (,(make-filter 'low :fc 0.025) (aref ,(g `_iqdata) (+ 1 (* 2 i))))))
 				    (di_dt (- smooth_i old_i))
@@ -871,20 +877,49 @@
 				    ;; imaginary part of complex division
 				    (dphase (/ (- (* dq_dt smooth_i)
 						  (* di_dt smooth_q))
-					       bot)))
-			       
-				)
+					       bot))))
 			      (setf old_i smooth_i
 				    old_q smooth_q)
 			      (world_to_screen (curly x (+ 3 (* -30 (abs (- sample old_sample)) dphase)))
 					       sx sy)
-			     
-			      (glVertex2f sx sy))
-			 )
-			)
-		      (glEnd))
+			      (when (- sample old_sample)
+				(dot ,(g `_sample_data)
+				     (push_back dphase)))
+			      (glVertex2f sx sy))))
+		      (glEnd)
+		      (let ((bit_count 0)
+			    (byte_count 0)
+			    (byte (uint8_t 0)))
+		       (dot ,(g `_sample_binary)
+			    (clear))
+			
+			(dotimes (i (dot ,(g `_sample_data)
+				     (size)))
+			     (let ((v (aref ,(g `_sample_data) i))
+				   (current_bit 0))
+			       (if (< 0 v)
+				   (do0
+				    (setf current_bit 0))
+				   (do0
+				    (setf current_bit 1)))
+			       (setf bit_count (% i 8)
+				     byte_count (/ i 8))
+			       (when (< (dot ,(g `_sample_binary)
+					     (size))
+					byte_count)
+				 (dot ,(g `_sample_binary)
+				      (push_back 0)))
+			       (setf (aref ,(g `_sample_binary)
+					   byte_count)
+				     (logior (aref ,(g `_sample_binary)
+						   byte_count)
+					     (& current_bit
+						(<< 1 bit_count)))
+				     )
+			       )))
+		      )
 
-		     (do0 ;; plot 1MSPS lines
+		     #+nil (do0 ;; plot 1MSPS lines
 		      (glColor4f .9s0 1s0 .9s0 .3s0)
 		      (glLineWidth 1)
 		      (glBegin GL_LINE_STRIP)
@@ -892,7 +927,7 @@
 			(do0 (setf x (* q i))
 
 			     (setf y 0s0)
-			     (when (== 0 (% (static_cast<int> (round (/ i 61.44))) 2))
+			     (when (== 0 (% (static_cast<int> (round (/ (+ i ,(g `_sample_offset)) 61.44))) 2))
 			       (setf y 7s0))
 			     
 			     (world_to_screen (curly x y)
@@ -951,6 +986,8 @@
 			     (static_cast<int> (aref ,(g `_snapped_world_cursor) 1)))
 		(ImGui--Text (string "iqdata_bytes: %d")
 			     ,(g `_iqdata_bytes))
+		(ImGui--Text (string "sample_offset: %f")
+			     ,(g `_sample_offset))
 		(ImGui--End))	       
 	       
 	       (let ((b true))

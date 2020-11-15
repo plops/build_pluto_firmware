@@ -606,6 +606,7 @@ void draw_circle(float sx, float sy, float rad) {
   glEnd();
 }
 void initDraw() {
+  state._sample_offset = (0.f);
   {
     // no debug
     std::lock_guard<std::mutex> guard(state._draw_mutex);
@@ -2539,9 +2540,12 @@ void drawFrame() {
     glBegin(GL_LINE_STRIP);
     auto sample = 0;
     auto old_sample = 0;
+    state._sample_data.clear();
     for (auto i = 0; (i) < (n); (i) += (1)) {
       x = ((q) * (i));
-      if ((0) == (static_cast<int>(round(((i) / ((61.440f))))) % 2)) {
+      if ((0) == (static_cast<int>(
+                      round(((((i) + (state._sample_offset))) / ((61.440f))))) %
+                  2)) {
         old_sample = sample;
         sample = 1;
       } else {
@@ -2594,21 +2598,32 @@ void drawFrame() {
       world_to_screen(
           {x, ((3) + (((-30) * (abs(((sample) - (old_sample)))) * (dphase))))},
           sx, sy);
-      glVertex2f(sx, sy);
-    }
-    glEnd();
-    glColor4f((0.90f), (1.0f), (0.90f), (0.30f));
-    glLineWidth(1);
-    glBegin(GL_LINE_STRIP);
-    for (auto i = 0; (i) < (n); (i) += (1)) {
-      x = ((q) * (i));
-      y = (0.f);
-      if ((0) == (static_cast<int>(round(((i) / ((61.440f))))) % 2)) {
-        y = (7.0f);
+      if (((sample) - (old_sample))) {
+        state._sample_data.push_back(dphase);
       }
-      world_to_screen({x, y}, sx, sy);
       glVertex2f(sx, sy);
     }
     glEnd();
+    auto bit_count = 0;
+    auto byte_count = 0;
+    auto byte = uint8_t(0);
+    state._sample_binary.clear();
+    for (auto i = 0; (i) < (state._sample_data.size()); (i) += (1)) {
+      auto v = state._sample_data[i];
+      auto current_bit = 0;
+      if ((0) < (v)) {
+        current_bit = 0;
+      } else {
+        current_bit = 1;
+      }
+      bit_count = i % 8;
+      byte_count = ((i) / (8));
+      if ((state._sample_binary.size()) < (byte_count)) {
+        state._sample_binary.push_back(0);
+      }
+      state._sample_binary[byte_count] =
+          ((state._sample_binary[byte_count]) |
+           (((current_bit) & ((1) << (bit_count)))));
+    }
   }
 }
