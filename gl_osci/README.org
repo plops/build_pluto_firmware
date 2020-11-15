@@ -1,0 +1,5 @@
+
+- dependencies on fedora
+#+begin_example
+sudo dnf install glm-devel
+#+end_example
