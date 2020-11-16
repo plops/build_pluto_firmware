@@ -101,17 +101,9 @@ void create_server() {
     if (state._iq_out.empty()) {
       state._iq_out.wait_while_empty();
     }
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("attempt to write") << (" ") << (std::endl) << (std::flush);
     while (!(state._iq_out.empty())) {
       auto msg = state._iq_out.pop_front();
-      auto n = write(fd1, reinterpret_cast<uint8_t *>(msg), 2);
+      auto n = write(fd1, reinterpret_cast<uint8_t *>(&msg), 2);
       if ((n) < (0)) {
 
         (std::cout) << (std::setw(10))

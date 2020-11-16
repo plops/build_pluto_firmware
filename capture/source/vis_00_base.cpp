@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "067b9063bae5f92d1b2d59fcad7ebff0667fd6cd";
+  state._code_version = "2372f6f27bc69d9fe5237546fbb59f22751c8a5f";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:43:52 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "20:47:05 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
