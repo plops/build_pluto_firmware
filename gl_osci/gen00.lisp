@@ -1151,7 +1151,8 @@
 			       (type size_t nbytes_header nbytes))
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
 			    (portno 1234)
-			    (server (gethostbyname (string "localhost" ;"192.168.2.1"
+			    (server (gethostbyname (string ;"localhost"
+							   "192.168.2.1"
 						    )))
 			    (server_addr "{}")
 			    ;(client_addr "{}")

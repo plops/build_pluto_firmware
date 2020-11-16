@@ -40,12 +40,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "232796958d535ff35b9e61b3742bb363541a7e23";
+  state._code_version = "694370d2b43e1f714208d0415fc01064515a5447";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "16:06:55 of Sunday, 2020-11-15 (GMT+1)";
+  state._code_generation_time = "17:51:36 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
       << (" ") << (std::endl) << (std::flush);
-  auto const nbuf = ((16) * (64) * (4096));
+  auto const nbuf = ((16) * (4096));
 
   (std::cout)
       << (std::setw(10))
@@ -263,7 +263,7 @@ int main(int argc, char **argv) {
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
   auto count = 0;
-  for (auto j = 0; (j) < (1); (j) += (1)) {
+  while (true) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =

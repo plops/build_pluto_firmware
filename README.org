@@ -1,3 +1,9 @@
+
+- contents
+| pluto_tui | experiment to visualize fft using unicode characters on terminal |   |
+| capture   | acquire and trigger data on pluto, send packets via socket       |   |
+| gl_osci   | visualize data that was acquired by capture with opengl          |   |
+
 - try to build pluto fpga firmware and linux on fedora 32
 - https://wiki.analog.com/resources/fpga/docs/releases
 #+begin_example
