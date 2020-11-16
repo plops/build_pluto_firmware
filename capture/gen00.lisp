@@ -69,6 +69,15 @@
 					;("std::width" 8)
 		      (string ,(format nil " ~a='" (emit-c :code e)))
 		      ,e
+		      (string "::")
+		      (dot (typeid ,e)
+			   (name))
+		      (string "'")))
+	     #+nil,@(loop for e in rest appending
+		    `(("std::setw" 8)
+					;("std::width" 8)
+		      (string ,(format nil " ~a='" (emit-c :code e)))
+		      ,e
 		      (string "'")))
 	     "std::endl"
 	     "std::flush"))))
@@ -560,7 +569,8 @@
 	       (include <sys/types.h>
 			<sys/socket.h>
 			<netinet/in.h>
-			<unistd.h>)
+			<unistd.h>
+			<arpa/inet.h>)
 	    
 		    (include <iostream>
 			     <chrono>
@@ -606,6 +616,11 @@
 			   #-nil (when (< fd1 0)
 				   ,(logprint "accept failed")
 				   )
+			   (let ((client_addr_buffer))
+			     (declare (type (array char INET_ADDRSTRLEN) client_addr_buffer))
+			     (inet_ntop AF_INET &client_addr.sin_addr client_addr_buffer (sizeof client_addr_buffer))
+			    ,(logprint "accept" `(client_addr_buffer
+						  client_addr.sin_port)))
 
 			   #+nil
 			   (let ((nh (write fd1 header nbytes_header)))
@@ -631,8 +646,7 @@
 			       
 				
 				)
-			   (close fd1)
-			   ))
+			   (close fd1)))
 			(do0 
 			     (close fd))))
 

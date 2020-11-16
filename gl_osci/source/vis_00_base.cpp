@@ -28,7 +28,7 @@ void mainLoop() {
 }
 int main(int argc, char **argv) {
   state._code_repository = "github.com/plops/build_pluto_firmware";
-  state._code_generation_time = "17:38:04 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "19:36:01 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -37,8 +37,10 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("start") << (" ")
-      << (std::setw(8)) << (" argc='") << (argc) << ("'") << (std::setw(8))
-      << (" argv[0]='") << (argv[0]) << ("'") << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" argc='") << (argc) << ("::")
+      << (typeid(argc).name()) << ("'") << (std::setw(8)) << (" argv[0]='")
+      << (argv[0]) << ("::") << (typeid(argv[0]).name()) << ("'") << (std::endl)
+      << (std::flush);
   initWindow();
   initGui();
   initDraw();

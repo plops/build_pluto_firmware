@@ -68,6 +68,16 @@
 					;("std::width" 8)
 		      (string ,(format nil " ~a='" (emit-c :code e)))
 		      ,e
+		      (string "::")
+		      (dot (typeid ,e)
+			   (name))
+		      (string "'")))
+	     #+nil
+	     ,@(loop for e in rest appending
+		    `(("std::setw" 8)
+					;("std::width" 8)
+		      (string ,(format nil " ~a='" (emit-c :code e)))
+		      ,e
 		      (string "'")))
 	     "std::endl"
 	     "std::flush"))))

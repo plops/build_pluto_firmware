@@ -4,6 +4,7 @@
 #include "globals.h"
 
 extern State state;
+#include <arpa/inet.h>
 #include <chrono>
 #include <iostream>
 #include <netinet/in.h>
@@ -27,8 +28,8 @@ void create_server() {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("attempt bind") << (" ")
-      << (std::setw(8)) << (" portno='") << (portno) << ("'") << (std::endl)
-      << (std::flush);
+      << (std::setw(8)) << (" portno='") << (portno) << ("::")
+      << (typeid(portno).name()) << ("'") << (std::endl) << (std::flush);
   if ((bind(fd, reinterpret_cast<struct sockaddr *>(&server_addr),
             sizeof(server_addr))) < (0)) {
 
@@ -63,6 +64,23 @@ void create_server() {
                   << (" ") << ("accept failed") << (" ") << (std::endl)
                   << (std::flush);
     }
+    char client_addr_buffer[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &client_addr.sin_addr, client_addr_buffer,
+              sizeof(client_addr_buffer));
+
+    (std::cout) << (std::setw(10))
+                << (std::chrono::high_resolution_clock::now()
+                        .time_since_epoch()
+                        .count())
+                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
+                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
+                << ("accept") << (" ") << (std::setw(8))
+                << (" client_addr_buffer='") << (client_addr_buffer) << ("::")
+                << (typeid(client_addr_buffer).name()) << ("'")
+                << (std::setw(8)) << (" client_addr.sin_port='")
+                << (client_addr.sin_port) << ("::")
+                << (typeid(client_addr.sin_port).name()) << ("'") << (std::endl)
+                << (std::flush);
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -72,10 +90,14 @@ void create_server() {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("enter transmission loop") << (" ") << (std::setw(8))
                 << (" state._iq_out.empty()='") << (state._iq_out.empty())
-                << ("'") << (std::setw(8)) << (" state._iq_out.front()='")
-                << (state._iq_out.front()) << ("'") << (std::setw(8))
-                << (" state._iq_out.back()='") << (state._iq_out.back())
-                << ("'") << (std::endl) << (std::flush);
+                << ("::") << (typeid(state._iq_out.empty()).name()) << ("'")
+                << (std::setw(8)) << (" state._iq_out.front()='")
+                << (state._iq_out.front()) << ("::")
+                << (typeid(state._iq_out.front()).name()) << ("'")
+                << (std::setw(8)) << (" state._iq_out.back()='")
+                << (state._iq_out.back()) << ("::")
+                << (typeid(state._iq_out.back()).name()) << ("'") << (std::endl)
+                << (std::flush);
     if (state._iq_out.empty()) {
       state._iq_out.wait_while_empty();
     }
@@ -109,7 +131,8 @@ void create_server() {
                   << (" ") << (std::this_thread::get_id()) << (" ")
                   << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
                   << (" ") << ("bytes written: ") << (" ") << (std::setw(8))
-                  << (" n='") << (n) << ("'") << (std::endl) << (std::flush);
+                  << (" n='") << (n) << ("::") << (typeid(n).name()) << ("'")
+                  << (std::endl) << (std::flush);
     }
     close(fd1);
   }

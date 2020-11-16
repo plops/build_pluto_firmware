@@ -640,15 +640,20 @@ void initDraw() {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("screen") << (" ")
       << (std::setw(8)) << (" state._screen_offset[0]='")
-      << (state._screen_offset[0]) << ("'") << (std::setw(8))
-      << (" state._screen_offset[1]='") << (state._screen_offset[1]) << ("'")
-      << (std::setw(8)) << (" state._screen_start_pan[0]='")
-      << (state._screen_start_pan[0]) << ("'") << (std::setw(8))
-      << (" state._screen_start_pan[1]='") << (state._screen_start_pan[1])
-      << ("'") << (std::setw(8)) << (" state._screen_scale='")
-      << (state._screen_scale) << ("'") << (std::setw(8))
-      << (" state._screen_grid='") << (state._screen_grid) << ("'")
-      << (std::endl) << (std::flush);
+      << (state._screen_offset[0]) << ("::")
+      << (typeid(state._screen_offset[0]).name()) << ("'") << (std::setw(8))
+      << (" state._screen_offset[1]='") << (state._screen_offset[1]) << ("::")
+      << (typeid(state._screen_offset[1]).name()) << ("'") << (std::setw(8))
+      << (" state._screen_start_pan[0]='") << (state._screen_start_pan[0])
+      << ("::") << (typeid(state._screen_start_pan[0]).name()) << ("'")
+      << (std::setw(8)) << (" state._screen_start_pan[1]='")
+      << (state._screen_start_pan[1]) << ("::")
+      << (typeid(state._screen_start_pan[1]).name()) << ("'") << (std::setw(8))
+      << (" state._screen_scale='") << (state._screen_scale) << ("::")
+      << (typeid(state._screen_scale).name()) << ("'") << (std::setw(8))
+      << (" state._screen_grid='") << (state._screen_grid) << ("::")
+      << (typeid(state._screen_grid).name()) << ("'") << (std::endl)
+      << (std::flush);
 }
 void world_to_screen(const glm::vec2 &v, int &screeni, int &screenj) {
   screeni = static_cast<int>(

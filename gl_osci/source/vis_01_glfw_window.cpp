@@ -30,8 +30,9 @@ void errorCallback(int err, const char *description) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("error") << (" ")
-      << (std::setw(8)) << (" err='") << (err) << ("'") << (std::setw(8))
-      << (" description='") << (description) << ("'") << (std::endl)
+      << (std::setw(8)) << (" err='") << (err) << ("::") << (typeid(err).name())
+      << ("'") << (std::setw(8)) << (" description='") << (description)
+      << ("::") << (typeid(description).name()) << ("'") << (std::endl)
       << (std::flush);
 }
 static void framebufferResizeCallback(GLFWwindow *window, int width,
@@ -42,8 +43,10 @@ static void framebufferResizeCallback(GLFWwindow *window, int width,
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("resize") << (" ")
-      << (std::setw(8)) << (" width='") << (width) << ("'") << (std::setw(8))
-      << (" height='") << (height) << ("'") << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" width='") << (width) << ("::")
+      << (typeid(width).name()) << ("'") << (std::setw(8)) << (" height='")
+      << (height) << ("::") << (typeid(height).name()) << ("'") << (std::endl)
+      << (std::flush);
   auto app = (State *)(glfwGetWindowUserPointer(window));
   app->_framebufferResized = true;
 }
@@ -66,10 +69,11 @@ void initWindow() {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("initWindow") << (" ") << (std::setw(8))
-                << (" state._window='") << (state._window) << ("'")
-                << (std::setw(8)) << (" glfwGetVersionString()='")
-                << (glfwGetVersionString()) << ("'") << (std::endl)
-                << (std::flush);
+                << (" state._window='") << (state._window) << ("::")
+                << (typeid(state._window).name()) << ("'") << (std::setw(8))
+                << (" glfwGetVersionString()='") << (glfwGetVersionString())
+                << ("::") << (typeid(glfwGetVersionString()).name()) << ("'")
+                << (std::endl) << (std::flush);
     glfwSetKeyCallback(state._window, keyCallback);
     glfwSetWindowUserPointer(state._window, &(state));
     glfwSetFramebufferSizeCallback(state._window, framebufferResizeCallback);

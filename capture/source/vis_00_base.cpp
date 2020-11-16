@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "fa4262e68918bf74dde893f7496a5bf6707047b7";
+  state._code_version = "067b9063bae5f92d1b2d59fcad7ebff0667fd6cd";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:30:42 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "19:43:52 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -53,8 +53,10 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("start") << (" ")
-      << (std::setw(8)) << (" argc='") << (argc) << ("'") << (std::setw(8))
-      << (" argv[0]='") << (argv[0]) << ("'") << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" argc='") << (argc) << ("::")
+      << (typeid(argc).name()) << ("'") << (std::setw(8)) << (" argv[0]='")
+      << (argv[0]) << ("::") << (typeid(argv[0]).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -62,7 +64,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._start_time='") << (state._start_time)
-      << ("'") << (std::endl) << (std::flush);
+      << ("::") << (typeid(state._start_time).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -70,7 +73,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_version='") << (state._code_version)
-      << ("'") << (std::endl) << (std::flush);
+      << ("::") << (typeid(state._code_version).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -78,7 +82,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_repository='")
-      << (state._code_repository) << ("'") << (std::endl) << (std::flush);
+      << (state._code_repository) << ("::")
+      << (typeid(state._code_repository).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -86,7 +92,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_generation_time='")
-      << (state._code_generation_time) << ("'") << (std::endl) << (std::flush);
+      << (state._code_generation_time) << ("::")
+      << (typeid(state._code_generation_time).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -94,7 +102,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_author='") << (state._code_author)
-      << ("'") << (std::endl) << (std::flush);
+      << ("::") << (typeid(state._code_author).name()) << ("'") << (std::endl)
+      << (std::flush);
 
   (std::cout)
       << (std::setw(10))
@@ -102,7 +111,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
-      << ("'") << (std::endl) << (std::flush);
+      << ("::") << (typeid(state._code_license).name()) << ("'") << (std::endl)
+      << (std::flush);
   auto ctx = iio_create_default_context();
   auto major = uint(0);
   auto minor = uint(0);
@@ -114,9 +124,11 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" major='") << (major) << ("'") << (std::setw(8))
-      << (" minor='") << (minor) << ("'") << (std::setw(8)) << (" git_tag='")
-      << (git_tag) << ("'") << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" major='") << (major) << ("::")
+      << (typeid(major).name()) << ("'") << (std::setw(8)) << (" minor='")
+      << (minor) << ("::") << (typeid(minor).name()) << ("'") << (std::setw(8))
+      << (" git_tag='") << (git_tag) << ("::") << (typeid(git_tag).name())
+      << ("'") << (std::endl) << (std::flush);
   if (!(ctx)) {
 
     (std::cout) << (std::setw(10))
@@ -126,7 +138,8 @@ int main(int argc, char **argv) {
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("create_default") << (" ") << (std::setw(8)) << (" ctx='")
-                << (ctx) << ("'") << (std::endl) << (std::flush);
+                << (ctx) << ("::") << (typeid(ctx).name()) << ("'")
+                << (std::endl) << (std::flush);
   }
 
   (std::cout)
@@ -135,8 +148,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
       << (std::setw(8)) << (" iio_context_get_devices_count(ctx)='")
-      << (iio_context_get_devices_count(ctx)) << ("'") << (std::endl)
-      << (std::flush);
+      << (iio_context_get_devices_count(ctx)) << ("::")
+      << (typeid(iio_context_get_devices_count(ctx)).name()) << ("'")
+      << (std::endl) << (std::flush);
   auto rx = iio_context_find_device(ctx, "cf-ad9361-lpc");
   if (!(rx)) {
 
@@ -155,7 +169,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("rx") << (" ")
       << (std::setw(8)) << (" iio_device_get_attrs_count(rx)='")
-      << (iio_device_get_attrs_count(rx)) << ("'") << (std::endl)
+      << (iio_device_get_attrs_count(rx)) << ("::")
+      << (typeid(iio_device_get_attrs_count(rx)).name()) << ("'") << (std::endl)
       << (std::flush);
   auto phy = iio_context_find_device(ctx, "ad9361-phy");
   if (!(phy)) {
@@ -175,8 +190,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("phy") << (" ")
       << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
-      << (iio_device_get_attrs_count(phy)) << ("'") << (std::endl)
-      << (std::flush);
+      << (iio_device_get_attrs_count(phy)) << ("::")
+      << (typeid(iio_device_get_attrs_count(phy)).name()) << ("'")
+      << (std::endl) << (std::flush);
   auto rx_lo_freq = 2420000000ULL;
   auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
 
@@ -185,8 +201,9 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" rx_lo_freq_MHz='") << (rx_lo_freq_MHz) << ("'")
-      << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" rx_lo_freq_MHz='") << (rx_lo_freq_MHz) << ("::")
+      << (typeid(rx_lo_freq_MHz).name()) << ("'") << (std::endl)
+      << (std::flush);
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "altvoltage0", true), "frequency",
       rx_lo_freq);
@@ -198,8 +215,8 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("'")
-      << (std::endl) << (std::flush);
+      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("::")
+      << (typeid(rx_rate_MSps).name()) << ("'") << (std::endl) << (std::flush);
   iio_channel_attr_write_longlong(
       iio_device_find_channel(phy, "voltage0", false), "sampling_frequency",
       rx_rate);
@@ -217,8 +234,8 @@ int main(int argc, char **argv) {
       << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" n_chan='") << (n_chan) << ("'") << (std::endl)
-      << (std::flush);
+      << (std::setw(8)) << (" n_chan='") << (n_chan) << ("::")
+      << (typeid(n_chan).name()) << ("'") << (std::endl) << (std::flush);
   auto rx_i = iio_device_get_channel(rx, 0);
 
   (std::cout)
@@ -227,8 +244,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_i 0") << (" ")
       << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_i)='")
-      << (iio_channel_get_attrs_count(rx_i)) << ("'") << (std::endl)
-      << (std::flush);
+      << (iio_channel_get_attrs_count(rx_i)) << ("::")
+      << (typeid(iio_channel_get_attrs_count(rx_i)).name()) << ("'")
+      << (std::endl) << (std::flush);
   auto rx_q = iio_device_get_channel(rx, 1);
 
   (std::cout)
@@ -237,8 +255,9 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_q 1") << (" ")
       << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_q)='")
-      << (iio_channel_get_attrs_count(rx_q)) << ("'") << (std::endl)
-      << (std::flush);
+      << (iio_channel_get_attrs_count(rx_q)) << ("::")
+      << (typeid(iio_channel_get_attrs_count(rx_q)).name()) << ("'")
+      << (std::endl) << (std::flush);
   iio_channel_enable(rx_i);
   iio_channel_enable(rx_q);
 
