@@ -379,7 +379,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 2 64 4096) ;; 48 64
+			    (let (("const nbuf" (* 48 64 4096) ;; 48 64
 						;4096
 						))
 			      ,(logprint "create buffer")
@@ -390,9 +390,16 @@
 				   (sample_start sample_and_compute_start)
 				   (compute_start sample_and_compute_start))
 				(do0
+				 (do0
+				  (dot ,(g `_iq_out) (push_back 42
+								))
+						(dot ,(g `_iq_out) (push_back 43))
+						)
 				 (let ((server_thread (run_server_in_new_thread)))
-				   ,(logprint "server started"))
-				(let ((count 0))
+				   ,(logprint "server started")
+				   (when (server_thread.joinable)
+				     (server_thread.join)))
+				#+nil (let ((count 0))
 				  (while true ;
 				   ;dotimes (j 1)
 
@@ -532,7 +539,7 @@
 				     
 
 				     )
-				   ;,(logprint "374" `(count nbytes compute_perc sample_perc))
+				   ,(logprint "374" `(count nbytes compute_perc sample_perc))
 				   )))
 			       )))
 
@@ -605,7 +612,9 @@
 			     (when (< nh 0)
 			       ,(logprint "writing header failed"))
 			     )
-			   ,(logprint "enter transmission loop" `((dot ,(g `_iq_out) (empty))))
+			   ,(logprint "enter transmission loop" `((dot ,(g `_iq_out) (empty))
+								  (dot ,(g `_iq_out) (front))
+								  (dot ,(g `_iq_out) (back))))
 
 			   (do0 (dot ,(g `_iq_out) (wait_while_empty))
 			       

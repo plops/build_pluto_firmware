@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "64561da3f5c89ab0986324223f07429f8546833c";
+  state._code_version = "117b09d0675dfa45e2f66e138e7ac4456de3765a";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "19:09:58 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "19:23:22 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
       << (" ") << (std::endl) << (std::flush);
-  auto const nbuf = ((2) * (64) * (4096));
+  auto const nbuf = ((48) * (64) * (4096));
 
   (std::cout)
       << (std::setw(10))
@@ -261,6 +261,8 @@ int main(int argc, char **argv) {
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
+  state._iq_out.push_back(42);
+  state._iq_out.push_back(43);
   auto server_thread = run_server_in_new_thread();
 
   (std::cout)
@@ -269,83 +271,8 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("server started")
       << (" ") << (std::endl) << (std::flush);
-  auto count = 0;
-  while (true) {
-    sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto nbytes = iio_buffer_refill(rxbuf);
-    auto time_now =
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto sample_dur = ((time_now) - (sample_start)).count();
-    auto step = iio_buffer_step(rxbuf);
-    auto end = iio_buffer_end(rxbuf);
-    auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
-    auto i = 0;
-    compute_start =
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto ma = 0;
-    auto old = (0.f);
-    auto trig = 0;
-    auto trig1 = 0;
-#pragma GCC ivdep
-    for (uint8_t *p = start; (p) < (end); (p) += (step)) {
-      auto si = reinterpret_cast<int16_t *>(p)[0];
-      auto sq = reinterpret_cast<int16_t *>(p)[1];
-      auto m = ((((si) * (si))) + (((sq) * (sq))));
-      auto mlow = ([](float xn) -> float {
-        // filter_2_low_01_real
-        ;
-        static float yn1 = (0.f);
-        static float yn2 = (0.f);
-        static float xn1 = (0.f);
-        static float xn2 = (0.f);
-        float yn =
-            (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
-             ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
-             ((((-0.9225943f)) * (yn2))));
-        xn2 = xn1;
-        xn1 = xn;
-        yn2 = yn1;
-        yn1 = yn;
-        return yn;
-      })(m);
-      if ((ma) < (mlow)) {
-        ma = mlow;
-      }
-      if ((((trig) == (0)) && ((old) < (4000)) && ((4000) <= (mlow)))) {
-        trig = i;
-      }
-      if ((0) < (trig)) {
-        state._iq_out.push_back(si);
-        state._iq_out.push_back(sq);
-        if ((((2000) < (old)) && ((mlow) <= (2000)))) {
-          trig1 = i;
-          auto pulse_ms = ((((trig1) - (trig))) / ((6.1440e+4f)));
-
-          (std::cout) << (std::setw(10))
-                      << (std::chrono::high_resolution_clock::now()
-                              .time_since_epoch()
-                              .count())
-                      << (" ") << (std::this_thread::get_id()) << (" ")
-                      << (__FILE__) << (":") << (__LINE__) << (" ")
-                      << (__func__) << (" ") << ("") << (" ") << (std::setw(8))
-                      << (" ma='") << (ma) << ("'") << (std::setw(8))
-                      << (" trig='") << (trig) << ("'") << (std::setw(8))
-                      << (" trig1='") << (trig1) << ("'") << (std::setw(8))
-                      << (" pulse_ms='") << (pulse_ms) << ("'") << (std::endl)
-                      << (std::flush);
-          trig = 0;
-        }
-      }
-      (i)++;
-      old = mlow;
-    }
-    auto compute_end =
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto compute_dur = ((compute_end) - (compute_start)).count();
-    auto compute_samp_dur = ((compute_end) - (sample_start)).count();
-    auto compute_perc = ((((100) * (compute_dur))) / (compute_samp_dur));
-    auto sample_perc = ((((100) * (sample_dur))) / (compute_samp_dur));
-    (count)++;
+  if (server_thread.joinable()) {
+    server_thread.join();
   }
   iio_context_destroy(ctx);
   return 0;

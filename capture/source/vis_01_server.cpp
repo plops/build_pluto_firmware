@@ -72,6 +72,9 @@ void create_server() {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("enter transmission loop") << (" ") << (std::setw(8))
                 << (" state._iq_out.empty()='") << (state._iq_out.empty())
+                << ("'") << (std::setw(8)) << (" state._iq_out.front()='")
+                << (state._iq_out.front()) << ("'") << (std::setw(8))
+                << (" state._iq_out.back()='") << (state._iq_out.back())
                 << ("'") << (std::endl) << (std::flush);
     state._iq_out.wait_while_empty();
 
