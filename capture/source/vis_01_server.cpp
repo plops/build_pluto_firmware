@@ -76,7 +76,9 @@ void create_server() {
                 << (state._iq_out.front()) << ("'") << (std::setw(8))
                 << (" state._iq_out.back()='") << (state._iq_out.back())
                 << ("'") << (std::endl) << (std::flush);
-    state._iq_out.wait_while_empty();
+    if (state._iq_out.empty()) {
+      state._iq_out.wait_while_empty();
+    }
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -88,6 +90,26 @@ void create_server() {
     while (!(state._iq_out.empty())) {
       auto msg = state._iq_out.pop_front();
       auto n = write(fd1, reinterpret_cast<uint8_t *>(msg), 2);
+      if ((n) < (0)) {
+
+        (std::cout) << (std::setw(10))
+                    << (std::chrono::high_resolution_clock::now()
+                            .time_since_epoch()
+                            .count())
+                    << (" ") << (std::this_thread::get_id()) << (" ")
+                    << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
+                    << (" ") << ("write failed") << (" ") << (std::endl)
+                    << (std::flush);
+      }
+
+      (std::cout) << (std::setw(10))
+                  << (std::chrono::high_resolution_clock::now()
+                          .time_since_epoch()
+                          .count())
+                  << (" ") << (std::this_thread::get_id()) << (" ")
+                  << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
+                  << (" ") << ("bytes written: ") << (" ") << (std::setw(8))
+                  << (" n='") << (n) << ("'") << (std::endl) << (std::flush);
     }
     close(fd1);
   }

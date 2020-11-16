@@ -616,18 +616,20 @@
 								  (dot ,(g `_iq_out) (front))
 								  (dot ,(g `_iq_out) (back))))
 
-			   (do0 (dot ,(g `_iq_out) (wait_while_empty))
+			   (do0 (when (dot ,(g `_iq_out) (empty))
+				  (dot ,(g `_iq_out) (wait_while_empty)))
 			       
 				,(logprint "attempt to write")
 				(while (not (dot ,(g `_iq_out) (empty)))
 				       (let ((msg (dot ,(g `_iq_out) (pop_front))))
 					 (let ((n (write fd1 (reinterpret_cast<uint8_t*> msg) 2)))
-					   #+nil (when (< n 0)
-						   ,(logprint "write failed")
-						   )
+					   (when (< n 0)
+					     ,(logprint "write failed")
+					     )
+					   ,(logprint "bytes written: " `(n))
 					   )))
 			       
-					;,(logprint "bytes written: " `(n))
+				
 				)
 			   (close fd1)
 			   ))
