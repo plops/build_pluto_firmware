@@ -15,7 +15,11 @@
 #include <unistd.h>
 #include <vector>
 ;
+#include <cassert>
+#include <sys/fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 ;
 #include "vis_01_server.hpp"
 ;

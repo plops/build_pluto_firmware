@@ -7,11 +7,15 @@ extern State state;
 #include "vis_01_server.hpp"
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <chrono>
 #include <complex>
 #include <iostream>
 #include <math.h>
+#include <sys/fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <thread>
 #include <unistd.h>
 #include <vector>
@@ -21,12 +25,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "5ed2a56c11b55d8f9ebb12f0423f653d87f49ec6";
+  state._code_version = "6d6045e2eaed4347dd92ddf11267133bb0d5811b";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "23:25:56 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "23:32:34 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -97,8 +101,9 @@ int main(int argc, char **argv) {
       << (std::flush);
   auto fn = "/home/martin/o.sdriq";
   auto file_length = ([fn]() {
-    auto in = std::ifstream(fn, ((std::ios::ate) | (std::ifstream::binary)));
-    return in.tellg();
+    struct stat st;
+    stat(fn, &st);
+    return st.st_size;
   })();
   auto fd = ([fn]() {
     auto fd = open(fn, O_RDONLY, 0);
@@ -111,7 +116,6 @@ int main(int argc, char **argv) {
     assert((MAP_FAILED) != (m));
     return static_cast<uint16_t *>(m);
   })();
-  auto iq_input_data_size = ((file_length) / (2));
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
@@ -130,12 +134,11 @@ int main(int argc, char **argv) {
   auto count = 0;
   while (true) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto nbytes = iio_buffer_refill(rxbuf);
     auto time_now =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto sample_dur = ((time_now) - (sample_start)).count();
     auto step = ((2) * (2));
-    auto start = static_cast<uint8_t *>(iq_input_data);
+    auto start = reinterpret_cast<uint8_t *>(iq_input_data);
     auto end = ((start) + (file_length));
     auto i = 0;
     compute_start =
@@ -216,8 +219,6 @@ int main(int argc, char **argv) {
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
                 << ("374") << (" ") << (std::setw(8)) << (" count='") << (count)
                 << ("::") << (typeid(count).name()) << ("'") << (std::setw(8))
-                << (" nbytes='") << (nbytes) << ("::")
-                << (typeid(nbytes).name()) << ("'") << (std::setw(8))
                 << (" compute_perc='") << (compute_perc) << ("::")
                 << (typeid(compute_perc).name()) << ("'") << (std::setw(8))
                 << (" sample_perc='") << (sample_perc) << ("::")

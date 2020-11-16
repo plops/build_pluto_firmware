@@ -231,7 +231,11 @@
 			       <algorithm>
 			       <vector>)
 
-		      (include <sys/mman.h>)
+		      (include <sys/mman.h>
+			       <sys/stat.h>
+			       <sys/types.h>
+			       <sys/fcntl.h>
+			       <cassert>)
 
 		      
 
@@ -307,9 +311,9 @@
 			     
 			     (file_length ((lambda ()
 					     (declare (capture fn))
-					     (let ((in (std--ifstream fn (logior std--ios--ate
-										 std--ifstream--binary))))
-					       (return (in.tellg))))))
+					     "struct stat st;"
+					     (stat fn &st)
+					     (return st.st_size))))
 			     (fd ((lambda ()
 				    (declare (capture fn))
 				    (let ((fd (open fn O_RDONLY 0)))
@@ -321,7 +325,8 @@
 							      fd 0)))
 						 (assert (!= MAP_FAILED m))
 						 (return (static_cast<uint16_t*> m))))))
-			     (iq_input_data_size (/ file_length 2)))
+			     ;(iq_input_data_size (/ file_length 2))
+			     )
 			
 			 (let (
 			       (sample_and_compute_start
@@ -345,7 +350,7 @@
 							     (time_since_epoch)
 							     ))
 				     (let (
-					   (nbytes (iio_buffer_refill rxbuf))
+					   ;(nbytes (iio_buffer_refill rxbuf))
 					   (time_now (dot ("std::chrono::high_resolution_clock::now")
 							  (time_since_epoch)
 							  ))
@@ -354,7 +359,7 @@
 							    (count)))
 					   (step (* 2 2))
 					   
-					   (start (static_cast<uint8_t*>
+					   (start (reinterpret_cast<uint8_t*>
 						   iq_input_data))
 					   (end (+ start file_length))
 					   (i 0)
@@ -466,7 +471,8 @@
 				       
 
 				       )
-				     ,(logprint "374" `(count nbytes compute_perc sample_perc))
+				     ,(logprint "374" `(count 
+							      compute_perc sample_perc))
 				     )))
 			   )))
 		      
@@ -518,7 +524,7 @@
 			(listen fd 5)
 			,(logprint "initiate accept")
 			(while true
-			 (let ((client_len (sizeof client_addr))
+			 (let ((client_len ("static_cast<unsigned int>"(sizeof client_addr)))
 			       (fd1 (accept fd
 					    ("reinterpret_cast<struct sockaddr*>" &client_addr)
 					    &client_len)))

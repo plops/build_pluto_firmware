@@ -50,7 +50,7 @@ void create_server() {
       << (__LINE__) << (" ") << (__func__) << (" ") << ("initiate accept")
       << (" ") << (std::endl) << (std::flush);
   while (true) {
-    auto client_len = sizeof(client_addr);
+    auto client_len = static_cast<unsigned int>(sizeof(client_addr));
     auto fd1 = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr),
                       &client_len);
     if ((fd1) < (0)) {
