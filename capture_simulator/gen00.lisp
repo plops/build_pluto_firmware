@@ -17,7 +17,7 @@
 				 '(:gui)))
 
 (progn
-  (defparameter *source-dir* #P"/home/martin/stage/build_pluto_firmware/capture/source/")
+  (defparameter *source-dir* #P"/home/martin/stage/build_pluto_firmware/capture_simulator/source/")
   
   (defparameter *day-names*
     '("Monday" "Tuesday" "Wednesday"

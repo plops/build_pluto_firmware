@@ -399,7 +399,7 @@
 				   (sample_start sample_and_compute_start)
 				   (compute_start sample_and_compute_start))
 				(do0
-				 (do0
+				 #+nil(do0
 				  (dot ,(g `_iq_out) (push_back 42
 								))
 						(dot ,(g `_iq_out) (push_back 43))
@@ -408,7 +408,7 @@
 				   ,(logprint "server started")
 				   (when (server_thread.joinable)
 				     (server_thread.join)))
-				#+nil (let ((count 0))
+				 (let ((count 0))
 				  (while true ;
 				   ;dotimes (j 1)
 
