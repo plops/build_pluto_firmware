@@ -5,7 +5,6 @@
 
 extern State state;
 #include "vis_01_server.hpp"
-#include "vis_02_filters.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -40,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "694370d2b43e1f714208d0415fc01064515a5447";
+  state._code_version = "543c2da073d1b44f4f8efcd322d4123322e033ce";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "17:51:36 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "18:36:06 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -262,6 +261,14 @@ int main(int argc, char **argv) {
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
   auto compute_start = sample_and_compute_start;
+  auto server_thread = run_server_in_new_thread();
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("server started")
+      << (" ") << (std::endl) << (std::flush);
   auto count = 0;
   while (true) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -273,33 +280,34 @@ int main(int argc, char **argv) {
     auto end = iio_buffer_end(rxbuf);
     auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
     auto i = 0;
-    // open server and wait for client to obtain rxbuf
-    // sdriq file format
-    // https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput
-    ;
-    auto header = sdriq_header_t({rx_rate, rx_lo_freq, 0, 16, 0, 895232605});
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("")
-                << (" ") << (std::setw(8)) << (" sizeof(header)='")
-                << (sizeof(header)) << ("'") << (std::endl) << (std::flush);
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto ma = 0;
     auto old = (0.f);
     auto trig = 0;
     auto trig1 = 0;
-    auto outiq = std::vector<int16_t>();
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];
       auto sq = reinterpret_cast<int16_t *>(p)[1];
       auto m = ((((si) * (si))) + (((sq) * (sq))));
-      auto mlow = filter_2_low_01_real(m);
+      auto mlow = ([](float xn) -> float {
+        // filter_2_low_01_real
+        ;
+        static float yn1 = (0.f);
+        static float yn2 = (0.f);
+        static float xn1 = (0.f);
+        static float xn2 = (0.f);
+        float yn =
+            (((((8.664870e-4f)) * (xn))) + ((((1.7326780e-3f)) * (xn1))) +
+             ((((8.663387e-4f)) * (xn2))) + ((((1.919129f)) * (yn1))) +
+             ((((-0.9225943f)) * (yn2))));
+        xn2 = xn1;
+        xn1 = xn;
+        yn2 = yn1;
+        yn1 = yn;
+        return yn;
+      })(m);
       if ((ma) < (mlow)) {
         ma = mlow;
       }
@@ -307,13 +315,13 @@ int main(int argc, char **argv) {
         trig = i;
       }
       if ((trig) < (0)) {
-        outiq.push_back(si);
-        outiq.push_back(sq);
+        state._iq_out.push_back(si);
+        state._iq_out.push_back(sq);
         (trig)++;
       }
       if ((0) < (trig)) {
-        outiq.push_back(si);
-        outiq.push_back(sq);
+        state._iq_out.push_back(si);
+        state._iq_out.push_back(sq);
         if ((((2000) < (old)) && ((mlow) <= (2000)))) {
           trig1 = i;
 
@@ -328,26 +336,12 @@ int main(int argc, char **argv) {
                       << (" trig='") << (trig) << ("'") << (std::setw(8))
                       << (" trig1='") << (trig1) << ("'") << (std::endl)
                       << (std::flush);
-          trig = -2000;
+          trig = 0;
         }
       }
       (i)++;
       old = mlow;
     }
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("finished") << (" ") << (std::setw(8)) << (" ma='") << (ma)
-                << ("'") << (std::setw(8)) << (" trig='") << (trig) << ("'")
-                << (std::setw(8)) << (" trig1='") << (trig1) << ("'")
-                << (std::setw(8)) << (" outiq.size()='") << (outiq.size())
-                << ("'") << (std::endl) << (std::flush);
-    create_server(reinterpret_cast<uint8_t *>(outiq.data()),
-                  ((2) * (outiq.size())));
     auto compute_end =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto compute_dur = ((compute_end) - (compute_start)).count();

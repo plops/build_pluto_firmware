@@ -13,5 +13,6 @@
 #include <iostream>
 #include <thread>
 ;
-void create_server(uint8_t *buf, size_t nbytes);
+void create_server();
+std::thread run_server_in_new_thread();
 #endif

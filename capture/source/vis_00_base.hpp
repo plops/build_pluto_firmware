@@ -17,7 +17,6 @@
 #include <vector>
 ;
 #include "vis_01_server.hpp"
-#include "vis_02_filters.hpp"
 ;
 // header;
 int main(int argc, char **argv);

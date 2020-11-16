@@ -76,6 +76,67 @@
       `(unless ,code
 	 ,(logprint (format nil "~a" code))))
 
+    (defun make-filter (pass &key (poles 2) (fc 0.01))
+    ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
+    (let ((l `((low 2 0.01
+		   :a (8.66487e-4 1.732678e-3 8.663387e-4)
+		   :b (1.919129e0 -9.225943e-1))
+	       (low 2 0.025
+		   :a (5.112374e-3 1.022475e-2 5.112374e-3)
+		   :b (1.797154 -8.176033e-1))
+	       (low 2 0.05
+		   :a (1.868823e-2 3.737647e-2 1.868823e-2)
+		   :b (1.593937 -6.686903e-1))
+	       (low 2 0.075
+		   :a (3.869430e-2 7.738860e-2 3.869430e-2)
+		   :b (1.392667 -5.474446e-1))
+	      (low 2 0.1
+		   :a (6.372802e-2 1.274560e-1 6.372802e-2)
+		   :b (1.194365e0 -4.492774e-1))
+	      (low 2 0.4
+		   :a (6.362308e-1 1.272462e0 6.362308e-1)
+		   :b (-1.125379e0 -4.195441e-1))
+	      (high 2 0.01
+		    :a (9.567529e-1 -1.913506e0 9.567529e-1)
+		    :b (1.911437e0 -9.155749e-1))
+	      (high 2 0.40
+		    :a (6.372801e-2 -1.274560e-1 6.372801e-2)
+		    :b (-1.194365e0 -4.492774e-1)))))
+     `(lambda (xn)
+	(declare (type float xn)
+		 (values float))
+	,@(remove-if #'null
+		     (loop for e in l
+			   collect
+			   (destructuring-bind (pass_ poles_ fc_ &key a b) e
+			     (when (and (eq pass pass_)
+					(eq poles poles_)
+					(eq fc fc_))
+			      `(do0
+				(comments ,(format nil "filter_~a_~a_~2,'0d_real" poles pass (floor (* 100 fc))))
+				
+				(let ((yn1 0s0)
+				      (yn2 0s0)
+				      
+				      (xn1 0s0)
+				      (xn2 0s0)
+				      
+				      (yn (+ (* ,(elt a 0) xn)
+					      (* ,(elt a 1) xn1)
+					      (* ,(elt a 2) xn2)
+					      (* ,(elt b 0) yn1)
+					      (* ,(elt b 1) yn2))))
+				  (declare (type "static float" yn1 yn2 xn1 xn2 xn3)
+					   (type float yn))
+
+				  (setf 
+					xn2 xn1
+					xn1 xn
+					yn2 yn1
+					yn1 yn)
+				  (return yn))))))))))
+    ;; (,(make-filter 'low :fc 0.01) (aref ,(g `_iqdata) (+ 0 (* 2 i))))
+    
     (defun emit-globals (&key init)
       (let ((l `((_start_time ,(emit-c :code `(typeof (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)
@@ -165,8 +226,7 @@
 
 		      
 
-		      (include "vis_01_server.hpp"
-			       "vis_02_filters.hpp")
+		      (include "vis_01_server.hpp")
 		      
 		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
 		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
@@ -329,7 +389,9 @@
 					   (time_since_epoch)))
 				   (sample_start sample_and_compute_start)
 				   (compute_start sample_and_compute_start))
-			       (do0
+				(do0
+				 (let ((server_thread (run_server_in_new_thread)))
+				   ,(logprint "server started"))
 				(let ((count 0))
 				  (while true ;
 				   ;dotimes (j 1)
@@ -354,7 +416,7 @@
 					 (i 0)
 					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
 					 )
-				     (do0
+				     #+nil(do0
 				      (comments "open server and wait for client to obtain rxbuf"
 						"sdriq file format"
 						"https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput")
@@ -376,7 +438,8 @@
 					    (old 0s0)
 					    (trig 0)
 					    (trig1 0)
-					    (outiq (std--vector<int16_t>)))
+					    ;(outiq (std--vector<int16_t>))
+					    )
 				       (do0
 				       
 					;"#pragma omp parallel"
@@ -390,7 +453,10 @@
 						   (sq (aref (reinterpret_cast<int16_t*> p) 1))
 						   (m (+ (* si si)
 							 (* sq sq)))
-						   (mlow (filter_2_low_01_real m))))
+						   (mlow
+						     (,(make-filter 'low :fc 0.01) m)
+						     ;(filter_2_low_01_real m)
+						     )))
 					     (when (< ma mlow)
 					       (setf ma mlow))
 					     (when (and (== trig 0)
@@ -400,8 +466,10 @@
 					     (when (< trig 0)
 					       ;; get a few more samples after trig1
 					       (do0
-						(outiq.push_back si)
-						(outiq.push_back sq)
+						(dot ,(g `_iq_out) (push_back si))
+						(dot ,(g `_iq_out) (push_back sq))
+						;(outiq.push_back si)
+						;(outiq.push_back sq)
 						(incf trig)
 						#+nil (when (== trig 0)
 							(dotimes (i (* 16 4096))
@@ -410,22 +478,27 @@
 							  ))))
 					     
 					     (when (< 0 trig)
-					       (do0
+					       #+nil (do0
 						(outiq.push_back si)
 						(outiq.push_back sq))
+					       (do0
+						(dot ,(g `_iq_out) (push_back si))
+						(dot ,(g `_iq_out) (push_back sq))
+						)
 					       (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
 							  (<= mlow 2000))
 						 (setf trig1 i)
 						 ,(logprint "" `(ma trig trig1))
-						 ;; read a few more samples
-						 (setf trig -2000)))
+						 ;; read a few more samples (if trig is set negative here)
+						 (setf trig 0)))
 					     (incf i)
 					     (setf old mlow)
 					     )
-					,(logprint "finished" `(ma trig trig1 (outiq.size))))
+					#+nil ,(logprint "finished" `(ma trig trig1 ;(outiq.size)
+								   )))
 					
 					)
-				      (create_server ;(reinterpret_cast<uint8_t*> &header)
+				      #+nil (create_server ;(reinterpret_cast<uint8_t*> &header)
 						      ; (sizeof header)
 						       (reinterpret_cast<uint8_t*> (outiq.data))
 						       (* 2 (outiq.size))
@@ -472,7 +545,7 @@
 		      (return 0)))))
 
     (define-module
-       `(server ()
+       `(server ((_iq_out :type "tsqueue<uint16_t>"))
 	      (do0
 	       (include <sys/types.h>
 			<sys/socket.h>
@@ -485,9 +558,17 @@
 			     
 			     )
 
+		    
+
+		    ;"tsqueue<uint16_t> iq_out;"
+
 		    (comments "http://www.linuxhowtos.org/data/6/server.c")
+
+		    
+		    
 		    (defun create_server (;header nbytes_header
-					  buf nbytes)
+					;  buf nbytes
+					  )
 		      (declare (type uint8_t* buf header)
 			       (type size_t nbytes_header nbytes))
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
@@ -498,112 +579,152 @@
 			(setf server_addr.sin_family AF_INET
 			      server_addr.sin_addr.s_addr INADDR_ANY
 			      server_addr.sin_port (htons portno))
+			;,(logprint "attempt bind")
 			(when (<  (bind fd
 					("reinterpret_cast<struct sockaddr*>" &server_addr)
 					(sizeof server_addr))
 				  0)
-			  ,(logprint "bind failed"))
+			 ; ,(logprint "bind failed")
+			  )
 			(listen fd 5)
+			;,(logprint "initiate accept")
 			(let ((client_len (sizeof client_addr))
 			      (fd1 (accept fd
 					   ("reinterpret_cast<struct sockaddr*>" &client_addr)
 					   &client_len)))
-			  (when (< fd1 0)
-			    ,(logprint "accept failed"))
+			  #+nil (when (< fd1 0)
+			    ,(logprint "accept failed")
+			    )
 
 			  #+nil
 			  (let ((nh (write fd1 header nbytes_header)))
 			    (when (< nh 0)
 			      ,(logprint "writing header failed"))
 			    )
-			  ,(logprint "attempt to write" `(nbytes))
-			  (let ((n (write fd1 buf nbytes)))
-			    (when (< n 0)
-			      ,(logprint "write failed"))
-			    )
-			  ,(logprint "bytes written: " `(n))
+			  ;,(logprint "enter transmission loop")
+
+			  (while true
+				 (do0 (dot ,(g `_iq_out) (wait_while_empty))
+				      
+				      ;,(logprint "attempt to write" `(nbytes))
+				      (while (not (dot ,(g `_iq_out) (empty)))
+					     (let ((msg (dot ,(g `_iq_out) (pop_front))))
+					       (let ((n (write fd1 (reinterpret_cast<uint8_t*> msg) 2)))
+						 #+nil (when (< n 0)
+						   ,(logprint "write failed")
+						   )
+						 )))
+				      
+				      ;,(logprint "bytes written: " `(n))
+				      ))
 			  (close fd1)
 			  (close fd)
-			  ))))))
+			  )))
 
+		    (defun run_server_in_new_thread ()
+		      (declare (values "std::thread"))
+		      ,(logprint "attempt to start a thread with the server")
+		      (return (std--thread create_server))
+		      )
+		    )))
+
+    
+    
     (define-module
-       `(filters ()
-		 (do0
-		  (include <iostream>
+       `(tsqueue () ;; thread safe queue
+	      (do0
+	       
+	       
+		    (include <iostream>
 			     <chrono>
 			     <thread>
-			     <complex>
-			     )
-		    ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
-		  ,(let ((l `((low 2 0.01
-				     :a (8.66487e-4 1.732678e-3 8.663387e-4)
-				     :b (1.919129e0 -9.225943e-1))
-				(low 2 0.1
-				     :a (6.372802e-2 1.274560e-1 6.372802e-2)
-				     :b (1.194365e0 -4.492774e-1))
-				(low 2 0.4
-				     :a (6.362308e-1 1.272462e0 6.362308e-1)
-				     :b (-1.125379e0 -4.195441e-1))
-				(high 2 0.01
-				      :a (9.567529e-1 -1.913506e0 9.567529e-1)
-				      :b (1.911437e0 -9.155749e-1))
-				(high 2 0.40
-				      :a (6.372801e-2 -1.274560e-1 6.372801e-2)
-				      :b (-1.194365e0 -4.492774e-1)))))
-		       `(do0
-			 ,@(loop for e in l
-				 collect
-				 (destructuring-bind (pass poles fc &key a b) e
-				     `(defun ,(format nil "filter_~a_~a_~2,'0d_real" poles pass (floor (* 100 fc))) (xn)
-					(declare (type float xn)
-						 (values float))
-					(let (
-					      (yn1 0s0)
-					      (yn2 0s0)
-					      
-					      (xn1 0s0)
-					      (xn2 0s0)
-					      
-					      (yn 0s0))
-					  (declare (type "static float" yn1 yn2 xn1 xn2 xn3)
-						   (type float yn))
+			     <deque>
+			     <mutex>
+			     <condition_variable>)
 
-					  (setf yn (+ (* ,(elt a 0) xn)
-						      (* ,(elt a 1) xn1)
-						      (* ,(elt a 2) xn2)
-						      (* ,(elt b 0) yn1)
-						      (* ,(elt b 1) yn2))
-						xn2 xn1
-						xn1 xn
-						yn2 yn1
-						yn1 yn)
-					  (return yn)))))
-			 ,@(loop for e in l
-				 collect
-				 (destructuring-bind (pass poles fc &key a b) e
-				     `(defun ,(format nil "filter_~a_~a_~2,'0d_complex" poles pass (floor (* 100 fc))) (xn)
-					(declare (type std--complex<float> xn)
-						 (values "std::complex<float>"))
-					(let ,(loop for f in `(yn1 yn2 xn1 xn2 yn) collect
-						    `(,f (std--complex<float> 0s0 0s0)))
-					  
-					  #+nil (declare (type "static std::complex<float>"
-							 ,@(loop for f in `(yn1 yn2 xn1 xn2) collect
-								 `((,f 0s0 0s0))))
-						   (type std--complex<float>
-							 ,@(loop for f in `(yn) collect
-								 `((,f 0s0 0s0)))))
+		    #+nil
+		    (include <boost/asio.hpp>
+			     <boost/asio/ts/buffer.hpp>
+			     <boost/asio/ts/internet.hpp>)
+	
+		    " "
 
-					  (setf yn (+ (* ,(elt a 0) xn)
-						      (* ,(elt a 1) xn1)
-						      (* ,(elt a 2) xn2)
-						      (* ,(elt b 0) yn1)
-						      (* ,(elt b 1) yn2))
-						xn2 xn1
-						xn1 xn
-						yn2 yn1
-						yn1 yn)
-					  (return yn)))))))))))
+		    (split-header-and-code
+		     (do0
+		      "// header"
+		      (defclass+ (tsqueue :template "typename T") ()
+			"public:"
+			"tsqueue() = default;"
+			"tsqueue(const tsqueue<T>&) = delete;"
+			(defmethod ~tsqueue ()
+			  (declare (virtual)
+				   (values :constructor))
+			  (clear))
+			#+nil(defmethod empty ()
+				    (declare (values bool)
+					     (const))
+				    (let ((lock (std--scoped_lock mux_deq)))
+				      (return (dot deq (empty)))))
+			,@(loop for e in
+				`((front "const T&")
+				  (back "const T&")
+				  (empty bool)
+				  ;(size size_t)
+				  (clear void)
+				  (pop_front "T" :code (let ((el (std--move
+								  (deq.front))))
+							 (deq.pop_front)
+							 (return el)))
+				  (pop_back "T" :code (let ((el (std--move
+								  (deq.back))))
+							 (deq.pop_back)
+							(return el)))
+				  
+				  (push_back void
+					    :params ((item "const T&"))
+					    :code (do0
+						   (deq.emplace_back
+						    (std--move item))
+						   (let ((ul (std--unique_lock<std--mutex> mux_blocking)))
+						     (cv_blocking.notify_one))))
+				  (push_front void
+					    :params ((item "const T&"))
+					    :code (do0
+						   (deq.emplace_front
+						    (std--move item))
+						   (let ((ul (std--unique_lock<std--mutex> mux_blocking)))
+						     (cv_blocking.notify_one))))
+				  (wait_while_empty void
+					    :params ()
+					    :code (while (empty)
+						   (let ((ul (std--unique_lock<std--mutex> mux_blocking)))
+						     (cv_blocking.wait ul)))))
+				collect
+				(destructuring-bind (name type &key params code)
+				    e
+				 `(defmethod ,name ,(mapcar #'first params)
+				    (declare (values ,type)
+					     ,@(loop for (e f) in params
+						     collect
+						     `(type ,f ,e)))
+				    (let ((lock (std--scoped_lock mux_deq)))
+				      ,(if code
+					   `(do0
+					     ,code)
+					   `(return (dot deq (,name))))))))
+			
+			"protected:"
+			"std::mutex mux_deq;"
+			"std::mutex mux_blocking;"
+			"std::condition_variable cv_blocking;"
+			"std::deque<T> deq;")
+		      )
+		     (do0
+		      "// implementation"
+		      ))
+		    )))
+
+    )
   
   (progn
     (progn ;with-open-file
@@ -712,6 +833,7 @@
 		    "#define GLOBALS_H"
 		    " "
 
+		    (include "vis_02_tsqueue.hpp")
 		    #+nil (include <complex>)
 		    #+nil (include <deque>
 			     <map>

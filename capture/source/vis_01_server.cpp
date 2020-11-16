@@ -13,7 +13,7 @@ extern State state;
 #include <unistd.h>
 // http://www.linuxhowtos.org/data/6/server.c
 ;
-void create_server(uint8_t *buf, size_t nbytes) {
+void create_server() {
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
   struct sockaddr_in server_addr = {};
@@ -23,56 +23,29 @@ void create_server(uint8_t *buf, size_t nbytes) {
   server_addr.sin_port = htons(portno);
   if ((bind(fd, reinterpret_cast<struct sockaddr *>(&server_addr),
             sizeof(server_addr))) < (0)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("bind failed") << (" ") << (std::endl) << (std::flush);
   }
   listen(fd, 5);
   auto client_len = sizeof(client_addr);
   auto fd1 = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr),
                     &client_len);
-  if ((fd1) < (0)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("accept failed") << (" ") << (std::endl) << (std::flush);
+  while (true) {
+    state._iq_out.wait_while_empty();
+    while (!(state._iq_out.empty())) {
+      auto msg = state._iq_out.pop_front();
+      auto n = write(fd1, reinterpret_cast<uint8_t *>(msg), 2);
+    }
   }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("attempt to write")
-      << (" ") << (std::setw(8)) << (" nbytes='") << (nbytes) << ("'")
-      << (std::endl) << (std::flush);
-  auto n = write(fd1, buf, nbytes);
-  if ((n) < (0)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("write failed") << (" ") << (std::endl) << (std::flush);
-  }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("bytes written: ")
-      << (" ") << (std::setw(8)) << (" n='") << (n) << ("'") << (std::endl)
-      << (std::flush);
   close(fd1);
   close(fd);
+}
+std::thread run_server_in_new_thread() {
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ")
+      << ("attempt to start a thread with the server") << (" ") << (std::endl)
+      << (std::flush);
+  return std::thread(create_server);
 }
