@@ -379,7 +379,7 @@
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
 			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (*  16 4096) ;; 48 64
+			    (let (("const nbuf" (* 2 64 4096) ;; 48 64
 						;4096
 						))
 			      ,(logprint "create buffer")
@@ -579,20 +579,20 @@
 			(setf server_addr.sin_family AF_INET
 			      server_addr.sin_addr.s_addr INADDR_ANY
 			      server_addr.sin_port (htons portno))
-			;,(logprint "attempt bind")
+			,(logprint "attempt bind" `(portno))
 			(when (<  (bind fd
 					("reinterpret_cast<struct sockaddr*>" &server_addr)
 					(sizeof server_addr))
 				  0)
-			 ; ,(logprint "bind failed")
+			  ,(logprint "bind failed")
 			  )
 			(listen fd 5)
-			;,(logprint "initiate accept")
+			,(logprint "initiate accept")
 			(let ((client_len (sizeof client_addr))
 			      (fd1 (accept fd
 					   ("reinterpret_cast<struct sockaddr*>" &client_addr)
 					   &client_len)))
-			  #+nil (when (< fd1 0)
+			  #-nil (when (< fd1 0)
 			    ,(logprint "accept failed")
 			    )
 
@@ -601,12 +601,12 @@
 			    (when (< nh 0)
 			      ,(logprint "writing header failed"))
 			    )
-			  ;,(logprint "enter transmission loop")
+			  ,(logprint "enter transmission loop")
 
 			  (while true
 				 (do0 (dot ,(g `_iq_out) (wait_while_empty))
 				      
-				      ;,(logprint "attempt to write" `(nbytes))
+				      ,(logprint "attempt to write")
 				      (while (not (dot ,(g `_iq_out) (empty)))
 					     (let ((msg (dot ,(g `_iq_out) (pop_front))))
 					       (let ((n (write fd1 (reinterpret_cast<uint8_t*> msg) 2)))

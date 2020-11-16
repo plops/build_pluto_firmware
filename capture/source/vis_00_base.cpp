@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "543c2da073d1b44f4f8efcd322d4123322e033ce";
+  state._code_version = "8173872a0b3b1ee80c118e4674dc99b38af0bfa6";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:36:06 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "18:59:36 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
       << (" ") << (std::endl) << (std::flush);
-  auto const nbuf = ((16) * (4096));
+  auto const nbuf = ((2) * (64) * (4096));
 
   (std::cout)
       << (std::setw(10))
