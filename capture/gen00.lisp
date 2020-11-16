@@ -463,9 +463,10 @@
 							(< old 4000) ;; trigger on positive edge
 							(<= 4000 mlow))
 					       (setf trig i))
-					     (when (< trig 0)
+					     #+nil (when (< trig 0)
 					       ;; get a few more samples after trig1
 					       (do0
+						
 						(dot ,(g `_iq_out) (push_back si))
 						(dot ,(g `_iq_out) (push_back sq))
 						;(outiq.push_back si)
@@ -488,7 +489,8 @@
 					       (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
 							  (<= mlow 2000))
 						 (setf trig1 i)
-						 ,(logprint "" `(ma trig trig1))
+						 (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
+						  ,(logprint "" `(ma trig trig1 pulse_ms)))
 						 ;; read a few more samples (if trig is set negative here)
 						 (setf trig 0)))
 					     (incf i)
@@ -530,7 +532,8 @@
 				     
 
 				     )
-				    ,(logprint "374" `(count nbytes compute_perc sample_perc)))))
+				   ;,(logprint "374" `(count nbytes compute_perc sample_perc))
+				   )))
 			       )))
 
 			  
@@ -588,38 +591,39 @@
 			  )
 			(listen fd 5)
 			,(logprint "initiate accept")
-			(let ((client_len (sizeof client_addr))
-			      (fd1 (accept fd
-					   ("reinterpret_cast<struct sockaddr*>" &client_addr)
-					   &client_len)))
-			  #-nil (when (< fd1 0)
-			    ,(logprint "accept failed")
-			    )
+			(while true
+			 (let ((client_len (sizeof client_addr))
+			       (fd1 (accept fd
+					    ("reinterpret_cast<struct sockaddr*>" &client_addr)
+					    &client_len)))
+			   #-nil (when (< fd1 0)
+				   ,(logprint "accept failed")
+				   )
 
-			  #+nil
-			  (let ((nh (write fd1 header nbytes_header)))
-			    (when (< nh 0)
-			      ,(logprint "writing header failed"))
-			    )
-			  ,(logprint "enter transmission loop")
+			   #+nil
+			   (let ((nh (write fd1 header nbytes_header)))
+			     (when (< nh 0)
+			       ,(logprint "writing header failed"))
+			     )
+			   ,(logprint "enter transmission loop" `((dot ,(g `_iq_out) (empty))))
 
-			  (while true
-				 (do0 (dot ,(g `_iq_out) (wait_while_empty))
-				      
-				      ,(logprint "attempt to write")
-				      (while (not (dot ,(g `_iq_out) (empty)))
-					     (let ((msg (dot ,(g `_iq_out) (pop_front))))
-					       (let ((n (write fd1 (reinterpret_cast<uint8_t*> msg) 2)))
-						 #+nil (when (< n 0)
+			   (do0 (dot ,(g `_iq_out) (wait_while_empty))
+			       
+				,(logprint "attempt to write")
+				(while (not (dot ,(g `_iq_out) (empty)))
+				       (let ((msg (dot ,(g `_iq_out) (pop_front))))
+					 (let ((n (write fd1 (reinterpret_cast<uint8_t*> msg) 2)))
+					   #+nil (when (< n 0)
 						   ,(logprint "write failed")
 						   )
-						 )))
-				      
-				      ;,(logprint "bytes written: " `(n))
-				      ))
-			  (close fd1)
-			  (close fd)
-			  )))
+					   )))
+			       
+					;,(logprint "bytes written: " `(n))
+				)
+			   (close fd1)
+			   ))
+			(do0 
+			     (close fd))))
 
 		    (defun run_server_in_new_thread ()
 		      (declare (values "std::thread"))

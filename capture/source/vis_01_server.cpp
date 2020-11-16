@@ -48,10 +48,21 @@ void create_server() {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("initiate accept")
       << (" ") << (std::endl) << (std::flush);
-  auto client_len = sizeof(client_addr);
-  auto fd1 = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr),
-                    &client_len);
-  if ((fd1) < (0)) {
+  while (true) {
+    auto client_len = sizeof(client_addr);
+    auto fd1 = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr),
+                      &client_len);
+    if ((fd1) < (0)) {
+
+      (std::cout) << (std::setw(10))
+                  << (std::chrono::high_resolution_clock::now()
+                          .time_since_epoch()
+                          .count())
+                  << (" ") << (std::this_thread::get_id()) << (" ")
+                  << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
+                  << (" ") << ("accept failed") << (" ") << (std::endl)
+                  << (std::flush);
+    }
 
     (std::cout) << (std::setw(10))
                 << (std::chrono::high_resolution_clock::now()
@@ -59,16 +70,9 @@ void create_server() {
                         .count())
                 << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
                 << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("accept failed") << (" ") << (std::endl) << (std::flush);
-  }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ")
-      << ("enter transmission loop") << (" ") << (std::endl) << (std::flush);
-  while (true) {
+                << ("enter transmission loop") << (" ") << (std::setw(8))
+                << (" state._iq_out.empty()='") << (state._iq_out.empty())
+                << ("'") << (std::endl) << (std::flush);
     state._iq_out.wait_while_empty();
 
     (std::cout) << (std::setw(10))
@@ -82,8 +86,8 @@ void create_server() {
       auto msg = state._iq_out.pop_front();
       auto n = write(fd1, reinterpret_cast<uint8_t *>(msg), 2);
     }
+    close(fd1);
   }
-  close(fd1);
   close(fd);
 }
 std::thread run_server_in_new_thread() {
