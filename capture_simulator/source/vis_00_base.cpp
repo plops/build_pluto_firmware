@@ -9,42 +9,24 @@ extern State state;
 #include <array>
 #include <chrono>
 #include <complex>
-#include <iio.h>
 #include <iostream>
 #include <math.h>
+#include <sys/mman.h>
 #include <thread>
 #include <unistd.h>
 #include <vector>
-#define MHz(x) ((long long)(x * 1000000.0 + .5))
-#define GHz(x) ((long long)(x * 1000000000.0 + .5))
-enum iodev { RX, TX };
-struct stream_cfg {
-  long long bw_hz;
-  long long fs_hz;
-  long long lo_hz;
-  const char *rfport;
-};
-typedef struct stream_cfg stream_cfg;
 using namespace std::chrono_literals;
 
 // implementation
 State state;
-struct __attribute__((packed)) sdriq_header_t {
-  uint32_t samplerate;
-  uint64_t center_frequency;
-  uint64_t timestamp;
-  uint32_t samplesize;
-  uint32_t padding;
-  uint32_t crc32;
-};
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "3c6edf05e098e0db8007de4703f1d261194d2f2f";
+  state._code_version = "5ed2a56c11b55d8f9ebb12f0423f653d87f49ec6";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "23:04:55 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "23:25:56 of Monday, 2020-11-16 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -113,169 +95,23 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("::") << (typeid(state._code_license).name()) << ("'") << (std::endl)
       << (std::flush);
-  auto ctx = iio_create_default_context();
-  auto major = uint(0);
-  auto minor = uint(0);
-  char git_tag[8];
-  iio_library_get_version(&major, &minor, git_tag);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" major='") << (major) << ("::")
-      << (typeid(major).name()) << ("'") << (std::setw(8)) << (" minor='")
-      << (minor) << ("::") << (typeid(minor).name()) << ("'") << (std::setw(8))
-      << (" git_tag='") << (git_tag) << ("::") << (typeid(git_tag).name())
-      << ("'") << (std::endl) << (std::flush);
-  if (!(ctx)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("create_default") << (" ") << (std::setw(8)) << (" ctx='")
-                << (ctx) << ("::") << (typeid(ctx).name()) << ("'")
-                << (std::endl) << (std::flush);
-  }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" iio_context_get_devices_count(ctx)='")
-      << (iio_context_get_devices_count(ctx)) << ("::")
-      << (typeid(iio_context_get_devices_count(ctx)).name()) << ("'")
-      << (std::endl) << (std::flush);
-  auto rx = iio_context_find_device(ctx, "cf-ad9361-lpc");
-  if (!(rx)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ") << ("rx")
-                << (" ") << (std::endl) << (std::flush);
-  }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx") << (" ")
-      << (std::setw(8)) << (" iio_device_get_attrs_count(rx)='")
-      << (iio_device_get_attrs_count(rx)) << ("::")
-      << (typeid(iio_device_get_attrs_count(rx)).name()) << ("'") << (std::endl)
-      << (std::flush);
-  auto phy = iio_context_find_device(ctx, "ad9361-phy");
-  if (!(phy)) {
-
-    (std::cout) << (std::setw(10))
-                << (std::chrono::high_resolution_clock::now()
-                        .time_since_epoch()
-                        .count())
-                << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__)
-                << (":") << (__LINE__) << (" ") << (__func__) << (" ")
-                << ("phy") << (" ") << (std::endl) << (std::flush);
-  }
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("phy") << (" ")
-      << (std::setw(8)) << (" iio_device_get_attrs_count(phy)='")
-      << (iio_device_get_attrs_count(phy)) << ("::")
-      << (typeid(iio_device_get_attrs_count(phy)).name()) << ("'")
-      << (std::endl) << (std::flush);
-  auto rx_lo_freq = 2420000000ULL;
-  auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" rx_lo_freq_MHz='") << (rx_lo_freq_MHz) << ("::")
-      << (typeid(rx_lo_freq_MHz).name()) << ("'") << (std::endl)
-      << (std::flush);
-  iio_channel_attr_write_longlong(
-      iio_device_find_channel(phy, "altvoltage0", true), "frequency",
-      rx_lo_freq);
-  auto rx_rate = 61440000UL;
-  auto rx_rate_MSps = ((rx_rate) / ((1.0e+6f)));
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" rx_rate_MSps='") << (rx_rate_MSps) << ("::")
-      << (typeid(rx_rate_MSps).name()) << ("'") << (std::endl) << (std::flush);
-  iio_channel_attr_write_longlong(
-      iio_device_find_channel(phy, "voltage0", false), "sampling_frequency",
-      rx_rate);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("get channels count..")
-      << (" ") << (std::endl) << (std::flush);
-  auto n_chan = iio_device_get_channels_count(rx);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("") << (" ")
-      << (std::setw(8)) << (" n_chan='") << (n_chan) << ("::")
-      << (typeid(n_chan).name()) << ("'") << (std::endl) << (std::flush);
-  auto rx_i = iio_device_get_channel(rx, 0);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_i 0") << (" ")
-      << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_i)='")
-      << (iio_channel_get_attrs_count(rx_i)) << ("::")
-      << (typeid(iio_channel_get_attrs_count(rx_i)).name()) << ("'")
-      << (std::endl) << (std::flush);
-  auto rx_q = iio_device_get_channel(rx, 1);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("rx_q 1") << (" ")
-      << (std::setw(8)) << (" iio_channel_get_attrs_count(rx_q)='")
-      << (iio_channel_get_attrs_count(rx_q)) << ("::")
-      << (typeid(iio_channel_get_attrs_count(rx_q)).name()) << ("'")
-      << (std::endl) << (std::flush);
-  iio_channel_enable(rx_i);
-  iio_channel_enable(rx_q);
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("iq channels enabled")
-      << (" ") << (std::endl) << (std::flush);
-  auto const nbuf = ((48) * (64) * (4096));
-
-  (std::cout)
-      << (std::setw(10))
-      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
-      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
-      << (__LINE__) << (" ") << (__func__) << (" ") << ("create buffer")
-      << (" ") << (std::endl) << (std::flush);
-  auto rxbuf = iio_device_create_buffer(rx, nbuf, false);
+  auto fn = "/home/martin/o.sdriq";
+  auto file_length = ([fn]() {
+    auto in = std::ifstream(fn, ((std::ios::ate) | (std::ifstream::binary)));
+    return in.tellg();
+  })();
+  auto fd = ([fn]() {
+    auto fd = open(fn, O_RDONLY, 0);
+    assert((fd) != (-1));
+    return fd;
+  })();
+  auto iq_input_data = ([file_length, fd]() {
+    auto m = mmap(nullptr, file_length, PROT_READ,
+                  ((MAP_PRIVATE) | (MAP_POPULATE)), fd, 0);
+    assert((MAP_FAILED) != (m));
+    return static_cast<uint16_t *>(m);
+  })();
+  auto iq_input_data_size = ((file_length) / (2));
   auto sample_and_compute_start =
       std::chrono::high_resolution_clock::now().time_since_epoch();
   auto sample_start = sample_and_compute_start;
@@ -298,9 +134,9 @@ int main(int argc, char **argv) {
     auto time_now =
         std::chrono::high_resolution_clock::now().time_since_epoch();
     auto sample_dur = ((time_now) - (sample_start)).count();
-    auto step = iio_buffer_step(rxbuf);
-    auto end = iio_buffer_end(rxbuf);
-    auto start = static_cast<uint8_t *>(iio_buffer_first(rxbuf, rx_i));
+    auto step = ((2) * (2));
+    auto start = static_cast<uint8_t *>(iq_input_data);
+    auto end = ((start) + (file_length));
     auto i = 0;
     compute_start =
         std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -388,6 +224,5 @@ int main(int argc, char **argv) {
                 << (typeid(sample_perc).name()) << ("'") << (std::endl)
                 << (std::flush);
   }
-  iio_context_destroy(ctx);
   return 0;
 }

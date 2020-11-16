@@ -11,10 +11,11 @@
 #include <algorithm>
 #include <array>
 #include <complex>
-#include <iio.h>
 #include <math.h>
 #include <unistd.h>
 #include <vector>
+;
+#include <sys/mman.h>
 ;
 #include "vis_01_server.hpp"
 ;

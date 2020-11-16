@@ -1,9 +1,9 @@
 # source /opt/Xilinx/Vivado/2019.1/settings64.sh; export PATH=$PATH:/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
-CROSS=arm-linux-gnueabihf-
-CROSS_ROOT=/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-none-eabi/arm-none-eabi/libc/
-SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot
-CXX=${CROSS}g++
-LD=${CROSS}ld
+#CROSS=arm-linux-gnueabihf-
+#CROSS_ROOT=/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-none-eabi/arm-none-eabi/libc/
+#SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot
+#CXX=${CROSS}g++
+#LD=${CROSS}ld
 
 #-Og -g3 -ggdb
 
@@ -11,10 +11,12 @@ LD=${CROSS}ld
 # Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpd32 
 # Hardware        : Xilinx Zynq Platform
 
+# -mfloat-abi=hard -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9  -mfpu=neon-vfpv3 
 
-CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
--mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
--O3 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3 \
+CXXFLAGS= \
+-march=native -mtune=native \
+-fomit-frame-pointer -fno-common -fno-builtin \
+-O3 -ffast-math -funsafe-math-optimizations \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \

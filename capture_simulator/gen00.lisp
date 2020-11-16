@@ -222,30 +222,21 @@
 			     )
 
 		     (do0
-		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
-		      (include <iio.h>
+		    
+		      (include 
 			       <array>
 			       <math.h>
 			       <complex>
-			       ;<fftw3.h>
-					;<omp.h>
 			       <unistd.h>
 			       <algorithm>
 			       <vector>)
 
+		      (include <sys/mman.h>)
+
 		      
 
 		      (include "vis_01_server.hpp")
-		      
-		     "#define MHz(x) ((long long)(x*1000000.0 + .5))"
-		     "#define GHz(x) ((long long)(x*1000000000.0 + .5))"
-		     "enum iodev{RX,TX};"
-		     (defstruct0 stream_cfg
-			 (bw_hz "long long")
-		       (fs_hz "long long")
-		       (lo_hz "long long")
-		       (rfport "const char*")
-		       ))
+		      )
 		    "using namespace std::chrono_literals;"
 		    " "
 
@@ -258,26 +249,9 @@
 
 		      ))
 		    "State state;"
-
-		    (space "struct __attribute__ ((packed)) sdriq_header_t"
-			   (progn
-			     "uint32_t samplerate;"
-			     "uint64_t center_frequency;"
-			     "uint64_t timestamp;"
-			     "uint32_t samplesize;"
-			     "uint32_t padding;"
-			     "uint32_t crc32;"))
 		    
-		    #+nil
-		    (defstruct0 sdriq_header_t 
-		      (samplerate uint32_t)
-		      (center_frequency uint64_t)
-		      (timestamp uint64_t)
-		      (samplesize uint32_t)
-		      (padding uint32_t)
-		      (crc32 uint32_t)
-		      )
 		    
+		    		    
 		    (defun main (argc argv
 				 )
 		      (declare (type int argc)
@@ -327,239 +301,174 @@
 		      
 		      (do0
 		
-		       ;;https://analogdevicesinc.github.io/libiio/master/libiio/index.html
-		       (let ((ctx (iio_create_default_context)))
-			 (do0
-			  (let ((major (uint 0))
-				(minor (uint 0))
-				(git_tag))
-			    (declare (type (array char 8) git_tag))
-			    (iio_library_get_version &major &minor git_tag)
-			   ,(logprint "" `(major minor git_tag)))
-			  (unless ctx
-			    ,(logprint "create_default" `(ctx)))
-			  ,(logprint ""
-				     `((iio_context_get_devices_count ctx)))
-			  #+nil (let ((n (iio_context_get_devices_count ctx))
-				(dev ("std--array<iio_device*,n>")))
+		       
+		       
+		       (let ((fn (string "/home/martin/o.sdriq"))
+			     
+			     (file_length ((lambda ()
+					     (declare (capture fn))
+					     (let ((in (std--ifstream fn (logior std--ios--ate
+										 std--ifstream--binary))))
+					       (return (in.tellg))))))
+			     (fd ((lambda ()
+				    (declare (capture fn))
+				    (let ((fd (open fn O_RDONLY 0)))
+				      (assert (!= fd -1))
+				      (return fd)))))
+			     (iq_input_data ((lambda ()
+					       (declare (capture file_length fd))
+					       (let ((m (mmap nullptr file_length PROT_READ (logior MAP_PRIVATE MAP_POPULATE)
+							      fd 0)))
+						 (assert (!= MAP_FAILED m))
+						 (return (static_cast<uint16_t*> m))))))
+			     (iq_input_data_size (/ file_length 2)))
+			
+			 (let (
+			       (sample_and_compute_start
+				 (dot ("std::chrono::high_resolution_clock::now")
+				      (time_since_epoch)))
+			       (sample_start sample_and_compute_start)
+			       (compute_start sample_and_compute_start))
+			   (do0
 			    
-			   (dotimes (i n)
-			     (setf (aref dev i)
-				   (iio_context_get_device ctx i)))
-			    )
-			  ,@(loop for (e f) in `((rx cf-ad9361-lpc)
-						 (phy ad9361-phy))
-				  collect
-				  `(let ((,e (iio_context_find_device ctx (string ,f))))
-				     ,(iio e)
-				     ,(logprint (format nil "~a" e)
-						`((iio_device_get_attrs_count ,e)))))
-			  (let ((rx_lo_freq 2420000000ULL)
-				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
-			   ;(comments "rx lo freq to 2.42GHz")
-			   ,(logprint "" `(rx_lo_freq_MHz))
-			   (iio_channel_attr_write_longlong
-			       (iio_device_find_channel phy
-							(string "altvoltage0")
-							true)
-			       (string "frequency")
-			       rx_lo_freq
-			       ))
-			  (let ((rx_rate 61440000UL
-					 ;20000000
-					 )
-				(rx_rate_MSps (/ rx_rate 1e6)))
-			   ;(comments "rx baseband rate 5MSPS")
-			   ,(logprint "" `(rx_rate_MSps))
-			   (iio_channel_attr_write_longlong
-			    (iio_device_find_channel phy
-						     (string "voltage0")
-						     false)
-			    (string "sampling_frequency")
-			    rx_rate
-			    ))
-			  ,(logprint "get channels count..")
-			  (let ((n_chan (iio_device_get_channels_count rx))
-				)
-			    ,(logprint "" `(n_chan))
-			    ,@(loop for e in `(rx_i rx_q) and i from 0 collect
-				    `(let ((,e (iio_device_get_channel rx ,i)))
-				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
-			    (iio_channel_enable rx_i)
-			    (iio_channel_enable rx_q)
-			    ,(logprint "iq channels enabled")
-			    (let (("const nbuf" (* 48 64 4096) ;; 48 64
-						;4096
-						))
-			      ,(logprint "create buffer")
-			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
-				    (sample_and_compute_start
-				      (dot ("std::chrono::high_resolution_clock::now")
-					   (time_since_epoch)))
-				   (sample_start sample_and_compute_start)
-				   (compute_start sample_and_compute_start))
-				(do0
-				 #+nil(do0
-				  (dot ,(g `_iq_out) (push_back 42
-								))
-						(dot ,(g `_iq_out) (push_back 43))
-						)
-				 (let ((server_thread (run_server_in_new_thread)))
-				   ,(logprint "server started")
-				   (when (server_thread.joinable)
-				     (server_thread.join)))
-				 (let ((count 0))
-				  (while true ;
-				   ;dotimes (j 1)
+			    (let ((server_thread (run_server_in_new_thread)))
+			      ,(logprint "server started")
+			      (when (server_thread.joinable)
+				(server_thread.join)))
+			    (let ((count 0))
+			      (while true ;
+					;dotimes (j 1)
 
-				   ; ,(logprint "308" `(count))
-				    
-				   (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
-							   (time_since_epoch)
-							   ))
-				   (let (
-					 (nbytes (iio_buffer_refill rxbuf))
-					 (time_now (dot ("std::chrono::high_resolution_clock::now")
-							(time_since_epoch)
-							))
-					 (sample_dur (dot (- time_now
-							     sample_start)
-							  (count)))
-					 (step (iio_buffer_step rxbuf))
-					 (end (iio_buffer_end rxbuf))
-					 (start (static_cast<uint8_t*>
-						 (iio_buffer_first rxbuf rx_i)))
-					 (i 0)
-					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
-					 )
-				     #+nil(do0
-				      (comments "open server and wait for client to obtain rxbuf"
-						"sdriq file format"
-						"https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput")
-				      (let ((header (sdriq_header_t (curly rx_rate
-									   rx_lo_freq
-									   0
-									   16
-									   0
-									   895232605  ;; crc computed with rescuesdriq
-									   ))))
-					,(logprint "" `((sizeof header)))
-					))
-				     (do0
-				      (setf compute_start
-					    (dot ("std::chrono::high_resolution_clock::now")
-						 (time_since_epoch)
-						 ))
-				      (let ((ma 0)
-					    (old 0s0)
-					    (trig 0)
-					    (trig1 0)
-					    ;(outiq (std--vector<int16_t>))
-					    )
-				       (do0
-				       
-					;"#pragma omp parallel"
-
-					"#pragma GCC ivdep"
-					#-nil
-					(for ((= "uint8_t* p" start)
-					      (< p end)
-					      (incf p step))
-					     (let ((si (aref (reinterpret_cast<int16_t*> p) 0))
-						   (sq (aref (reinterpret_cast<int16_t*> p) 1))
-						   (m (+ (* si si)
-							 (* sq sq)))
-						   (mlow
-						     (,(make-filter 'low :fc 0.01) m)
-						     ;(filter_2_low_01_real m)
-						     )))
-					     (when (< ma mlow)
-					       (setf ma mlow))
-					     (when (and (== trig 0)
-							(< old 4000) ;; trigger on positive edge
-							(<= 4000 mlow))
-					       (setf trig i))
-					     #+nil (when (< trig 0)
-					       ;; get a few more samples after trig1
-					       (do0
-						
-						(dot ,(g `_iq_out) (push_back si))
-						(dot ,(g `_iq_out) (push_back sq))
-						;(outiq.push_back si)
-						;(outiq.push_back sq)
-						(incf trig)
-						#+nil (when (== trig 0)
-							(dotimes (i (* 16 4096))
-							  (outiq.push_back 0)
-							  (outiq.push_back 0)
-							  ))))
-					     
-					     (when (< 0 trig)
-					       #+nil (do0
-						(outiq.push_back si)
-						(outiq.push_back sq))
-					       (do0
-						(dot ,(g `_iq_out) (push_back si))
-						(dot ,(g `_iq_out) (push_back sq))
-						)
-					       (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
-							  (<= mlow 2000))
-						 (setf trig1 i)
-						 (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
-						  ,(logprint "" `(ma trig trig1 pulse_ms)))
-						 ;; read a few more samples (if trig is set negative here)
-						 (setf trig 0)))
-					     (incf i)
-					     (setf old mlow)
-					     )
-					#+nil ,(logprint "finished" `(ma trig trig1 ;(outiq.size)
-								   )))
-					
-					)
-				      #+nil (create_server ;(reinterpret_cast<uint8_t*> &header)
-						      ; (sizeof header)
-						       (reinterpret_cast<uint8_t*> (outiq.data))
-						       (* 2 (outiq.size))
-					;(+ (* 4 trig) start) (* 4 (- trig1 trig))
-						       #+nil (- nbytes
-									       (* 4 trig)
-									       ))
-				     )
-				     (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
+					; ,(logprint "308" `(count))
+				     
+				     (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
 							     (time_since_epoch)
 							     ))
-					   (compute_dur (dot (- compute_end compute_start)
-							     (count)))
-					   (compute_samp_dur (dot (- compute_end
-								     sample_start)
-								  (count)))
-					   (compute_perc (/ (* 100 compute_dur)
-							    compute_samp_dur))
-					   (sample_perc (/ (* 100 sample_dur)
-							   compute_samp_dur)))
-				       
+				     (let (
+					   (nbytes (iio_buffer_refill rxbuf))
+					   (time_now (dot ("std::chrono::high_resolution_clock::now")
+							  (time_since_epoch)
+							  ))
+					   (sample_dur (dot (- time_now
+							       sample_start)
+							    (count)))
+					   (step (* 2 2))
+					   
+					   (start (static_cast<uint8_t*>
+						   iq_input_data))
+					   (end (+ start file_length))
+					   (i 0)
+					;  (rate_MSamp_per_sec (/ (* 1d3 nbuf) dur))
+					   )
+				       #+nil(do0
+					     (comments "open server and wait for client to obtain rxbuf"
+						       "sdriq file format"
+						       "https://github.com/f4exb/sdrangel/tree/master/plugins/samplesource/fileinput")
+					     (let ((header (sdriq_header_t (curly rx_rate
+										  rx_lo_freq
+										  0
+										  16
+										  0
+										  895232605  ;; crc computed with rescuesdriq
+										  ))))
+					       ,(logprint "" `((sizeof header)))
+					       ))
 				       (do0
-					(incf count)
+					(setf compute_start
+					      (dot ("std::chrono::high_resolution_clock::now")
+						   (time_since_epoch)
+						   ))
+					(let ((ma 0)
+					      (old 0s0)
+					      (trig 0)
+					      (trig1 0)
+					;(outiq (std--vector<int16_t>))
+					      )
+					  (do0
+					   
+					;"#pragma omp parallel"
 
+					   "#pragma GCC ivdep"
+					   #-nil
+					   (for ((= "uint8_t* p" start)
+						 (< p end)
+						 (incf p step))
+						(let ((si (aref (reinterpret_cast<int16_t*> p) 0))
+						      (sq (aref (reinterpret_cast<int16_t*> p) 1))
+						      (m (+ (* si si)
+							    (* sq sq)))
+						      (mlow
+							(,(make-filter 'low :fc 0.01) m))))
+						(when (< ma mlow)
+						  (setf ma mlow))
+						(when (and (== trig 0)
+							   (< old 4000) ;; trigger on positive edge
+							   (<= 4000 mlow))
+						  (setf trig i))
+						#+nil (when (< trig 0)
+							;; get a few more samples after trig1
+							(do0
+							 
+							 (dot ,(g `_iq_out) (push_back si))
+							 (dot ,(g `_iq_out) (push_back sq))
+					;(outiq.push_back si)
+					;(outiq.push_back sq)
+							 (incf trig)
+							 #+nil (when (== trig 0)
+								 (dotimes (i (* 16 4096))
+								   (outiq.push_back 0)
+								   (outiq.push_back 0)
+								   ))))
+						
+						(when (< 0 trig)
+						  #+nil (do0
+							 (outiq.push_back si)
+							 (outiq.push_back sq))
+						  (do0
+						   (dot ,(g `_iq_out) (push_back si))
+						   (dot ,(g `_iq_out) (push_back sq))
+						   )
+						  (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
+							     (<= mlow 2000))
+						    (setf trig1 i)
+						    (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
+						      ,(logprint "" `(ma trig trig1 pulse_ms)))
+						    ;; read a few more samples (if trig is set negative here)
+						    (setf trig 0)))
+						(incf i)
+						(setf old mlow)
+						)
+					   #+nil ,(logprint "finished" `(ma trig trig1 ;(outiq.size)
+									    )))
+					  
+					  )
 					)
+				       (let ((compute_end (dot ("std::chrono::high_resolution_clock::now")
+							       (time_since_epoch)
+							       ))
+					     (compute_dur (dot (- compute_end compute_start)
+							       (count)))
+					     (compute_samp_dur (dot (- compute_end
+								       sample_start)
+								    (count)))
+					     (compute_perc (/ (* 100 compute_dur)
+							      compute_samp_dur))
+					     (sample_perc (/ (* 100 sample_dur)
+							     compute_samp_dur)))
+					 
+					 (do0
+					  (incf count)
+
+					  )
+					 
+					 
+					 )
 				       
-				       
+
 				       )
-				     
-
-				     )
-				   ,(logprint "374" `(count nbytes compute_perc sample_perc))
-				   )))
-			       )))
-
-			  
-			  )
-
-			 
-			 
-			 (iio_context_destroy ctx)
-
-			 			 ))
+				     ,(logprint "374" `(count nbytes compute_perc sample_perc))
+				     )))
+			   )))
 		      
 		      (return 0)))))
 
