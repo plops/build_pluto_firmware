@@ -51,14 +51,14 @@
 	     (dot ("std::chrono::high_resolution_clock::now")
 		  (time_since_epoch)
 		  (count))
-					;,(g `_start_time)
+					;,(g `_start_time) 
 	     
 	     (string " ")
 	     ("std::this_thread::get_id")
 	     (string " ")
 	     __FILE__
 	     (string ":")
-	     __LINE__
+	     __LINE__ 
 	     (string " ")
 	     __func__
 	     (string " ")
