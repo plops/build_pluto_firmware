@@ -2,7 +2,6 @@
 	  (safety 3)
 	  (speed 0)
 	  (debug 3)))
-
 (eval-when (:compile-toplevel :execute :load-toplevel)
      (ql:quickload "cl-cpp-generator2")
      (ql:quickload "cl-ppcre"))
