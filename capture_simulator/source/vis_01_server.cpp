@@ -91,13 +91,7 @@ void create_server() {
                 << ("enter transmission loop") << (" ") << (std::setw(8))
                 << (" state._iq_out.empty()='") << (state._iq_out.empty())
                 << ("::") << (typeid(state._iq_out.empty()).name()) << ("'")
-                << (std::setw(8)) << (" state._iq_out.front()='")
-                << (state._iq_out.front()) << ("::")
-                << (typeid(state._iq_out.front()).name()) << ("'")
-                << (std::setw(8)) << (" state._iq_out.back()='")
-                << (state._iq_out.back()) << ("::")
-                << (typeid(state._iq_out.back()).name()) << ("'") << (std::endl)
-                << (std::flush);
+                << (std::endl) << (std::flush);
     if (state._iq_out.empty()) {
       state._iq_out.wait_while_empty();
     }

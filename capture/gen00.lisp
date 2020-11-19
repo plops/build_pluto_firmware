@@ -354,7 +354,7 @@
 				     ,(iio e)
 				     ,(logprint (format nil "~a" e)
 						`((iio_device_get_attrs_count ,e)))))
-			  (let ((rx_lo_freq 2420000000ULL)
+			  (let ((rx_lo_freq 2467000000ULL)
 				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
 			   ;(comments "rx lo freq to 2.42GHz")
 			   ,(logprint "" `(rx_lo_freq_MHz))
@@ -406,8 +406,7 @@
 						)
 				 (let ((server_thread (run_server_in_new_thread)))
 				   ,(logprint "server started")
-				   (when (server_thread.joinable)
-				     (server_thread.join)))
+				   )
 				 (let ((count 0))
 				  (while true ;
 				   ;dotimes (j 1)
@@ -495,10 +494,10 @@
 							  ))))
 					     
 					     (when (< 0 trig)
-					       #+nil (do0
+					        #+nil (do0
 						(outiq.push_back si)
 						(outiq.push_back sq))
-					       (do0
+					      #-nil (do0
 						(dot ,(g `_iq_out) (push_back si))
 						(dot ,(g `_iq_out) (push_back sq))
 						)
@@ -508,7 +507,8 @@
 						 (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
 						  ,(logprint "" `(ma trig trig1 pulse_ms)))
 						 ;; read a few more samples (if trig is set negative here)
-						 (setf trig 0)))
+						 (setf trig 0)
+						 ))
 					     (incf i)
 					     (setf old mlow)
 					     )
@@ -556,7 +556,8 @@
 			  )
 
 			 
-			 
+			 (when (server_thread.joinable)
+				     (server_thread.join))
 			 (iio_context_destroy ctx)
 
 			 			 ))

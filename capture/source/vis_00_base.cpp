@@ -39,12 +39,12 @@ struct __attribute__((packed)) sdriq_header_t {
 };
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "3c6edf05e098e0db8007de4703f1d261194d2f2f";
+  state._code_version = "16fa56d883f0f9acdcd4e80807c940400114aba1";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "20:58:59 of Monday, 2020-11-16 (GMT+1)";
+  state._code_generation_time = "20:08:08 of Thursday, 2020-11-19 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
       << (iio_device_get_attrs_count(phy)) << ("::")
       << (typeid(iio_device_get_attrs_count(phy)).name()) << ("'")
       << (std::endl) << (std::flush);
-  auto rx_lo_freq = 2420000000ULL;
+  auto rx_lo_freq = 2467000000ULL;
   auto rx_lo_freq_MHz = ((rx_lo_freq) / ((1.0e+6f)));
 
   (std::cout)
@@ -288,9 +288,6 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("server started")
       << (" ") << (std::endl) << (std::flush);
-  if (server_thread.joinable()) {
-    server_thread.join();
-  }
   auto count = 0;
   while (true) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -387,6 +384,9 @@ int main(int argc, char **argv) {
                 << (" sample_perc='") << (sample_perc) << ("::")
                 << (typeid(sample_perc).name()) << ("'") << (std::endl)
                 << (std::flush);
+  }
+  if (server_thread.joinable()) {
+    server_thread.join();
   }
   iio_context_destroy(ctx);
   return 0;

@@ -409,39 +409,19 @@
 							   (< old 4000) ;; trigger on positive edge
 							   (<= 4000 mlow))
 						  (setf trig i))
-						#+nil (when (< trig 0)
-							;; get a few more samples after trig1
-							(do0
-							 
-							 (dot ,(g `_iq_out) (push_back si))
-							 (dot ,(g `_iq_out) (push_back sq))
-					;(outiq.push_back si)
-					;(outiq.push_back sq)
-							 (incf trig)
-							 #+nil (when (== trig 0)
-								 (dotimes (i (* 16 4096))
-								   (outiq.push_back 0)
-								   (outiq.push_back 0)
-								   ))))
-						
 						(when (< 0 trig)
 						  #+nil (do0
-							 (outiq.push_back si)
-							 (outiq.push_back sq))
-						  (do0
-						   (dot ,(g `_iq_out) (push_back si))
-						   (dot ,(g `_iq_out) (push_back sq))
-						   )
+							 (dot ,(g `_iq_out) (push_back si))
+							 (dot ,(g `_iq_out) (push_back sq)))
 						  (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
 							     (<= mlow 2000))
 						    (setf trig1 i)
+						    (dot ,(g `_iq_out) (push_back ("std::pair<uint64_t,uint16_t>" trig trig1)))
 						    (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
 						      ,(logprint "" `(ma trig trig1 pulse_ms)))
-						    ;; read a few more samples (if trig is set negative here)
 						    (setf trig 0)))
 						(incf i)
-						(setf old mlow)
-						)
+						(setf old mlow))
 					   #+nil ,(logprint "finished" `(ma trig trig1 ;(outiq.size)
 									    )))
 					  
@@ -451,6 +431,7 @@
 							       (time_since_epoch)
 							       ))
 					     (compute_dur (dot (- compute_end compute_start)
+
 							       (count)))
 					     (compute_samp_dur (dot (- compute_end
 								       sample_start)
@@ -478,7 +459,7 @@
 		      (return 0)))))
 
     (define-module
-       `(server ((_iq_out :type "tsqueue<uint16_t>"))
+       `(server ((_iq_out :type "tsqueue<std::pair<uint64_t,uint64_t>>"))
 	      (do0
 	       (include <sys/types.h>
 			<sys/socket.h>
@@ -488,17 +469,11 @@
 	    
 		    (include <iostream>
 			     <chrono>
-			     <thread>
-			     
-			     )
+			     <thread>)
 
-		    
+					;"tsqueue<uint16_t> iq_out;"
 
-		    ;"tsqueue<uint16_t> iq_out;"
-
-		    (comments "http://www.linuxhowtos.org/data/6/server.c")
-
-		    
+		    (comments "http://www.linuxhowtos.org/data/6/server.c")		 
 		    
 		    (defun create_server (;header nbytes_header
 					;  buf nbytes
@@ -518,8 +493,7 @@
 					("reinterpret_cast<struct sockaddr*>" &server_addr)
 					(sizeof server_addr))
 				  0)
-			  ,(logprint "bind failed")
-			  )
+			  ,(logprint "bind failed"))
 			(listen fd 5)
 			,(logprint "initiate accept")
 			(while true
@@ -528,8 +502,7 @@
 					    ("reinterpret_cast<struct sockaddr*>" &client_addr)
 					    &client_len)))
 			   #-nil (when (< fd1 0)
-				   ,(logprint "accept failed")
-				   )
+				   ,(logprint "accept failed"))
 			   (let ((client_addr_buffer))
 			     (declare (type (array char INET_ADDRSTRLEN) client_addr_buffer))
 			     (inet_ntop AF_INET &client_addr.sin_addr client_addr_buffer (sizeof client_addr_buffer))
@@ -542,8 +515,9 @@
 			       ,(logprint "writing header failed"))
 			     )
 			   ,(logprint "enter transmission loop" `((dot ,(g `_iq_out) (empty))
-								  (dot ,(g `_iq_out) (front))
-								  (dot ,(g `_iq_out) (back))))
+								  ;(dot ,(g `_iq_out) (front))
+								  ;(dot ,(g `_iq_out) (back))
+								  ))
 
 			   (do0 (when (dot ,(g `_iq_out) (empty))
 				  (dot ,(g `_iq_out) (wait_while_empty)))
