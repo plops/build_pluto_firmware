@@ -25,12 +25,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "b7d4de9a07e60747a47afd7c28c6e4f40588bd4e";
+  state._code_version = "c42f2a1aae2eaa69b2e1bc7c015e8a385217bcc7";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "18:21:02 of Friday, 2020-11-20 (GMT+1)";
+  state._code_generation_time = "19:30:47 of Friday, 2020-11-20 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -194,6 +194,7 @@ int main(int argc, char **argv) {
                       << (" pulse_ms='") << (pulse_ms) << ("::")
                       << (typeid(pulse_ms).name()) << ("'") << (std::endl)
                       << (std::flush);
+          usleep(32000);
           trig = 0;
         }
       }

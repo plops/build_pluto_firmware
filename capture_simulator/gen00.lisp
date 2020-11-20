@@ -396,6 +396,7 @@
 					   (for ((= "uint8_t* p" start)
 						 (< p end)
 						 (incf p step))
+						
 						(let ((si (aref (reinterpret_cast<int16_t*> p) 0))
 						      (sq (aref (reinterpret_cast<int16_t*> p) 1))
 						      (m (+ (* si si)
@@ -422,6 +423,7 @@
 						    ;(dot ,(g `_iq_out) (push_back ("std::pair<uint64_t,uint16_t>" trig trig1)))
 						    (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
 						      ,(logprint "" `(ma trig trig1 pulse_ms)))
+						    (usleep 32000)
 						    (setf trig 0)))
 						(incf i)
 						(setf old mlow))
