@@ -306,7 +306,7 @@
 		
 		       
 		       
-		       (let ((fn (string "/home/martin/o.sdriq"))
+		       (let ((fn (string "o_4channels")) ;/home/martin/o.sdriq
 			     
 			     (file_length ((lambda ()
 					     (declare (capture fn))
@@ -337,8 +337,7 @@
 			    
 			    (let ((server_thread (run_server_in_new_thread)))
 			      ,(logprint "server started")
-			      (when (server_thread.joinable)
-				(server_thread.join)))
+			      )
 			    (let ((count 0))
 			      (while true ;
 					;dotimes (j 1)
@@ -410,13 +409,17 @@
 							   (<= 4000 mlow))
 						  (setf trig i))
 						(when (< 0 trig)
+						  (do0
+						   (dot ,(g `_iq_out) (push_back si))
+						   (dot ,(g `_iq_out) (push_back sq))
+						   )
 						  #+nil (do0
 							 (dot ,(g `_iq_out) (push_back si))
 							 (dot ,(g `_iq_out) (push_back sq)))
 						  (when (and (< 2000 old) ;; trigger1 on negative edge (only when trig0 has been found)
 							     (<= mlow 2000))
 						    (setf trig1 i)
-						    (dot ,(g `_iq_out) (push_back ("std::pair<uint64_t,uint16_t>" trig trig1)))
+						    ;(dot ,(g `_iq_out) (push_back ("std::pair<uint64_t,uint16_t>" trig trig1)))
 						    (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
 						      ,(logprint "" `(ma trig trig1 pulse_ms)))
 						    (setf trig 0)))
@@ -455,11 +458,16 @@
 							      compute_perc sample_perc))
 				     )))
 			   )))
-		      
+		      (do0
+			  (setf ,(g `_server_keep_running ) false)
+			  (when (server_thread.joinable)
+			    (server_thread.join)))
 		      (return 0)))))
 
     (define-module
-       `(server ((_iq_out :type "tsqueue<std::pair<uint64_t,uint64_t>>"))
+       `(server ((_iq_out :type "tsqueue<uint16_t>")
+		 (_server_keep_running :type bool))
+		#+nil((_iq_out :type "tsqueue<std::pair<uint64_t,uint64_t>>"))
 	      (do0
 	       (include <sys/types.h>
 			<sys/socket.h>
@@ -480,6 +488,7 @@
 					  )
 		      (declare (type uint8_t* buf header)
 			       (type size_t nbytes_header nbytes))
+		      (setf ,(g `_server_keep_running ) true)
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
 			    (portno 1234)
 			    (server_addr "{}")

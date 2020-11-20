@@ -25,12 +25,12 @@ using namespace std::chrono_literals;
 State state;
 int main(int argc, char **argv) {
   setlocale(LC_ALL, "");
-  state._code_version = "16fa56d883f0f9acdcd4e80807c940400114aba1";
+  state._code_version = "b7d4de9a07e60747a47afd7c28c6e4f40588bd4e";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "21:11:15 of Wednesday, 2020-11-18 (GMT+1)";
+  state._code_generation_time = "18:21:02 of Friday, 2020-11-20 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
       << (std::setw(8)) << (" state._code_license='") << (state._code_license)
       << ("::") << (typeid(state._code_license).name()) << ("'") << (std::endl)
       << (std::flush);
-  auto fn = "/home/martin/o.sdriq";
+  auto fn = "o_4channels";
   auto file_length = ([fn]() {
     struct stat st;
     stat(fn, &st);
@@ -128,9 +128,6 @@ int main(int argc, char **argv) {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("server started")
       << (" ") << (std::endl) << (std::flush);
-  if (server_thread.joinable()) {
-    server_thread.join();
-  }
   auto count = 0;
   while (true) {
     sample_start = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -176,9 +173,10 @@ int main(int argc, char **argv) {
         trig = i;
       }
       if ((0) < (trig)) {
+        state._iq_out.push_back(si);
+        state._iq_out.push_back(sq);
         if ((((2000) < (old)) && ((mlow) <= (2000)))) {
           trig1 = i;
-          state._iq_out.push_back(std::pair<uint64_t, uint16_t>(trig, trig1));
           auto pulse_ms = ((((trig1) - (trig))) / ((6.1440e+4f)));
 
           (std::cout) << (std::setw(10))
@@ -223,6 +221,10 @@ int main(int argc, char **argv) {
                 << (" sample_perc='") << (sample_perc) << ("::")
                 << (typeid(sample_perc).name()) << ("'") << (std::endl)
                 << (std::flush);
+  }
+  state._server_keep_running = false;
+  if (server_thread.joinable()) {
+    server_thread.join();
   }
   return 0;
 }

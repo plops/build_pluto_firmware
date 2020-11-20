@@ -554,10 +554,10 @@
 
 			  
 			  )
-
-			 
-			 (when (server_thread.joinable)
-				     (server_thread.join))
+			 (do0
+			  (setf ,(g `_server_keep_running ) false)
+			  (when (server_thread.joinable)
+			    (server_thread.join)))
 			 (iio_context_destroy ctx)
 
 			 			 ))
@@ -565,7 +565,8 @@
 		      (return 0)))))
 
     (define-module
-       `(server ((_iq_out :type "tsqueue<uint16_t>"))
+	`(server ((_iq_out :type "tsqueue<uint16_t>")
+		  (_server_keep_running :type bool))
 	      (do0
 	       (include <sys/types.h>
 			<sys/socket.h>
@@ -592,6 +593,7 @@
 					  )
 		      (declare (type uint8_t* buf header)
 			       (type size_t nbytes_header nbytes))
+		      (setf ,(g `_server_keep_running ) true)
 		      (let ((fd (socket AF_INET SOCK_STREAM 0))
 			    (portno 1234)
 			    (server_addr "{}")
@@ -609,7 +611,7 @@
 			  )
 			(listen fd 5)
 			,(logprint "initiate accept")
-			(while true
+			(while ,(g `_server_keep_running)
 			 (let ((client_len (sizeof client_addr))
 			       (fd1 (accept fd
 					    ("reinterpret_cast<struct sockaddr*>" &client_addr)
@@ -641,7 +643,8 @@
 					 (let ((n (write fd1 (reinterpret_cast<uint8_t*> &msg) 2)))
 					   (when (< n 0)
 					     ,(logprint "write failed"))
-					   ,(logprint "bytes written: " `(n))))))
+					   ;,(logprint "bytes written: " `(n))
+					   ))))
 			   (close fd1)))
 			(do0 
 			 (close fd))))

@@ -15,6 +15,7 @@ extern State state;
 // http://www.linuxhowtos.org/data/6/server.c
 ;
 void create_server() {
+  state._server_keep_running = true;
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
   struct sockaddr_in server_addr = {};
@@ -49,7 +50,7 @@ void create_server() {
       << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
       << (__LINE__) << (" ") << (__func__) << (" ") << ("initiate accept")
       << (" ") << (std::endl) << (std::flush);
-  while (true) {
+  while (state._server_keep_running) {
     auto client_len = sizeof(client_addr);
     auto fd1 = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr),
                       &client_len);
@@ -115,16 +116,6 @@ void create_server() {
                     << (" ") << ("write failed") << (" ") << (std::endl)
                     << (std::flush);
       }
-
-      (std::cout) << (std::setw(10))
-                  << (std::chrono::high_resolution_clock::now()
-                          .time_since_epoch()
-                          .count())
-                  << (" ") << (std::this_thread::get_id()) << (" ")
-                  << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
-                  << (" ") << ("bytes written: ") << (" ") << (std::setw(8))
-                  << (" n='") << (n) << ("::") << (typeid(n).name()) << ("'")
-                  << (std::endl) << (std::flush);
     }
     close(fd1);
   }

@@ -15,6 +15,7 @@ extern State state;
 // http://www.linuxhowtos.org/data/6/server.c
 ;
 void create_server() {
+  state._server_keep_running = true;
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   auto portno = 1234;
   struct sockaddr_in server_addr = {};

@@ -8,6 +8,7 @@
 struct State {
   typeof(std::chrono::high_resolution_clock::now().time_since_epoch().count())
       _start_time;
+  bool _server_keep_running;
   tsqueue<uint16_t> _iq_out;
   std::string _code_license;
   std::string _code_author;
