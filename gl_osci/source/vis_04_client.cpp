@@ -4,6 +4,7 @@
 #include "globals.h"
 
 extern State state;
+#include <arpa/inet.h>
 #include <chrono>
 #include <iostream>
 #include <netdb.h>
@@ -26,6 +27,21 @@ void initClient() {
   bcopy(static_cast<char *>(server->h_addr),
         reinterpret_cast<char *>(&server_addr.sin_addr.s_addr),
         server->h_length);
+  char server_addr_buffer[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &server_addr.sin_addr, server_addr_buffer,
+            sizeof(server_addr_buffer));
+
+  (std::cout)
+      << (std::setw(10))
+      << (std::chrono::high_resolution_clock::now().time_since_epoch().count())
+      << (" ") << (std::this_thread::get_id()) << (" ") << (__FILE__) << (":")
+      << (__LINE__) << (" ") << (__func__) << (" ") << ("try to connect")
+      << (" ") << (std::setw(8)) << (" server_addr_buffer='")
+      << (server_addr_buffer) << ("::") << (typeid(server_addr_buffer).name())
+      << ("'") << (std::setw(8)) << (" server_addr.sin_port='")
+      << (server_addr.sin_port) << ("::")
+      << (typeid(server_addr.sin_port).name()) << ("'") << (std::endl)
+      << (std::flush);
   if ((connect(fd, reinterpret_cast<struct sockaddr *>(&server_addr),
                sizeof(server_addr))) < (0)) {
 

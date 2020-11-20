@@ -1145,6 +1145,7 @@
 			<sys/socket.h>
 			<netinet/in.h>
 			<unistd.h>
+			<arpa/inet.h>
 			<netdb.h>
 			<strings.h>)
 	    
@@ -1175,10 +1176,16 @@
 			       (reinterpret_cast<char*> &server_addr.sin_addr.s_addr
 						   )
 			       server->h_length)
+			(let ((server_addr_buffer))
+			     (declare (type (array char INET_ADDRSTRLEN) server_addr_buffer))
+			     (inet_ntop AF_INET &server_addr.sin_addr server_addr_buffer (sizeof server_addr_buffer))
+			    ,(logprint "try to connect" `(server_addr_buffer
+						  server_addr.sin_port)))
 			(when (<  (connect fd
 					("reinterpret_cast<struct sockaddr*>" &server_addr)
 					(sizeof server_addr))
 				  0)
+			  
 			  ,(logprint "connect failed"))
 			
 			(let ((bytes_remaining (* 2 (dot ,(g `_iqdata)
