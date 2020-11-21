@@ -1138,7 +1138,11 @@
 	       ))))
     
     (define-module
-	`(client ((_iqdata :direction 'out :type "std::array<int16_t,1024*128*2>")
+	`(client (,(let* ((pulse (* 10 .39e-3)) ;; s
+			    (rate 61.44e6)	   ;; S/s
+			    (samples (coerce (ceiling (* pulse rate)) 'fixnum))
+			    )
+		     `(_iqdata :direction 'out :type ,(format nil "std::array<int16_t,~a>" samples)))
 		  (_iqdata_bytes :direction 'out :type int))
 	      (do0
 	       (include <sys/types.h>

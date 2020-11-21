@@ -539,7 +539,8 @@
 					 (let ((n (write fd1 (reinterpret_cast<uint8_t*> &msg) 2)))
 					   (when (< n 0)
 					     ,(logprint "write failed"))
-					   ,(logprint "bytes written: " `(n))))))
+					   ;,(logprint "bytes written: " `(n))
+					   ))))
 			   (close fd1)))
 			(do0 
 			 (close fd))))

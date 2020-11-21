@@ -110,16 +110,6 @@ void create_server() {
                     << (" ") << ("write failed") << (" ") << (std::endl)
                     << (std::flush);
       }
-
-      (std::cout) << (std::setw(10))
-                  << (std::chrono::high_resolution_clock::now()
-                          .time_since_epoch()
-                          .count())
-                  << (" ") << (std::this_thread::get_id()) << (" ")
-                  << (__FILE__) << (":") << (__LINE__) << (" ") << (__func__)
-                  << (" ") << ("bytes written: ") << (" ") << (std::setw(8))
-                  << (" n='") << (n) << ("::") << (typeid(n).name()) << ("'")
-                  << (std::endl) << (std::flush);
     }
     close(fd1);
   }

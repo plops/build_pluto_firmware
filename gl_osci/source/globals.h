@@ -15,7 +15,7 @@ struct State {
   typeof(std::chrono::high_resolution_clock::now().time_since_epoch().count())
       _start_time;
   int _iqdata_bytes;
-  std::array<int16_t, 1024 * 128 * 2> _iqdata;
+  std::array<int16_t, 239616> _iqdata;
   bool _gui_request_diff_reset;
   std::mutex _gui_mutex;
   std::vector<uint8_t> _sample_valid;
