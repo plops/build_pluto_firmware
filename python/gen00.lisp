@@ -49,13 +49,14 @@
 			   (np numpy)
 			   ;serial
 			   (pd pandas)
-			   ;(xr xarray)
-			   ;(xrp xarray.plot)
-					;skimage.restoration
+			   (xr xarray)
+			   (xrp xarray.plot)
+			   ;skimage.restoration
 					;(u astropy.units)
 					; EP_SerialIO
-			   ;scipy.ndimage
-			   ;scipy.optimize
+			   scipy.ndimage
+			   scipy.optimize
+			   numpy.fft
 					;nfft
 			   ;sklearn
 			   ;sklearn.linear_model
@@ -90,11 +91,27 @@
 			      (- tz)))))
 		 (do0
 
-		  (setf a (np.fromfile (string "/home/martin/stage/build_pluto_firmware/capture_simulator/source/o_4channels")
+		  (setf a (np.fromfile (string "/home/martin/stage/build_pluto_firmware/capture_simulator/source/o_4channels"
+					;"/home/martin/o.sdriq"
+					       )
 				       np.int16))
-		  (setf b (+ (* 1s0 (aref a (slice 0 40000 2)))
-			     (* 1j (* 1s0 (aref a (slice 1 40000 2))))))
-		  (plt.plot (np.abs b))
+		  (setf b (+ (* 1s0 (aref a (slice (+ 32 0) (* 2 23330) 2)))
+			     (* 1j (* 1s0 (aref a (slice (+ 32 1) (* 2 23330) 2))))))
+		  (setf n (len b))
+		  
+		  (do0
+		   (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft b)
+								  )
+				 )
+		   (plt.grid))
+
+
+		  (setf q 0.244663
+			osc (np.exp (* 2j np.pi q (np.arange n))))
+		  (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft osc)
+								  )
+				 )
+
 		  )))
 	   ))
     (write-source (format nil "~a/source/~a" *path* *code-file*) code)))
