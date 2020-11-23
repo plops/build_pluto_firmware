@@ -53,9 +53,10 @@
 			   (xrp xarray.plot)
 			   ;skimage.restoration
 					;(u astropy.units)
-					; EP_SerialIO
+				
 			   scipy.ndimage
 			   scipy.optimize
+			   scipy.signal
 			   numpy.fft
 					;nfft
 			   ;sklearn
@@ -111,10 +112,24 @@
 		   (plt.grid))
 
 		  (setf bs (* b osc))
-		  (do0
-		   (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft bs)))
+		  #+nil (do0
+		   (plt.semilogy (np.fft.fftshift (np.fft.fftfreq n))
+				 (np.fft.fftshift (np.abs (np.fft.fft bs))))
 		   (plt.grid))
-		  
+
+		  (do0
+		   (setf sav_win 57)
+		   (setf fbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 0)
+				(* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 0))))
+		   (setf dbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 1)
+				(* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 1)))
+			 dphi (np.imag (/ dbs fbs)))
+		   #+nil (do0 (plt.plot (np.real dbs))
+			      (plt.plot (np.imag dbs)))
+		   (do0
+		    (plt.plot dphi)
+		    (plt.ylim (tuple -0.05 0.05))
+		    (plt.grid)))
 
 		  )))
 	   ))
