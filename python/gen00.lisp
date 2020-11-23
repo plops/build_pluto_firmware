@@ -92,6 +92,9 @@
 
 		  (setf a (np.fromfile (string "/home/martin/stage/build_pluto_firmware/capture_simulator/source/o_4channels")
 				       np.int16))
+		  (setf b (+ (* 1s0 (aref a (slice 0 40000 2)))
+			     (* 1j (* 1s0 (aref a (slice 1 40000 2))))))
+		  (plt.plot (np.abs b))
 		  )))
 	   ))
     (write-source (format nil "~a/source/~a" *path* *code-file*) code)))
