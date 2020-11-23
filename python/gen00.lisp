@@ -98,19 +98,23 @@
 		  (setf b (+ (* 1s0 (aref a (slice (+ 32 0) (* 2 23330) 2)))
 			     (* 1j (* 1s0 (aref a (slice (+ 32 1) (* 2 23330) 2))))))
 		  (setf n (len b))
+		  (setf q 0.244663
+			osc (np.exp (* -2j np.pi q (np.arange n))))
 		  
-		  (do0
+		  #+nil (do0
 		   (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft b)
+								  )
+				 )
+		   (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft osc)
 								  )
 				 )
 		   (plt.grid))
 
-
-		  (setf q 0.244663
-			osc (np.exp (* 2j np.pi q (np.arange n))))
-		  (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft osc)
-								  )
-				 )
+		  (setf bs (* b osc))
+		  (do0
+		   (plt.semilogy (np.fft.fftfreq n) (np.abs (np.fft.fft bs)))
+		   (plt.grid))
+		  
 
 		  )))
 	   ))
