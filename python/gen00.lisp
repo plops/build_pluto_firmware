@@ -118,7 +118,7 @@
 		   (plt.grid))
 
 		  (do0
-		   (setf sav_win 57)
+		   (setf sav_win 87)
 		   (setf fbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 0)
 				(* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 0))))
 		   (setf dbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 1)
