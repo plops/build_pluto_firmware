@@ -14,19 +14,23 @@ import scipy.ndimage
 import scipy.optimize
 import scipy.signal
 import numpy.fft
-_code_git_version="91bc226718d03e18f961e233447924dfc231b63a"
+_code_git_version="8ba119a129405ce06818d35cab375850274bace6"
 _code_repository="https://github.com/plops/build_pluto_firmware/python/tree/master/python/source/run_00_start.py"
-_code_generation_time="22:53:52 of Monday, 2020-11-23 (GMT+1)"
+_code_generation_time="19:31:25 of Tuesday, 2020-11-24 (GMT+1)"
 a=np.fromfile("/home/martin/stage/build_pluto_firmware/capture_simulator/source/o_4channels", np.int16)
-b=(((((1.0    ))*(a[((32)+(0)):((2)*(23330)):2])))+(((1j)*((((1.0    ))*(a[((32)+(1)):((2)*(23330)):2]))))))
+ss=12
+b=(((((1.0    ))*(a[((32)+(0)):((ss)*(2)*(23330)):2])))+(((1j)*((((1.0    ))*(a[((32)+(1)):((ss)*(2)*(23330)):2]))))))
 n=len(b)
 q=(0.2446630    )
 osc=np.exp(((-2j)*(np.pi)*(q)*(np.arange(n))))
 bs=((b)*(osc))
-sav_win=87
-fbs=((scipy.signal.savgol_filter(np.real(bs), sav_win, 3, deriv=0))+(((1j)*(scipy.signal.savgol_filter(np.imag(bs), sav_win, 3, deriv=0)))))
-dbs=((scipy.signal.savgol_filter(np.real(bs), sav_win, 3, deriv=1))+(((1j)*(scipy.signal.savgol_filter(np.imag(bs), sav_win, 3, deriv=1)))))
+# use gaussian
+sigma=(3.20    )
+fbs=((scipy.ndimage.gaussian_filter(np.real(bs), sigma))+(((1j)*(scipy.ndimage.gaussian_filter(np.imag(bs), sigma)))))
+dbs=np.gradient(fbs)
 dphi=np.imag(((dbs)/(fbs)))
-plt.plot(dphi)
-plt.ylim(((-5.00e-2),(5.00e-2),))
+# select template
+t0=dphi[14000:22000]
+cc=scipy.signal.correlate(t0, dphi)
+plt.plot(cc)
 plt.grid()

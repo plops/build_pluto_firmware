@@ -96,8 +96,9 @@
 					;"/home/martin/o.sdriq"
 					       )
 				       np.int16))
-		  (setf b (+ (* 1s0 (aref a (slice (+ 32 0) (* 2 23330) 2)))
-			     (* 1j (* 1s0 (aref a (slice (+ 32 1) (* 2 23330) 2))))))
+		  (setf ss 12)
+		  (setf b (+ (* 1s0 (aref a (slice (+ 32 0) (* ss 2 23330) 2)))
+			     (* 1j (* 1s0 (aref a (slice (+ 32 1) (* ss  2 23330) 2))))))
 		  (setf n (len b))
 		  (setf q 0.244663
 			osc (np.exp (* -2j np.pi q (np.arange n))))
@@ -118,17 +119,39 @@
 		   (plt.grid))
 
 		  (do0
-		   (setf sav_win 87)
-		   (setf fbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 0)
-				(* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 0))))
-		   (setf dbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 1)
-				(* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 1)))
-			 dphi (np.imag (/ dbs fbs)))
+		   #+nil (do0 (comments "use savgol to compute derivative")
+		    (setf sav_win 87)
+			
+			(setf fbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 0)
+				     (* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 0))))
+			(setf dbs (+ (scipy.signal.savgol_filter (np.real bs) sav_win 3 :deriv 1)
+				     (* 1j (scipy.signal.savgol_filter (np.imag bs) sav_win 3 :deriv 1)))
+			      dphi (np.imag (/ dbs fbs))))
+		   (do0 (comments "use gaussian")
+			(setf sigma 3.2)
+			(setf fbs (+ (scipy.ndimage.gaussian_filter (np.real bs) sigma)
+				     (* 1j (scipy.ndimage.gaussian_filter (np.imag bs) sigma))))
+			(setf 
+			      dbs (np.gradient fbs)
+			      dphi (np.imag (/ dbs fbs))))
+
+		   (do0
+		    (comments "select template")
+		    (setf t0 (aref dphi (slice 14000 22000)))
+		    (setf cc (scipy.signal.correlate t0 dphi)))
 		   #+nil (do0 (plt.plot (np.real dbs))
 			      (plt.plot (np.imag dbs)))
-		   (do0
-		    (plt.plot dphi)
-		    (plt.ylim (tuple -0.05 0.05))
+		   #+nil (do0
+		   (plt.semilogy (np.fft.fftshift (np.fft.fftfreq n))
+				 (np.fft.fftshift (np.abs (np.fft.fft fbs))))
+		   (plt.grid))
+		   #-nil (do0
+			  #+nil (do0 (plt.plot (np.real fbs))
+			       (plt.plot (np.imag fbs)))
+			  #+nil (do0
+			   (plt.plot dphi)
+			   (plt.ylim (tuple -0.05 0.05)))
+			  (plt.plot cc)
 		    (plt.grid)))
 
 		  )))
