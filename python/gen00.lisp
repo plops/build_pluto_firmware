@@ -137,7 +137,7 @@
 
 		   (do0
 		    (comments "select template")
-		    (setf t0 (aref dphi (slice 14000 22000)))
+		    (setf t0 (aref dphi (slice 12000 23000)))
 		    (setf cc (scipy.signal.correlate t0 dphi)))
 		   #+nil (do0 (plt.plot (np.real dbs))
 			      (plt.plot (np.imag dbs)))
