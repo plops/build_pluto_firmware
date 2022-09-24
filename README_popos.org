@@ -141,3 +141,9 @@ Submodule path 'u-boot-xlnx': checked out '90401ce9ce029e5563f4dface63914d42badf
    to the make process)
  - if i run `strace -f -e execve make` the  build seems to proceed
  
+#+begin_example
+strace: Process 394264 attached
+[pid 394264] execve("/home/martin/src/hdl/2/plutosdr-fw/buildroot/output/build/.check-headers.ZR3eh1", ["/home/martin/src/hdl/2/plutosdr-"...], 0x5613384fd218 /* 94 vars */) = 0
+Incorrect selection of kernel headers: expected 4.14.x, got 5.8.x
+
+#+end_example
