@@ -228,6 +228,7 @@ pw: analog
 
 cd ~/src/hdl/
 git clone https://github.com/analogdevicesinc/plutosdr_scripts
+
 cd ~/src/hdl/plutosdr-fw
 ../plutosdr_scripts/pluto_ramboot
 
@@ -255,8 +256,30 @@ sudo eject /dev/sdb
 # fast flashing of the outside blue led
 #+end_example
 - that worked, now the ssh prompt shows v0.35
+#+begin_example
+# ls -lSr|tail -4
+-rwxr-xr-x    1 root     root         32180 Jul 19  2022 fftw-wisdom
+-rwxr-xr-x    1 root     root         34488 Jul 19  2022 iio_attr
+-rwxr-xr-x    1 root     root         47544 Jul 19  2022 xmllint
+-rwxr-xr-x    1 root     root        150416 Jul 19  2022 dbus-daemon
+# md5sum xmllint iio_attr dbus-daemon 
+3cdfe3355047c1dce94ccc92a0e52a83  xmllint
+365b02cf86e92dc45c5ba649c851955f  iio_attr
+e258eb0208d351c1d9b3c6950f6b6116  dbus-daemon
+
+#+end_example
+
 - in order to bring the device into dfu mode (USB device firmware upgrade):
   - with a toothpick or paper-clip depress the device button while
     plugging in the usb connection or
   - run `device_reboot sf` via terminal or ssh
 - in DFU mode the usb pid is 0xB674 (PlutoSDR DFU)
+
+- try ramboot with the image that i built by myself:
+#+begin_example
+cd ~/src/hdl/plutosdr-fw
+../plutosdr_scripts/pluto_ramboot
+
+# ssh command /usr/sbin/pluto_reboot ram; failed
+
+#+end_example
