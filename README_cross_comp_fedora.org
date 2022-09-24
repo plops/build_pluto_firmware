@@ -58,21 +58,46 @@ arm-linux-gnueabihf-gcc -mfloat-abi=hard \
 
 #+end_example
 
-- this fails like this:
-  #+begin_example
-/home/martin/gcc-arm-linux-gnueabi/lib/gcc/arm-linux-gnueabihf/8.2.0/include/stdint.h:9:16: fatal error: stdint.h: No such file or directory
- # include_next <stdint.h>
-
-
-  #+end_example
-
-
+- copy to pluto
 #+begin_example
+
+scp pluto_stream slim:/dev/shm/
+
+ssh slim
+sshpass -v -panalog scp -Cr /dev/shm/pluto_stream root@192.168.2.1:/dev/shm
+
 
 sshpass -v -panalog ssh \
     -oStrictHostKeyChecking=no \
     -oUserKnownHostsFile=/dev/null \
     -oCheckHostIP=no \
     root@192.168.2.1
+    
+# ./pluto_stream 
+* Acquiring IIO context
+* Acquiring AD9361 streaming devices
+* Configuring AD9361 for streaming
+* Acquiring AD9361 phy channel 0
+* Acquiring AD9361 RX lo channel
+* Acquiring AD9361 phy channel 0
+* Acquiring AD9361 TX lo channel
+* Initializing AD9361 IIO streaming channels
+* Enabling IIO streaming channels
+* Creating non-cyclic IIO buffers with 1 MiS
+* Starting IO streaming (press CTRL+C to cancel)
+	RX     1.05 MSmp, TX     1.05 MSmp
+	RX     2.10 MSmp, TX     2.10 MSmp
+	RX     3.15 MSmp, TX     3.15 MSmp
+	RX     4.19 MSmp, TX     4.19 MSmp
+	RX     5.24 MSmp, TX     5.24 MSmp
+	RX     6.29 MSmp, TX     6.29 MSmp
+	RX     7.34 MSmp, TX     7.34 MSmp
+	RX     8.39 MSmp, TX     8.39 MSmp
+^CWaiting for process to finish... Got signal 2
+	RX     9.44 MSmp, TX     9.44 MSmp
+* Destroying buffers
+* Disabling streaming channels
+* Destroying context
+# 
 
 #+end_example
