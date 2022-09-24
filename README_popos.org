@@ -24,6 +24,7 @@ martin@pop-os:~/src/hdl/plutosdr-fw$ find ~/src/hdl/Xilinx/ -name vivado -execut
 git clone --recursive https://github.com/analogdevicesinc/plutosdr-fw.git
 # make sure sources are up to date
 git pull --recurse-submodules
+git submodule update --init --recursive
 #+end_example
 - which vivado version do we need?
   #+begin_example
@@ -36,6 +37,8 @@ less ./hdl/projects/scripts/adi_project_xilinx.tcl
 # in second line:
 set required_vivado_version "2021.1"
     #+end_example
+    - in v0.35 it is 2021.1
+    - in master it is 
   - i have the correct version installed
 - branch after checkout: `git branch` => master
 - what branches are available?
@@ -67,7 +70,7 @@ export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh
 unset LD_LIBRARY_PATH
 
 # synthesize each ip indivdually (not tried yet)
-# export ADI_USE_OOC_SYNTHESIS=y
+export ADI_USE_OOC_SYNTHESIS=y
 
 sudo apt install flex bison
 
@@ -77,10 +80,17 @@ make
 
 
   #+end_example
+  - ther readme in plutosdr-fw states:
+     - In the v0.30 release we swithched to the arm-linux-gnueabihf-gcc
+       hard-float toolchain.
+     - 2019.1 is the current tested FPGA systhesis toolchain (which
+       one should i use for v0.35?)
 
   - note: make doesn't work inside tmux for some reason
 
   - what does make build
+    - note: this is described on
+      https://wiki.analog.com/university/tools/pluto/building_the_image
     - build linux
 #+begin_example
 martin@pop-os:~/src/hdl/plutosdr-fw/linux$ make kernelversion
@@ -117,3 +127,16 @@ hdl:         HEAD detached at d09fc9207
 linux:       HEAD detached at 9dfba10b795d
 u-boot-xlnx: HEAD detached at 90401ce9ce
 #+end_example
+
+  - in a fresh checkout from master the submodules have the same
+    versions as v0.35
+#+begin_example
+Submodule path 'buildroot': checked out 'b0ed105e9ab6c60ffd2ddafdfff6890b5cc46ed8'
+Submodule path 'hdl': checked out 'd09fc920792c2c67ce5f28179d8263172d46fbdd'
+Submodule path 'linux': checked out '9dfba10b795d0004ae90f2ab29dac0197c8a3b3e'
+Submodule path 'u-boot-xlnx': checked out '90401ce9ce029e5563f4dface63914d42badf5bc'
+#+end_example
+
+ - make sometimes stops with a read (i see that when i attach strace
+   to the make process)
+ - if i run `strace -f -e execve make` the  build seems to proceed
