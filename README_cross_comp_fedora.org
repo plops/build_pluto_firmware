@@ -1,0 +1,2 @@
+- how to cross compile C/C++ for adalm pluto on Fedora 36
+  
