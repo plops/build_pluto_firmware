@@ -1,4 +1,4 @@
-
+<
 - contents
 | pluto_tui | experiment to visualize fft using unicode characters on terminal |   |
 | capture   | acquire and trigger data on pluto, send packets via socket       |   |
@@ -38,6 +38,7 @@ git clone https://github.com/analogdevicesinc/hdl/
 git checkout    remotes/origin/hdl_2019_r1
 
 #+end_example
+
 
 
 

@@ -215,3 +215,22 @@ make
 
   #+end_example
 - looks like the build succeeded
+
+- testing on the target
+#+begin_example
+sudo apt-get install sshpass'
+
+ssh root@192.168.2.1
+# make sure host key is accepted
+pw: analog
+# currently i have v0.32 installed
+
+
+cd ~/src/hdl/
+git clone https://github.com/analogdevicesinc/plutosdr_scripts
+cd ~/src/hdl/plutosdr-fw
+../plutosdr_scripts/pluto_ramboot
+
+#+end_example
+
+- this script will execute /usr/sbin/pluto_reboot ram
