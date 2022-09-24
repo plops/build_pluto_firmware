@@ -536,3 +536,19 @@ cd /home/martin/src/hdl/plutosdr-fw
 make
  
 #+end_example
+
+- this build stopped
+  #+begin_example
+
+Building pluto project [/home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto/pluto_vivado.log] ... OK
+make[1]: Leaving directory '/home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto'
+unzip -l build/system_top.xsa | grep -q ps7_init || cp hdl/projects/pluto/pluto.srcs/sources_1/bd/system/ip/system_sys_ps7_0/ps7_init* build/
+rm -Rf build/sdk
+bash -c "source /mnt/Xilinx2021.1/Vivado/2021.1/settings64.sh && xsct scripts/create_fsbl_project.tcl"
+bash: line 1: xsct: command not found
+make: *** [Makefile:148: build/system_top.bit] Error 127
+rm linux/arch/arm/boot/dts/zynq-pluto-sdr.dtb linux/arch/arm/boot/dts/zynq-pluto-sdr-revc.dtb linux/arch/arm/boot/dts/zynq-pluto-sdr-revb.dtb
+
+#+end_example
+- XSCT is a part of the Xilinx Vitis environment that allows creating,
+  building and configuring projects programmatically.
