@@ -39,7 +39,7 @@ wget https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.35/sys
 # 50MB download
 tar xaf sysroot-v0.35.tar.gz
 # 172MB extracted
-mv staging ~/ploto-0.35.sysroot
+mv staging ~/pluto-0.35.sysroot
 
   #+end_example
 
@@ -65,6 +65,22 @@ arm-linux-gnueabihf-gcc -mfloat-abi=hard \
 
 
   #+end_example
+
+- try to compile example code on server
+  #+begin_example
+  
+ssh slim
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+export VIVADO_SETTINGS=/home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
+mkdir -p ~/src/pluto
+cd ~/src/pluto
+wget https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.35/sysroot-v0.35.tar.gz
+tar xaf sysroot*.tar.gz
+mv staging ~/
+
+
+#+end_example
 
 
 #+begin_example
