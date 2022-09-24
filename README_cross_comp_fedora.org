@@ -24,7 +24,38 @@ rsync -avz \
   slim:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/ \
   gcc-arm-linux-gnueabi
 
+# check the version
+export PATH=$PATH:/home/martin/gcc-arm-linux-gnueabi/bin
+arm-linux-gnueabihf-gcc --version
+
   #+end_example
+
+- get the sysroot (i will use the github release)
+  #+begin_example
+
+mkdir -p ~/src/pluto
+cd ~/src/pluto
+wget https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.35/sysroot-v0.35.tar.gz
+# 50MB download
+tar xaf sysroot-v0.35.tar.gz
+# 172MB extracted
+mv staging ~/ploto-0.35.sysroot
+
+  #+end_example
+
+- compile the example code
+#+begin_example
+
+cd ~/src/pluto
+wget https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
+arm-linux-gnueabihf-gcc -mfloat-abi=hard \
+  --sysroot=$HOME/pluto-0.35.sysroot \
+  -std=gnu99 -g -o pluto_stream \
+  ad9361-iiostream.c \
+  -lpthread -liio -lm -Wall -Wextra
+
+#+end_example
+
 
 #+begin_example
 
