@@ -1,0 +1,73 @@
+- attempt to build pluto firmware on Pop!_OS 22.04 LTS
+
+- create xilinx account
+- download vivado 2021.1 (~20GB download, 77GB installed)
+  - Starting 2019.2, Xilinx SDK, SDSoC™ and SDAccel™ development
+    environments are unified into an all-in-one Vitis™ unified
+    software platform
+    - i need vitis (with this, the whole install requires 102GB instead of 77GB)
+      - note: after the install ~/Xilinx is 58GB
+   
+  https://wiki.analog.com/resources/fpga/docs/releases
+  - depending on the version of the xilinx tools you may need 32 bit
+    libraries
+  - apparently this version is 64bit:
+    #+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw$ find ~/src/hdl/Xilinx/ -name vivado -executable -type f|xargs file
+/home/martin/src/hdl/Xilinx/Vivado/2021.1/bin/unwrapped/lnx64.o/vivado: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, stripped
+    #+end_example
+    
+
+- download the repo from analog devices (4.7GB on disk)
+  https://wiki.analog.com/university/tools/pluto/obtaining_the_sources
+#+begin_example
+git clone --recursive https://github.com/analogdevicesinc/plutosdr-fw.git
+# make sure sources are up to date
+git pull --recurse-submodules
+#+end_example
+- which vivado version do we need?
+  #+begin_example
+ grep REQUIRED_VIVADO_VERSION $(find ./ -name "adi*.tcl")|grep set
+  #+end_example
+  - note this doesn't give a result on master
+  - i manually found the file with the definition
+    #+begin_example
+less ./hdl/projects/scripts/adi_project_xilinx.tcl
+# in second line:
+set required_vivado_version "2021.1"
+    #+end_example
+  - i have the correct version installed
+- branch after checkout: `git branch` => master
+- what branches are available?
+  `git branch -r`, that is not what i need
+- this is what i want: `git tag` lists v0.35 which is also the last
+  released firmware
+#+begin_example
+git checkout tags/v0.35
+#+end_example
+   - i don't know how to change the tag such that hdl and other
+     submodules change as well in the appropriate way
+   - for now i stay on master, let's see if that works
+- https://wiki.analog.com/university/tools/pluto/building_the_image
+  
+- install some packages
+  #+begin_example
+sudo apt-get install git build-essential ccache device-tree-compiler \
+  dfu-util fakeroot help2man libncurses5-dev libssl-dev mtools rsync \
+  u-boot-tools bc cpio zip unzip file wget
+
+  #+end_example
+- now build
+  #+begin_example
+
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export PATH=$PATH:/home/martin/Xilinx/Vitis/2021.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin
+export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh
+sudo apt install flex bison
+cd /home/martin/src/hdl/plutosdr-fw
+make
+
+
+  #+end_example
+
+  - note: make doesn't work inside tmux for some reason
