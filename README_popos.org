@@ -82,6 +82,38 @@ make
 
   - what does make build
     - build linux
-    - download libraries into /home/martin/src/hdl/plutosdr-fw/buildroot/dl/
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw/linux$ make kernelversion
+5.10.0
+#+end_example
+     - download libraries into /home/martin/src/hdl/plutosdr-fw/buildroot/dl/
     
     - target is pluto
+
+  
+  - try again
+    - make clean
+    - git checkout tags/v0.35
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw$ git status
+HEAD detached at v0.35
+nothing to commit, working tree clean
+martin@pop-os:~/src/hdl/plutosdr-fw/hdl$ git status
+HEAD detached at d09fc9207
+
+for i in buildroot hdl linux u-boot-xlnx
+do
+  cd $i
+  echo $i
+  git status
+  cd ..
+done
+
+#+end_example
+
+#+begin_example
+buildroot:   HEAD detached at b0ed105e9a
+hdl:         HEAD detached at d09fc9207
+linux:       HEAD detached at 9dfba10b795d
+u-boot-xlnx: HEAD detached at 90401ce9ce
+#+end_example
