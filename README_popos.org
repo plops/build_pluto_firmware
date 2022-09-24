@@ -200,7 +200,7 @@ Incorrect selection of gcc version: expected 8.x, got 10.2.0
 
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
-export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh
+export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh # note this is wrong
 
 unset LD_LIBRARY_PATH
 
@@ -434,6 +434,32 @@ b39efeda45847e61731e8d16c3080617  xmllint
   the dates are from today
 
 - try to open the fpga code in vivado:
+  - the make file seems to build the fpga bit stream from this folder
+    /home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto
+  - documentation of the reference design
+    https://wiki.analog.com/resources/eval/user-guides/ad-fmcomms2-ebz/reference_hdl
+
+  - maybe so far the fpga bitstream just has been downloaded. the
+    makefile expects the vivado config in a specific directory
+#+begin_example
+VIVADO_SETTINGS ?= /opt/Xilinx/Vivado/$(VIVADO_VERSION)/settings64.sh
+# change to
+
+VIVADO_SETTINGS ?= /home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
+#+end_example
+- build again
+#+begin_example
+
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+export VIVADO_SETTINGS=/home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
+unset LD_LIBRARY_PATH
+#export ADI_USE_OOC_SYNTHESIS=y
+cd /home/martin/src/hdl/plutosdr-fw
+make
+
+#+end_example
+
  #+begin_example
 cd /home/martin/src/hdl/plutosdr-fw/hdl/library/axi_ad9361
 sudo apt install libtinfo5
