@@ -552,3 +552,4 @@ rm linux/arch/arm/boot/dts/zynq-pluto-sdr.dtb linux/arch/arm/boot/dts/zynq-pluto
 #+end_example
 - XSCT is a part of the Xilinx Vitis environment that allows creating,
   building and configuring projects programmatically.
+- perhaps i have to install vitis 2021.1 as well
