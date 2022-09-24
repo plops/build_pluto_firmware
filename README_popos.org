@@ -389,6 +389,7 @@ This program is Free Software and has ABSOLUTELY NO WARRANTY
 Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
 
 Opening DFU capable USB device...
+
 ID 0456:b674
 Run-time device DFU version 0110
 Claiming USB DFU Interface...
@@ -411,7 +412,8 @@ ______ _       _        _________________
 | ___ \ |     | |      /  ___|  _  \ ___ \
 | |_/ / |_   _| |_ ___ \ `--.| | | | |_/ /
 |  __/| | | | | __/ _ \ `--. \ | | |    /
-| |   | | |_| | || (_) /\__/ / |/ /| |\ \
+|
+|   | | |_| | || (_) /\__/ / |/ /| |\ \
 \_|   |_|\__,_|\__\___/\____/|___/ \_| \_|
 
 v0.35
@@ -433,7 +435,8 @@ b39efeda45847e61731e8d16c3080617  xmllint
 - this is likely the firmware i built, the md5sums are different and
   the dates are from today
 
-- try to open the fpga code in vivado:
+- try to open the fpga co
+  de in vivado:
   - the make file seems to build the fpga bit stream from this folder
     /home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto
   - documentation of the reference design
@@ -460,6 +463,42 @@ cd /home/martin/src/hdl/plutosdr-fw
 make
  
 #+end_example
+- this hdl build failed
+  #+begin_example
+make[2]: Entering directory '/home/martin/src/hdl/plutosdr-fw/hdl/library/util_pack/util_upack2'
+Building util_upack2 library [/home/martin/src/hdl/plutosdr-fw/hdl/library/util_pack/util_upack2/util_upack2_ip.log] ... OK
+make[2]: Leaving directory '/home/martin/src/hdl/plutosdr-fw/hdl/library/util_pack/util_upack2'
+Building pluto project [/home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto/pluto_vivado.log] ... FAILED
+For details see /home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto/pluto_vivado.log
+
+make[1]: *** [../scripts/project-xilinx.mk:65: pluto.sdk/system_top.xsa] Error 1
+
+
+contents of log file:
+
+
+open_run: Time (s): cpu = 00:00:15 ; elapsed = 00:00:19 . Memory (MB): peak = 3136.062 ; gain = 25.293 ; free physical = 1538 ; free virtual = 23559
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+report_timing_summary: Time (s): cpu = 00:00:21 ; elapsed = 00:00:09 . Memory (MB): peak = 3220.375 ; gain = 84.312 ; free physical = 1421 ; free virtual = 23492
+GENERATE_REPORTS: Resource utilization files won't be generated because ADI_GENERATE_UTILIZATION env var is not set
+GENERATE_REPORTS: Power analysis files won't be generated because ADI_GENERATE_XPA env var is not set
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+invalid command name "write_hw_platform"
+    while executing
+"write_hw_platform -fixed -force  -include_bit -file $project_name.sdk/system_top.xsa"
+    invoked from within
+"if { [string match "*VIOLATED*" $timing_string] == 1 ||
+       [string match "*Timing constraints are not met*" $timing_string] == 1} {
+    write_hw_p..."
+    (procedure "adi_project_run" line 146)
+    invoked from within
+"adi_project_run pluto"
+    (file "system_project.tcl" line 14)
+INFO: [Common 17-206] Exiting Vivado at Sat Sep 24 14:09:01 2022...
+
+  #+end_example
 
  #+begin_example
 cd /home/martin/src/hdl/plutosdr-fw/hdl/library/axi_ad9361
