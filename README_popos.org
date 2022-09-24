@@ -84,3 +84,4 @@ make
     - build linux
     - download libraries into /home/martin/src/hdl/plutosdr-fw/buildroot/dl/
     
+    - target is pluto
