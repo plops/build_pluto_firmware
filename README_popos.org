@@ -140,3 +140,4 @@ Submodule path 'u-boot-xlnx': checked out '90401ce9ce029e5563f4dface63914d42badf
  - make sometimes stops with a read (i see that when i attach strace
    to the make process)
  - if i run `strace -f -e execve make` the  build seems to proceed
+ 
