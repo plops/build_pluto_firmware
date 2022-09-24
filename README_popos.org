@@ -63,12 +63,24 @@ sudo apt-get install git build-essential ccache device-tree-compiler \
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export PATH=$PATH:/home/martin/Xilinx/Vitis/2021.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin
 export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh
+
+unset LD_LIBRARY_PATH
+
+# synthesize each ip indivdually (not tried yet)
+# export ADI_USE_OOC_SYNTHESIS=y
+
 sudo apt install flex bison
+
 cd /home/martin/src/hdl/plutosdr-fw
+
 make
 
 
   #+end_example
 
   - note: make doesn't work inside tmux for some reason
-  - 
+
+  - what does make build
+    - build linux
+    - download libraries into /home/martin/src/hdl/plutosdr-fw/buildroot/dl/
+    
