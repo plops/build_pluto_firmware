@@ -450,6 +450,7 @@ VIVADO_SETTINGS ?= /home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
 - build again
 #+begin_example
 
+export VIVADO_VERSION=2019.1
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
 export VIVADO_SETTINGS=/home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
@@ -457,7 +458,7 @@ unset LD_LIBRARY_PATH
 #export ADI_USE_OOC_SYNTHESIS=y
 cd /home/martin/src/hdl/plutosdr-fw
 make
-
+ 
 #+end_example
 
  #+begin_example
