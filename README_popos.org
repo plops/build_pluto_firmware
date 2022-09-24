@@ -234,3 +234,29 @@ cd ~/src/hdl/plutosdr-fw
 #+end_example
 
 - this script will execute /usr/sbin/pluto_reboot ram
+- first do a normal firmware update https://wiki.analog.com/university/tools/pluto/users/firmware
+#+begin_example
+mount
+...
+/dev/sdb1 on /media/martin/PlutoSDR type vfat (rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro,uhelper=udisks2)
+
+wget https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.35/plutosdr-fw-v0.35.zip
+unzip plutosdr-fw-v0.35.zip
+martin@pop-os:/dev/shm$ ls -tlrh
+total 42M
+-rw-rw-r-- 1 martin martin  11M Jul 19 13:53 pluto.dfu
+-rw-rw---- 1 martin martin 129K Jul 19 13:53 uboot-env.dfu
+-rw-rw-r-- 1 martin martin  11M Jul 19 13:53 pluto.frm
+-rw-rw-r-- 1 martin martin 572K Jul 19 13:53 boot.frm
+-rw-rw-r-- 1 martin martin 443K Jul 19 13:53 boot.dfu
+-rw-rw-r-- 1 martin martin  20M Jul 19 15:02 plutosdr-fw-v0.35.zip
+cp pluto.frm  /media/martin/PlutoSDR
+sudo eject /dev/sdb
+# fast flashing of the outside blue led
+#+end_example
+
+- in order to bring the device into dfu mode (USB device firmware upgrade):
+  - with a toothpick or paper-clip depress the device button while
+    plugging in the usb connection or
+  - run `device_reboot sf` via terminal or ssh
+- in DFU mode the usb pid is 0xB674 (PlutoSDR DFU)
