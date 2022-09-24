@@ -313,7 +313,7 @@ sshpass -v -panalog ssh \
     -oCheckHostIP=no \
     root@192.168.2.1 \
     "/usr/sbin/pluto_reboot ram"
-
+ 
 [57056.167754] usb 3-1: new high-speed USB device number 9 using xhci_hcd
 [57056.318236] usb 3-1: New USB device found, idVendor=0456, idProduct=b674, bcdDevice= 2.21
 [57056.318240] usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3

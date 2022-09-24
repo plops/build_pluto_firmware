@@ -1,2 +1,21 @@
 - how to cross compile C/C++ for adalm pluto on Fedora 36
+- official documentation:
+  https://wiki.analog.com/university/tools/pluto/devs/embedded_code
+- check in mass storage the compiler version that was used to build
+  the firmware
+#+begin_example
+GCC Compiler Target Triple 	arm-linux-gnueabihf
+GCC version 	GCC 8.2.0
+Binutils version 	Linaro_Binutils- 2.31
+SysRoot 	SYSROOT for firmware version v0.35
+#+end_example
   
+#+begin_example
+
+sshpass -v -panalog ssh \
+    -oStrictHostKeyChecking=no \
+    -oUserKnownHostsFile=/dev/null \
+    -oCheckHostIP=no \
+    root@192.168.2.1
+
+#+end_example
