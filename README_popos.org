@@ -147,3 +147,41 @@ strace: Process 394264 attached
 Incorrect selection of kernel headers: expected 4.14.x, got 5.8.x
 
 #+end_example
+- the script that prints this message is
+  buildroot/support/scripts/check-kernel-headers.sh
+- it is called like this
+#+begin_example
+  [pid 414366] execve("support/scripts/check-kernel-headers.sh", ["support/scripts/check-kernel-hea"..., "/home/martin/src/hdl/2/plutosdr-"..., "/home/martin/Xilinx/Vitis/2021.1"..., "4.14", "strict"], 0x55db70bcf1c0 /* 76 vars */) = 0
+#+end_example
+  - usage: check-kernel-headers.sh <BUILDDIR> <SYSROOT> <HDR_VER> <CHECK>
+    - HDR_VER is of the form X.Y
+    - check is strict or loose
+- the check-kernel-headers.sh script is called from
+  toolchain/helpers.mk:
+  #+begin_example
+# Check the specified kernel headers version actually matches the
+# version in the toolchain.
+#
+# $1: build directory
+# $2: sysroot directory
+# $3: kernel version string, in the form: X.Y
+# $4: test to do for the latest kernel version, 'strict' or 'loose'
+#     always 'strict' if this is not the latest version.
+#
+check_kernel_headers_version = \
+        if ! support/scripts/check-kernel-headers.sh $(1) $(2) $(3) \
+                $(if $(BR2_TOOLCHAIN_HEADERS_LATEST),$(4),strict); \
+        then \
+                exit 1; \
+        fi
+
+  #+end_example
+ - i will try to change this to 'loose'
+ - the next error is:
+
+#+begin_example
+Incorrect selection of gcc version: expected 8.x, got 10.2.0
+#+end_example
+ - looks like the vitis sdk is too new
+
+   
