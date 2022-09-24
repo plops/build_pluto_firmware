@@ -183,5 +183,11 @@ check_kernel_headers_version = \
 Incorrect selection of gcc version: expected 8.x, got 10.2.0
 #+end_example
  - looks like the vitis sdk is too new
-
+ - maybe i should really use vivado 2019.1 instead of 2021.1
    
+- try to install this: Vivado HLx 2019.1: WebPACK and Editions - Linux
+  Self Extracting Web Installer
+- i realized that i have 342GB in /dev/nvme0n1p5, in case i need more
+  space
+- i may need to install the 2019.1 SDK and use the 2021.1 version to
+  create fpga bitstream
