@@ -101,3 +101,15 @@ sshpass -v -panalog ssh \
 # 
 
 #+end_example
+
+
+- documentation of libiio
+  https://analogdevicesinc.github.io/libiio/
+
+  - RPC interface
+    - usb, networking or local without code change
+
+  - needs boilerplate, can be cumbersome to use
+    - pyadi-iio  fixes this
+
+  - sudo dnf install libiio-devel

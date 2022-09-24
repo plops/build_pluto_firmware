@@ -553,3 +553,150 @@ rm linux/arch/arm/boot/dts/zynq-pluto-sdr.dtb linux/arch/arm/boot/dts/zynq-pluto
 - XSCT is a part of the Xilinx Vitis environment that allows creating,
   building and configuring projects programmatically.
 - perhaps i have to install vitis 2021.1 as well
+
+- i installed vitis 2021.1, try to build with that
+#+begin_example
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+export VIVADO_SETTINGS=/mnt/Vitis2021.1/Vivado/2021.1/settings64.sh
+unset LD_LIBRARY_PATH
+#export ADI_USE_OOC_SYNTHESIS=y
+cd /home/martin/src/hdl/plutosdr-fw
+make
+
+#+end_example
+  
+- now it complains about X
+#+begin_example
+bash -c "source /mnt/Vitis2021.1/Vivado/2021.1/settings64.sh && xsct scripts/create_fsbl_project.tcl"
+ERROR: Xvfb is not available on the system, please make sure Xvfb is available on the system.
+
+#+end_example
+- i ran it inside an ssh console, now run it within x11vnc
+
+- seems to have finished
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw/build$ ls -ltr
+total 393616
+-rwxrwxr-x 1 martin martin   4212392 Sep 24 20:10 zImage
+-rw-rw-r-- 1 martin martin    564691 Sep 24 20:10 LICENSE.html
+-rw-r--r-- 1 martin martin   5597628 Sep 24 20:10 rootfs.cpio.gz
+-rw-rw-r-- 1 martin martin     22105 Sep 24 20:10 zynq-pluto-sdr.dtb
+-rw-rw-r-- 1 martin martin     22181 Sep 24 20:11 zynq-pluto-sdr-revb.dtb
+-rw-rw-r-- 1 martin martin     22757 Sep 24 20:11 zynq-pluto-sdr-revc.dtb
+-rw-rw-r-- 1 martin martin    730069 Sep 24 20:11 system_top.xsa
+-rw-rw-r-- 1 martin martin      3679 Sep 24 20:11 ps7_init.h
+-rw-rw-r-- 1 martin martin      4283 Sep 24 20:11 ps7_init_gpl.h
+-rw-rw-r-- 1 martin martin    451715 Sep 24 20:11 ps7_init_gpl.c
+-rw-rw-r-- 1 martin martin    451111 Sep 24 20:11 ps7_init.c
+-rw-rw-r-- 1 martin martin     31486 Sep 24 20:11 ps7_init.tcl
+-rw-rw-r-- 1 martin martin   2428124 Sep 24 20:11 ps7_init.html
+-rw-rw-r-- 1 martin martin    964108 Sep 24 20:11 system_top.bit
+drwxrwxr-x 6 martin martin      4096 Sep 24 20:11 sdk
+-rw-rw-r-- 1 martin martin  10845043 Sep 24 20:11 pluto.itb
+-rw-rw-r-- 1 martin martin  10845059 Sep 24 20:11 pluto.dfu
+-rw-rw-r-- 1 martin martin      7066 Sep 24 20:12 uboot-env.txt
+-rw-rw---- 1 martin martin    131072 Sep 24 20:12 uboot-env.bin
+-rw-rw---- 1 martin martin    131088 Sep 24 20:12 uboot-env.dfu
+-rw-rw-r-- 1 martin martin        33 Sep 24 20:12 pluto.frm.md5
+-rw-rw-r-- 1 martin martin  10845076 Sep 24 20:12 pluto.frm
+-rw-rw-r-- 1 martin martin        69 Sep 24 20:12 boot.bif
+-rw-rw-r-- 1 martin martin    453532 Sep 24 20:12 boot.bin
+-rw-rw-r-- 1 martin martin    453548 Sep 24 20:12 boot.dfu
+-rw-rw-r-- 1 martin martin    585661 Sep 24 20:12 boot.frm
+-rwxrwxr-x 1 martin martin    448484 Sep 24 20:12 u-boot.elf
+-rw-rw-r-- 1 martin martin    588097 Sep 24 20:12 plutosdr-jtag-bootstrap-v0.35.zip
+-rw-rw-r-- 1 martin martin  20724965 Sep 24 20:12 plutosdr-fw-v0.35.zip
+-rw-rw-r-- 1 martin martin 331482260 Sep 24 20:12 legal-info-v0.35.tar.gz
+
+
+martin@pop-os:~/src/hdl/plutosdr-fw/build$ md5sum *
+d3c94ff306001a98ef5a30c8d556fb99  boot.bif
+3e9c97e0bccaa431cc28710e32402f0a  boot.bin
+ee6da7eabdbf1a715d48f5a0596d8887  boot.dfu
+afc16a56b9047bc3e5f363255963d15f  boot.frm
+e4bcde8b86c45b3ce3f30916719b6b08  legal-info-v0.35.tar.gz
+40abf30968b05d3de976062b779c995c  LICENSE.html
+997bb431d40e6dfa19d6b4ef6e99ecbe  pluto.dfu
+584c476e6ad80259ccb51569a8581d33  pluto.frm
+3e45e3557149bc66e201d120b0d3c5c7  pluto.frm.md5
+e2bb15e759d3df63313b0575e6248a9c  pluto.itb
+429c757ffc007f6f40be725833be71d7  plutosdr-fw-v0.35.zip
+40cc5f4a721427ed1e87358dd5f6a5f1  plutosdr-jtag-bootstrap-v0.35.zip
+1b202e11777b01244e5c43ce24ad9c75  ps7_init.c
+f58828a605d12ea1b5a3451fcce14ad5  ps7_init_gpl.c
+8131c29b08dfe2d090210752fbd366b8  ps7_init_gpl.h
+aa3de8efdaa637b7622f8ebf7bc91e1b  ps7_init.h
+d1f6571eed5586fb9f4856c67f3c41a9  ps7_init.html
+da52f3f10feef048d5abedef219f48a2  ps7_init.tcl
+cfeb1d2a2d63a39ad37bf5931e6e76f5  rootfs.cpio.gz
+md5sum: sdk: Is a directory
+eefc62c8193efc06c8f2df8c3ad421eb  system_top.bit
+e1393dccdd2d38ac5255662ddab70651  system_top.xsa
+9fc68e7585aedef1f3be902d15d6d184  u-boot.elf
+c6d1432ba10c25860bcf3974f3166001  uboot-env.bin
+a6541d54331cee8d670ecea5c9b6d210  uboot-env.dfu
+5fd99ec0085f1f9a572db08c52d63b2a  uboot-env.txt
+26746092ad6bd7e63be18a1b4572e834  zImage
+eab6052aa9570cad9aaea43092c40fdb  zynq-pluto-sdr.dtb
+607ea7d1a285fe74a0a741e8118554e7  zynq-pluto-sdr-revb.dtb
+1f463fc3e170eb5826d1fd9de32dd14b  zynq-pluto-sdr-revc.dtb
+
+#+end_example
+
+- look at the hdl
+
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw/build$ md5sum *
+d3c94ff306001a98ef5a30c8d556fb99  boot.bif
+3e9c97e0bccaa431cc28710e32402f0a  boot.bin
+ee6da7eabdbf1a715d48f5a0596d8887  boot.dfu
+afc16a56b9047bc3e5f363255963d15f  boot.frm
+e4bcde8b86c45b3ce3f30916719b6b08  legal-info-v0.35.tar.gz
+40abf30968b05d3de976062b779c995c  LICENSE.html
+997bb431d40e6dfa19d6b4ef6e99ecbe  pluto.dfu
+584c476e6ad80259ccb51569a8581d33  pluto.frm
+3e45e3557149bc66e201d120b0d3c5c7  pluto.frm.md5
+e2bb15e759d3df63313b0575e6248a9c  pluto.itb
+429c757ffc007f6f40be725833be71d7  plutosdr-fw-v0.35.zip
+40cc5f4a721427ed1e87358dd5f6a5f1  plutosdr-jtag-bootstrap-v0.35.zip
+1b202e11777b01244e5c43ce24ad9c75  ps7_init.c
+f58828a605d12ea1b5a3451fcce14ad5  ps7_init_gpl.c
+8131c29b08dfe2d090210752fbd366b8  ps7_init_gpl.h
+aa3de8efdaa637b7622f8ebf7bc91e1b  ps7_init.h
+d1f6571eed5586fb9f4856c67f3c41a9  ps7_init.html
+da52f3f10feef048d5abedef219f48a2  ps7_init.tcl
+cfeb1d2a2d63a39ad37bf5931e6e76f5  rootfs.cpio.gz
+md5sum: sdk: Is a directory
+eefc62c8193efc06c8f2df8c3ad421eb  system_top.bit
+e1393dccdd2d38ac5255662ddab70651  system_top.xsa
+9fc68e7585aedef1f3be902d15d6d184  u-boot.elf
+c6d1432ba10c25860bcf3974f3166001  uboot-env.bin
+a6541d54331cee8d670ecea5c9b6d210  uboot-env.dfu
+5fd99ec0085f1f9a572db08c52d63b2a  uboot-env.txt
+26746092ad6bd7e63be18a1b4572e834  zImage
+eab6052aa9570cad9aaea43092c40fdb  zynq-pluto-sdr.dtb
+607ea7d1a285fe74a0a741e8118554e7  zynq-pluto-sdr-revb.dtb
+1f463fc3e170eb5826d1fd9de32dd14b  zynq-pluto-sdr-revc.dtb
+
+#+end_example
+
+#+begin_example
+cd /home/martin/src/hdl/plutosdr-fw/hdl/projects/pluto
+source /mnt/Vitis2021.1/Vivado/2021.1/settings64.sh 
+
+vivado pluto.xpr
+#+end_example
+
+- i looked at the floorplan, tried to make screenshots but the device
+  view (floor plan) doesn't show the highlight colors when fully
+  zoomed out.
+
+- my hardware model is rev.B
+- here is description of different hardware revisions:
+  https://wiki.analog.com/university/tools/pluto/hacking/hardware
+#+begin_example
+hw_model: Analog Devices PlutoSDR Rev.B (Z7010-AD9364)
+
+
+#+end_example
