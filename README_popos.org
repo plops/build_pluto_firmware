@@ -129,7 +129,8 @@ u-boot-xlnx: HEAD detached at 90401ce9ce
 #+end_example
 
   - in a fresh checkout from master the submodules have the same
-    versions as v0.35
+    versions as v0.35. looking through github i verified that the last
+    commit in master is also the tag v0.35
 #+begin_example
 Submodule path 'buildroot': checked out 'b0ed105e9ab6c60ffd2ddafdfff6890b5cc46ed8'
 Submodule path 'hdl': checked out 'd09fc920792c2c67ce5f28179d8263172d46fbdd'
