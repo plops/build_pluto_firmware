@@ -22,7 +22,7 @@ martin@pop-os:~/src/hdl/plutosdr-fw$ find ~/src/hdl/Xilinx/ -name vivado -execut
   https://wiki.analog.com/university/tools/pluto/obtaining_the_sources
 #+begin_example
 git clone --recursive https://github.com/analogdevicesinc/plutosdr-fw.git
-# make sure sources are up to date
+# ensure sources are up to date
 git pull --recurse-submodules
 git submodule update --init --recursive
 #+end_example
@@ -188,7 +188,30 @@ Incorrect selection of gcc version: expected 8.x, got 10.2.0
    
 - try to install this: Vivado HLx 2019.1: WebPACK and Editions - Linux
   Self Extracting Web Installer
+  - 23GB installed on disk
 - i realized that i have 342GB in /dev/nvme0n1p5, in case i need more
   space
 - i may need to install the 2019.1 SDK and use the 2021.1 version to
-  create fpga bitstream
+  create fpga bitstream (note: no)
+  
+- compile with new toolchain
+  #+begin_example
+
+
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+export VIVADO_SETTINGS=/home/martin/Xilinx/Vivado/2021.1/settings64.sh
+
+unset LD_LIBRARY_PATH
+
+# synthesize each ip indivdually (not tried yet)
+# export ADI_USE_OOC_SYNTHESIS=y
+
+
+
+cd /home/martin/src/hdl/plutosdr-fw
+
+make
+
+  #+end_example
+- looks like the build succeeded
