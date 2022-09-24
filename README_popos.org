@@ -254,7 +254,7 @@ cp pluto.frm  /media/martin/PlutoSDR
 sudo eject /dev/sdb
 # fast flashing of the outside blue led
 #+end_example
-
+- that worked, now the ssh prompt shows v0.35
 - in order to bring the device into dfu mode (USB device firmware upgrade):
   - with a toothpick or paper-clip depress the device button while
     plugging in the usb connection or
