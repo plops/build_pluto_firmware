@@ -449,7 +449,7 @@ VIVADO_SETTINGS ?= /home/martin/Xilinx2019.1/Vivado/2019.1/settings64.sh
 #+end_example
 - build again
 #+begin_example
-
+export ADI_IGNORE_VERSION_CHECK=1
 export VIVADO_VERSION=2019.1
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export PATH=$PATH:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
@@ -471,5 +471,5 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 adi_ip_create axi_ad9361 
 # this closed the window
 
-source axi_ad9361_ip.tcl
+source axi_ad9361_ip.tcl 
  #+end_example
