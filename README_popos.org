@@ -700,3 +700,28 @@ hw_model: Analog Devices PlutoSDR Rev.B (Z7010-AD9364)
 
 
 #+end_example
+
+
+- get files for rev.B:
+
+#+begin_example
+wget https://wiki.analog.com/_media/university/tools/pluto/hacking/plutosdr_schematic_revb.pdf
+https://wiki.analog.com/_media/university/tools/pluto/hacking/plutosdr_gerber_revb.zip
+https://wiki.analog.com/_media/university/tools/pluto/hacking/plutosdr_bom_revb.xls
+https://wiki.analog.com/_media/university/tools/pluto/hacking/plutosdr_brd_revb.zip
+https://wiki.analog.com/_media/university/tools/pluto/hacking/plutosdr_cadence_project_revb.zip
+https://wiki.analog.com/_media/university/tools/pluto/hacking/pluto_revb_3d.zip
+wget https://wiki.analog.com/_detail/university/tools/pluto/marketing/adalm-pluto-photo.jpg?id=university%3Atools%3Apluto%3Amarketing
+#+end_example
+
+- problems with rev.B
+  -  we put the VBUS monitoring (R88) on the wrong side of the fuse,
+    and the inclusion of the DC choke. While the DC choke reduces
+    noise, and there is no DC difference between PGDN, and GND, on
+    certain hosts, with certain operating systems, there can be a
+    250mV AC difference between PGND and GND. Since the analog
+    comparators inside the Microchip USB3320 will be referenced to GND
+    (quiet), it appears to toggle between host mode and device mode.
+  -  had issue on ESD testing, and will be adding an ESD protection to
+    the RF connector.
+  - rev.C also pins out the 2nd channel
