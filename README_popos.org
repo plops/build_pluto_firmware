@@ -283,3 +283,152 @@ cd ~/src/hdl/plutosdr-fw
 # ssh command /usr/sbin/pluto_reboot ram; failed
 
 #+end_example
+
+- try to perform pluto_ramboot steps manually
+- the ip address is read from config.txt in pluto's mass storage
+  #+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw$ cat /media/martin/PlutoSDR/config.txt 
+# Analog Devices PlutoSDR Rev.B (Z7010-AD9363)
+# Device Configuration File
+#   1. Open with an Editor
+#   2. Edit this file
+#   3. Save this file on the device USB drive
+#   4. Eject the device USB Drive
+# Doc: https://wiki.analog.com/university/tools/pluto/users/customizing
+
+[NETWORK]
+hostname = pluto
+ipaddr = 192.168.2.1
+...
+  #+end_example
+    #+begin_example
+  
+sshpass -v -panalog ssh \
+    -oStrictHostKeyChecking=no \
+    -oUserKnownHostsFile=/dev/null \
+    -oCheckHostIP=no \
+    root@192.168.2.1 \
+    "/usr/sbin/pluto_reboot ram"
+
+[57056.167754] usb 3-1: new high-speed USB device number 9 using xhci_hcd
+[57056.318236] usb 3-1: New USB device found, idVendor=0456, idProduct=b674, bcdDevice= 2.21
+[57056.318240] usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[57056.318242] usb 3-1: Product: USB download gadget
+[57056.318244] usb 3-1: Manufacturer: Analog Devices Inc.
+
+
+martin@pop-os:~/src/hdl/plutosdr-fw$ lsusb|grep Analog
+Bus 003 Device 009: ID 0456:b674 Analog Devices, Inc. USB download gadget
+
+  #+end_example
+  - note that the idProduct is now what it should be for DFU
+
+ - check the listing of dfu-util. this must run as root. i think this
+   is why the script fails
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw$ sudo dfu-util -l -d 0456:b673,0456:b674
+dfu-util 0.9
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2016 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
+
+Found DFU: [0456:b674] ver=0221, devnum=9, cfg=1, intf=0, path="3-1", alt=1, name="firmware.dfu", serial="UNKNOWN"
+Found DFU: [0456:b674] ver=0221, devnum=9, cfg=1, intf=0, path="3-1", alt=0, name="dummy.dfu", serial="UNKNOWN"
+
+#+end_example
+  
+#+begin_example
+
+ sudo dfu-util -d 0456:b673,0456:b674 -D ./build/pluto.dfu -a firmware.dfu 
+
+
+ sudo dfu-util -d 0456:b673,0456:b674 -a firmware.dfu -e 
+
+#+end_example
+
+- first file
+
+#+begin_example
+martin@pop-os:~/src/hdl/plutosdr-fw$  sudo dfu-util -d 0456:b673,0456:b674 -D ./build/pluto.dfu -a firmware.dfu 
+dfu-util 0.9
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2016 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
+
+Opening DFU capable USB device...
+ID 0456:b674
+Run-time device DFU version 0110
+Claiming USB DFU Interface...
+Setting Alternate Setting #1 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 0110
+Device returned transfer size 4096
+Copying data from PC to DFU device
+Download	[=========================] 100%     10845099 bytes
+Download done.
+state(7) = dfuMANIFEST, status(0) = No error condition is present
+state(2) = dfuIDLE, status(0) = No error condition is present
+Done!
+
+#+end_example
+
+- second file:
+  #+begin_example
+
+martin@pop-os:~/src/hdl/plutosdr-fw$  sudo dfu-util -d 0456:b673,0456:b674 -a firmware.dfu -e 
+dfu-util 0.9
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2016 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
+
+Opening DFU capable USB device...
+ID 0456:b674
+Run-time device DFU version 0110
+Claiming USB DFU Interface...
+Setting Alternate Setting #1 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 0110
+Device returned transfer size 4096
+
+#+end_example
+
+- login with ssh:
+
+  #+begin_example
+
+martin@pop-os:~/src/hdl/plutosdr-fw$ ssh -l root 192.168.2.1
+root@192.168.2.1's password: 
+Welcome to:
+______ _       _        _________________
+| ___ \ |     | |      /  ___|  _  \ ___ \
+| |_/ / |_   _| |_ ___ \ `--.| | | | |_/ /
+|  __/| | | | | __/ _ \ `--. \ | | |    /
+| |   | | |_| | || (_) /\__/ / |/ /| |\ \
+\_|   |_|\__,_|\__\___/\____/|___/ \_| \_|
+
+v0.35
+https://wiki.analog.com/university/tools/pluto
+# cd /usr/bin
+# ls -lSr | tail -4
+-rwxr-xr-x    1 root     root         32180 Sep 24  2022 fftw-wisdom
+-rwxr-xr-x    1 root     root         34488 Sep 24  2022 iio_attr
+-rwxr-xr-x    1 root     root         47544 Sep 24  2022 xmllint
+-rwxr-xr-x    1 root     root        150416 Sep 24  2022 dbus-daemon
+# md5sum xmllint iio_attr dbus-daemon 
+b39efeda45847e61731e8d16c3080617  xmllint
+48b198a96eb658fe76aeadada192ad29  iio_attr
+7f07491d7e5003c06d314bf56222f8d9  dbus-daemon
+
+
+#+end_example
+
+- this is likely the firmware i built, the md5sums are different and
+  the dates are from today
