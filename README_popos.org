@@ -436,10 +436,13 @@ b39efeda45847e61731e8d16c3080617  xmllint
 - try to open the fpga code in vivado:
  #+begin_example
 cd /home/martin/src/hdl/plutosdr-fw/hdl/library/axi_ad9361
+sudo apt install libtinfo5
 source ~/Xilinx2019.1/Vivado/2019.1/settings64.sh
 vivado
 source ../scripts/adi_env.tcl
 source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 adi_ip_create axi_ad9361
+# this closed the window
+
 source axi_ad9361_ip.tcl
  #+end_example
