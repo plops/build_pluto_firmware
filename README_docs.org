@@ -1,0 +1,41 @@
+- how to convert libiio documentation to docset for reading with dash
+  / zeal
+
+#+begin_example
+git clone https://github.com/analogdevicesinc/libiio.git
+# modify Doxyfile.in:
+GENERATE_DOCSET        = YES
+
+cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_DOC=ON -DWITH_EXAMPLES=ON -G Ninja
+
+#+end_example
+
+- Tokens.xml and Info.plist must be present
+
+- get another tool
+  #+begin_example
+cd ~/src
+git clone --recurse-submodules -j8  https://github.com/chinmaygarde/doxygen2docset
+cmake .. -DCMAKE_BUILD_TYPE=Release -G Ninja
+  #+end_example
+- final executable: /home/martin/src/doxygen2docset/b/source/doxygen2docset
+
+#+begin_example
+
+cd /home/martin/src/libiio/b
+/home/martin/src/doxygen2docset/b/source/doxygen2docset \
+  --doxygen html/v0.24/libiio/ \
+  --docset libiio-0_24.docset
+cp -r libiio-0_24.docset/org.doxygen.Project.docset \
+   ~/.local/share/Zeal/Zeal/docsets/libiio24.docset
+
+#+end_example
+
+- run doc viewer
+
+#+begin_example
+
+QT_STYLE_OVERRIDE=adwaita zeal
+   
+
+#+end_example

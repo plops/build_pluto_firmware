@@ -1,0 +1,12 @@
+- install sdrangel on popos
+#+begin_example
+install qt and a bunch of ubuntu packages
+
+sdrangel
+libiio
+serialDV
+
+
+  cmake -Wno-dev -DDEBUG_OUTPUT=ON -DRX_SAMPLE_24BIT=OFF -DCMAKE_BUILD_TYPE=Release -DIIO_DIR=/opt/install/libiio -DSERIALDV_DIR=/opt/install/serialdv -DCMAKE_INSTALL_PREFIX=/opt/install/sdrangel ..
+#+end_example
+
