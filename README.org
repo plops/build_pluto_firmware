@@ -1,8 +1,15 @@
 <
 - contents
-| pluto_tui | experiment to visualize fft using unicode characters on terminal |   |
-| capture   | acquire and trigger data on pluto, send packets via socket       |   |
-| gl_osci   | visualize data that was acquired by capture with opengl          |   |
+| file                         | completeness | comment                                                                                   |   |
+|------------------------------+--------------+-------------------------------------------------------------------------------------------+---|
+| pluto_tui                    |              | experiment to visualize fft using unicode characters on terminal                          |   |
+| capture                      |              | acquire and trigger data on pluto, send packets via socket                                |   |
+| gl_osci                      |              | visualize data that was acquired by capture with opengl                                   |   |
+| README.org                   |              | first attempt to build firmware and hdl on fedora 32 (2020 Nov)                           |   |
+| README_popos.org             |          80% | second attempt (i think succesfull) to build firmware and hdl on ubuntu 22 (2022 Sep)     |   |
+| README_docs.org              |          90% | document how to convert libiio docs to dash format (for fast search)                      |   |
+| README_sdrangel.org          |          70% | document how to compile sdsangel with pluto support                                       |   |
+| README_cross_comp_fedora.org |          50% | document how to cross compile embedded C code for pluto (using only rootfs and toolchain) |   |
 
 - try to build pluto fpga firmware and linux on fedora 32
 - https://wiki.analog.com/resources/fpga/docs/releases
