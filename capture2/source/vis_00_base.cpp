@@ -61,12 +61,12 @@ void lprint(std::string msg, std::initializer_list<std::string> il,
 int main(int argc, char **argv) {
   g_start_time = std::chrono::high_resolution_clock::now();
   setlocale(LC_ALL, "");
-  state._code_version = "24859ce8201fa80d9b3a7e4eb9b7c2ca1c327fc7";
+  state._code_version = "d9b6927f712760ec1a467e57c0bbeb278e7ab332";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "11:14:46 of Monday, 2022-09-26 (GMT+1)";
+  state._code_generation_time = "20:09:32 of Monday, 2022-09-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
   lprint("start",
@@ -96,33 +96,36 @@ int main(int argc, char **argv) {
       {" state._code_license='", fmt::format("{}", state._code_license), "'"},
       __func__, __FILE__, __LINE__);
   auto ctx = iio_create_default_context();
+  if ((nullptr) == (ctx)) {
+    lprint("iio_create_default_context failed", {}, __func__, __FILE__,
+           __LINE__);
+  }
   auto major = uint(0);
   auto minor = uint(0);
   char git_tag[8];
   iio_library_get_version(&major, &minor, git_tag);
-  lprint("",
+  lprint("libiio version",
          {" major='", fmt::format("{}", major), "'", " minor='",
           fmt::format("{}", minor), "'", " git_tag='",
           fmt::format("{}", git_tag), "'"},
          __func__, __FILE__, __LINE__);
-  if (!(ctx)) {
-    lprint("create_default", {}, __func__, __FILE__, __LINE__);
-  }
   lprint("",
          {" iio_context_get_devices_count(ctx)='",
           fmt::format("{}", iio_context_get_devices_count(ctx)), "'"},
          __func__, __FILE__, __LINE__);
   auto rx = iio_context_find_device(ctx, "cf-ad9361-lpc");
-  if (!(rx)) {
-    lprint("rx", {}, __func__, __FILE__, __LINE__);
+  if ((nullptr) == (rx)) {
+    lprint("error: rx = iio_context_find_device(ctx, 'cf-ad9361-lpc')", {},
+           __func__, __FILE__, __LINE__);
   }
   lprint("rx",
          {" iio_device_get_attrs_count(rx)='",
           fmt::format("{}", iio_device_get_attrs_count(rx)), "'"},
          __func__, __FILE__, __LINE__);
   auto phy = iio_context_find_device(ctx, "ad9361-phy");
-  if (!(phy)) {
-    lprint("phy", {}, __func__, __FILE__, __LINE__);
+  if ((nullptr) == (phy)) {
+    lprint("error: phy = iio_context_find_device(ctx, 'ad9361-phy')", {},
+           __func__, __FILE__, __LINE__);
   }
   lprint("phy",
          {" iio_device_get_attrs_count(phy)='",

@@ -122,9 +122,10 @@
 		      (string "'")))
 	     "std::endl"
 	     "std::flush"))))
-    (defun iio (code)
-      `(unless ,code
-	 ,(lprint :msg (format nil "~a" code))))
+    (defun iio (code &key msg)
+      `(when (== nullptr ,code)
+	 ,(lprint :msg (format nil "error: ~a = ~a" code (substitute #\' #\"
+							    (emit-c :code msg))))))
 
     (defun make-filter (pass &key (poles 2) (fc 0.01))
     ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
@@ -374,17 +375,18 @@
 		       ;;https://analogdevicesinc.github.io/libiio/master/libiio/index.html
 		       (let ((ctx (iio_create_default_context)))
 			 (do0
+			  (when (== nullptr ctx)
+			    ,(lprint :msg "iio_create_default_context failed"
+				     ;; FIXME: fmt doesn't print pointers
+				      ; :vars `(ctx)
+				     ))
 			  (let ((major (uint 0))
 				(minor (uint 0))
 				(git_tag))
 			    (declare (type (array char 8) git_tag))
 			    (iio_library_get_version &major &minor git_tag)
-			   ,(lprint :msg ""  :vars `(major minor git_tag)))
-			  (unless ctx
-			    ,(lprint :msg "create_default"
-				     ;; FIXME: fmt doesn't print pointers
-				      ; :vars `(ctx)
-				      ))
+			   ,(lprint :msg "libiio version"  :vars `(major minor git_tag)))
+			  
 			  ,(lprint :msg "" :vars
 				   `((iio_context_get_devices_count ctx)))
 			  #+nil (let ((n (iio_context_get_devices_count ctx))
@@ -398,7 +400,7 @@
 						 (phy ad9361-phy))
 				  collect
 				  `(let ((,e (iio_context_find_device ctx (string ,f))))
-				     ,(iio e)
+				     ,(iio e :msg `(iio_context_find_device ctx (string ,f)))
 				     ,(lprint :msg (format nil "~a" e)
 					      :vars `((iio_device_get_attrs_count ,e)))))
 			  (let ((rx_lo_freq 2467000000ULL)
