@@ -3,7 +3,8 @@
 | file                         | completeness | comment                                                                                   |   |
 |------------------------------+--------------+-------------------------------------------------------------------------------------------+---|
 | pluto_tui                    |              | experiment to visualize fft using unicode characters on terminal                          |   |
-| capture                      |              | acquire and trigger data on pluto, send packets via socket                                |   |
+| capture                      |              | acquire and trigger data on pluto, send packets via socket (2020 Nov)                     |   |
+| capture2                     |              | revisit embedded program (2022 Sep)                                                       |   |
 | gl_osci                      |              | visualize data that was acquired by capture with opengl                                   |   |
 | README.org                   |              | first attempt to build firmware and hdl on fedora 32 (2020 Nov)                           |   |
 | README_popos.org             |          80% | second attempt (i think succesfull) to build firmware and hdl on ubuntu 22 (2022 Sep)     |   |

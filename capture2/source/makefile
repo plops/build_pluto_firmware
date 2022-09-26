@@ -1,7 +1,10 @@
-# source /opt/Xilinx/Vivado/2019.1/settings64.sh; export PATH=$PATH:/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/
+# from slim:/home/martin/Xilinx2019.1/SDK/2019.1/gnu/aarch32/lin/gcc-arm-linux-gnueabi/
+# export PATH=$PATH:/home/martin/gcc-arm-linux-gnueabi/bin
 CROSS=arm-linux-gnueabihf-
-CROSS_ROOT=/opt/Xilinx/SDK/2019.1/gnu/aarch32/lin/gcc-arm-none-eabi/arm-none-eabi/libc/
-SDK=/home/martin/src/plutosdr-fw/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot
+
+#CROSS_ROOT=/home/martin/gcc-arm-linux-gnueabi
+# wget https://github.com/analogdevicesinc/plutosdr-fw/releases/download/v0.35/sysroot-v0.35.tar.gz
+SDK=/home/martin/pluto-0.35.sysroot/
 CXX=${CROSS}g++
 LD=${CROSS}ld
 

@@ -26,6 +26,59 @@
     
     (defparameter *module-global-parameters* nil)
     (defparameter *module* nil)
+
+    (progn (defun lprint (&key (msg "") (vars nil))
+	     
+	   `(lprint (string ,msg)
+		    (curly
+
+		     ,@(loop for e in vars appending
+			     `(	;("std::setw" 8)
+					;("std::width" 8)
+			       (string ,(format nil " ~a='" (emit-c :code e)))
+					;("std::to_string" ,e)
+			       (fmt--format (string "{}") ,e)
+			       (string "'"))))
+		    __func__
+		    __FILE__
+		    __LINE__
+
+		    ))
+	 (defun init-lprint ()
+	   `(do0
+	     (comments "This function is generates log output including wall clock time, source file and line, function and optionally some variables that will be submitted as strings in an initializer_list. Arbitrary values are converted to strings using fmt::format")
+	     (comments "requires https://github.com/fmtlib/fmt as a header only library using the macro FMT_HEADER_ONLY")
+	     "std::chrono::time_point<std::chrono::high_resolution_clock> g_start_time;"
+	     (defun lprint (msg il func file line)
+	       (declare (type "std::initializer_list<std::string>" il)
+			(type "std::string" file func msg)
+			(type int line))
+
+	       "std::chrono::duration<double>  timestamp = std::chrono::high_resolution_clock::now() - g_start_time;"
+	       (<< "std::cout"
+		   ("std::setw" 10)
+		   (dot timestamp
+			(count))
+		   (string " ")
+		   ("std::this_thread::get_id")
+		   (string " ")
+		   file
+		   (string ":")
+		   line
+		   (string " ")
+		   func
+		   (string " ")
+		   msg
+		   (string " ")
+		   )
+	       (for-range ((elem :type "const auto&")
+			   il)
+			  (<< "std::cout"
+
+			      elem) )
+	       (<< "std::cout"
+		   "std::endl"
+		   "std::flush")))))
     
     (defun logprint (msg &optional rest)
       `(do0
@@ -71,7 +124,7 @@
 	     "std::flush"))))
     (defun iio (code)
       `(unless ,code
-	 ,(logprint (format nil "~a" code))))
+	 ,(lprint :msg (format nil "~a" code))))
 
     (defun make-filter (pass &key (poles 2) (fc 0.01))
     ;; https://www.analog.com/media/en/technical-documentation/dsp-book/dsp_book_Ch20.pdf
@@ -207,7 +260,11 @@
 			     <chrono>
 			     <thread>
 			     
+			     
 			     )
+		    (do0
+		     "#define FMT_HEADER_ONLY"
+		     (include "/home/martin/src/fmt/include/fmt/format.h"))
 
 		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
@@ -266,12 +323,13 @@
 		      (crc32 uint32_t)
 		      )
 		    
+		    ,(init-lprint)
 		    (defun main (argc argv
 				 )
 		      (declare (type int argc)
 			       (type char** argv)
 			       (values int))
-
+		      (setf g_start_time ("std::chrono::high_resolution_clock::now"))
 		      (do0
 		       (setlocale LC_ALL (string ""))
 		       (setf ,(g `_code_version)
@@ -302,7 +360,7 @@
                                                     (time_since_epoch)
                                                     (count))))
 
-		      ,(logprint "start" `(argc (aref argv 0)
+		      ,(lprint :msg "start" :vars `(argc (aref argv 0)
 						))
 		      ,@(loop for e in `(_start_time _code_version _code_repository
 						     _code_generation_time _code_author
@@ -866,7 +924,7 @@
 		    " "
 		    ,@(loop for e in (reverse *global-code*) collect
 			 e)
-
+		    "extern std::chrono::time_point<std::chrono::high_resolution_clock> g_start_time;"
 		    " "
 		    ,(emit-globals)
 		    " "
