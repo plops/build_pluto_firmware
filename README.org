@@ -1,5 +1,5 @@
 
-- contents
+* Contents
 | file                         | completeness | comment                                                                                   |   |
 |------------------------------+--------------+-------------------------------------------------------------------------------------------+---|
 | pluto_tui                    |              | experiment to visualize fft using unicode characters on terminal                          |   |
@@ -11,6 +11,18 @@
 | README_docs.org              |          90% | document how to convert libiio docs to dash format (for fast search)                      |   |
 | README_sdrangel.org          |          70% | document how to compile sdsangel with pluto support                                       |   |
 | README_cross_comp_fedora.org |          50% | document how to cross compile embedded C code for pluto (using only rootfs and toolchain) |   |
+
+* Note on the history of this code
+
+- I think I gave up development in Nov 2020 when I realized that the
+  local oscillators for TX and RX are different. This would make
+  experiments with a radar quite complicated.
+
+- In Sep 2022 I learned of a new hardware revision that has two
+  additional connectors for one more RX and one more TX
+  channel. Perhaps those can be used to recover the oscillator drift,
+  making radar experiments feasible again.
+
 
 - try to build pluto fpga firmware and linux on fedora 32
 - https://wiki.analog.com/resources/fpga/docs/releases
