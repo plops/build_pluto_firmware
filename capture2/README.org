@@ -10,7 +10,7 @@ git clone https://github.com/fmtlib/fmt
 
 
 * network connection
-
+- check open port on pluto
 #+begin_example
 # netstat -a
 Active Internet connections (servers and established)
@@ -19,4 +19,30 @@ tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN
 tcp        0      0 0.0.0.0:30431           0.0.0.0:*               LISTEN      
 tcp        0      0 0.0.0.0:www             0.0.0.0:*               LISTEN      
 tcp        0      0 0.0.0.0:1234            0.0.0.0:*               LISTEN   
+#+end_example
+- on laptop read from pluto port 1234
+#+begin_example
+[martin@localhost source]$ nc 192.168.2.1  1234 
+... prints lots of binary data ...
+
+# this is the log output on pluto
+  0.447753 2862556224 vis_01_server.cpp:27 create_server attempt bind  portno='1234'
+  0.448565 2862556224 vis_01_server.cpp:33 create_server initiate accept 
+   10.9364 3069968400 vis_00_base.cpp:240 main line604  count='1' nbytes='50331648' compute_perc='98' sample_perc='1'
+   22.3425 3069968400 vis_00_base.cpp:240 main line604  count='2' nbytes='50331648' compute_perc='99' sample_perc='0'
+   36.5203 3069968400 vis_00_base.cpp:240 main line604  count='3' nbytes='50331648' compute_perc='99' sample_perc='0'
+   46.6414 3069968400 vis_00_base.cpp:240 main line604  count='4' nbytes='50331648' compute_perc='99' sample_perc='0'
+   60.8209 3069968400 vis_00_base.cpp:240 main line604  count='5' nbytes='50331648' compute_perc='99' sample_perc='0'
+   72.0845 3069968400 vis_00_base.cpp:240 main line604  count='6' nbytes='50331648' compute_perc='99' sample_perc='0'
+    83.447 3069968400 vis_00_base.cpp:240 main line604  count='7' nbytes='50331648' compute_perc='99' sample_perc='0'
+    96.563 3069968400 vis_00_base.cpp:240 main line604  count='8' nbytes='50331648' compute_perc='99' sample_perc='0'
+   110.487 3069968400 vis_00_base.cpp:240 main line604  count='9' nbytes='50331648' compute_perc='99' sample_perc='0'
+   123.652 3069968400 vis_00_base.cpp:240 main line604  count='10' nbytes='50331648' compute_perc='99' sample_perc='0'
+   135.044 3069968400 vis_00_base.cpp:240 main line604  count='11' nbytes='50331648' compute_perc='99' sample_perc='0'
+   146.572 3069968400 vis_00_base.cpp:240 main line604  count='12' nbytes='50331648' compute_perc='99' sample_perc='0'
+   174.772 3069968400 vis_00_base.cpp:240 main line604  count='13' nbytes='50331648' compute_perc='99' sample_perc='0'
+   199.684 2862556224 vis_01_server.cpp:48 create_server accept  client_addr_buffer='192.168.2.10' client_addr.sin_port='26777'
+   199.684 2862556224 vis_01_server.cpp:56 create_server enter transmission loop  state._iq_out.empty()='false' state._iq_out.front()='56' state._iq_out.back()='65405'
+    200.38 2862556224 vis_01_server.cpp:64 create_server write failed 
+
 #+end_example
