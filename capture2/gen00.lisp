@@ -79,7 +79,7 @@
 	       (<< "std::cout"
 		   "std::endl"
 		   "std::flush")))))
-    
+    #+nil
     (defun logprint (msg &optional rest)
       `(do0
 	" "
@@ -366,8 +366,8 @@
 						     _code_generation_time _code_author
 						     _code_license)
 			      collect
-			      (logprint ""
-					`(,(g e))))
+			      (lprint :msg ""
+				      :vars `(,(g e))))
 
 		
 		      
@@ -381,10 +381,11 @@
 				(git_tag))
 			    (declare (type (array char 8) git_tag))
 			    (iio_library_get_version &major &minor git_tag)
-			   ,(logprint "" `(major minor git_tag)))
+			   ,(lprint :msg ""  :vars `(major minor git_tag)))
 			  (unless ctx
-			    ,(logprint "create_default" `(ctx)))
-			  ,(logprint ""
+			    ,(lprint :msg "create_default"
+				       :vars `(ctx)))
+			  ,(lprint :msg "" :vars
 				     `((iio_context_get_devices_count ctx)))
 			  #+nil (let ((n (iio_context_get_devices_count ctx))
 				(dev ("std--array<iio_device*,n>")))
@@ -398,12 +399,13 @@
 				  collect
 				  `(let ((,e (iio_context_find_device ctx (string ,f))))
 				     ,(iio e)
-				     ,(logprint (format nil "~a" e)
-						`((iio_device_get_attrs_count ,e)))))
+				     ,(lprint :msg (format nil "~a" e)
+					      :vars `((iio_device_get_attrs_count ,e)))))
 			  (let ((rx_lo_freq 2467000000ULL)
 				(rx_lo_freq_MHz (/ rx_lo_freq 1e6)))
 			   ;(comments "rx lo freq to 2.42GHz")
-			   ,(logprint "" `(rx_lo_freq_MHz))
+			    ,(lprint :msg ""
+				     :vars `(rx_lo_freq_MHz))
 			   (iio_channel_attr_write_longlong
 			       (iio_device_find_channel phy
 							(string "altvoltage0")
@@ -416,7 +418,8 @@
 					 )
 				(rx_rate_MSps (/ rx_rate 1e6)))
 			   ;(comments "rx baseband rate 5MSPS")
-			   ,(logprint "" `(rx_rate_MSps))
+			    ,(lprint :msg ""
+				     :vars `(rx_rate_MSps))
 			   (iio_channel_attr_write_longlong
 			    (iio_device_find_channel phy
 						     (string "voltage0")
@@ -424,20 +427,22 @@
 			    (string "sampling_frequency")
 			    rx_rate
 			    ))
-			  ,(logprint "get channels count..")
+			  ,(lprint :msg "get channels count..")
 			  (let ((n_chan (iio_device_get_channels_count rx))
 				)
-			    ,(logprint "" `(n_chan))
+			    ,(lprint :msg ""
+				     :vars `(n_chan))
 			    ,@(loop for e in `(rx_i rx_q) and i from 0 collect
 				    `(let ((,e (iio_device_get_channel rx ,i)))
-				       ,(logprint (format nil "~a ~a" e i) `((iio_channel_get_attrs_count ,e)))))
+				       ,(lprint :msg (format nil "~a ~a" e i)
+						:vars `((iio_channel_get_attrs_count ,e)))))
 			    (iio_channel_enable rx_i)
 			    (iio_channel_enable rx_q)
-			    ,(logprint "iq channels enabled")
+			    ,(lprint :msg "iq channels enabled")
 			    (let (("const nbuf" (* 48 64 4096) ;; 48 64
 						;4096
 						))
-			      ,(logprint "create buffer")
+			      ,(lprint :msg "create buffer")
 			      (let ((rxbuf (iio_device_create_buffer rx nbuf false))
 				    (sample_and_compute_start
 				      (dot ("std::chrono::high_resolution_clock::now")
@@ -451,13 +456,13 @@
 						(dot ,(g `_iq_out) (push_back 43))
 						)
 				 (let ((server_thread (run_server_in_new_thread)))
-				   ,(logprint "server started")
+				   ,(lprint :msg "server started")
 				   )
 				 (let ((count 0))
 				  (while true ;
 				   ;dotimes (j 1)
 
-				   ; ,(logprint "308" `(count))
+				   ; ,(lprint :msg "line465" :vars `(count))
 				    
 				   (setf sample_start (dot ("std::chrono::high_resolution_clock::now")
 							   (time_since_epoch)
@@ -488,7 +493,8 @@
 									   0
 									   895232605  ;; crc computed with rescuesdriq
 									   ))))
-					,(logprint "" `((sizeof header)))
+					,(lprint :msg ""
+						 :vars `((sizeof header)))
 					))
 				     (do0
 				      (setf compute_start
@@ -551,14 +557,16 @@
 							  (<= mlow 2000))
 						 (setf trig1 i)
 						 (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
-						  ,(logprint "" `(ma trig trig1 pulse_ms)))
+						   ,(lprint :msg ""
+							    :vars `(ma trig trig1 pulse_ms)))
 						 ;; read a few more samples (if trig is set negative here)
 						 (setf trig 0)
 						 ))
 					     (incf i)
 					     (setf old mlow)
 					     )
-					#+nil ,(logprint "finished" `(ma trig trig1 ;(outiq.size)
+					#+nil ,(lprint :msg "finished"
+						       :vars `(ma trig trig1 ;(outiq.size)
 								   )))
 					
 					)
@@ -594,7 +602,8 @@
 				     
 
 				     )
-				   ,(logprint "374" `(count nbytes compute_perc sample_perc))
+				   ,(lprint :msg "line604"
+					    :vars `(count nbytes compute_perc sample_perc))
 				   )))
 			       )))
 
@@ -648,48 +657,51 @@
 			(setf server_addr.sin_family AF_INET
 			      server_addr.sin_addr.s_addr INADDR_ANY
 			      server_addr.sin_port (htons portno))
-			,(logprint "attempt bind" `(portno))
+			,(lprint :msg "attempt bind" :vars `(portno))
 			(when (<  (bind fd
 					("reinterpret_cast<struct sockaddr*>" &server_addr)
 					(sizeof server_addr))
 				  0)
-			  ,(logprint "bind failed")
+			  ,(lprint :msg "bind failed")
 			  )
 			(listen fd 5)
-			,(logprint "initiate accept")
+			,(lprint :msg "initiate accept")
 			(while ,(g `_server_keep_running)
 			 (let ((client_len (sizeof client_addr))
 			       (fd1 (accept fd
 					    ("reinterpret_cast<struct sockaddr*>" &client_addr)
 					    &client_len)))
 			   #-nil (when (< fd1 0)
-				   ,(logprint "accept failed")
+				   ,(lprint :msg "accept failed")
 				   )
 			   (let ((client_addr_buffer))
 			     (declare (type (array char INET_ADDRSTRLEN) client_addr_buffer))
 			     (inet_ntop AF_INET &client_addr.sin_addr client_addr_buffer (sizeof client_addr_buffer))
-			    ,(logprint "accept" `(client_addr_buffer
+			     ,(lprint :msg "accept"
+				      :vars `(client_addr_buffer
 						  client_addr.sin_port)))
 
 			   #+nil
 			   (let ((nh (write fd1 header nbytes_header)))
 			     (when (< nh 0)
-			       ,(logprint "writing header failed"))
+			       ,(lprint :msg "writing header failed"))
 			     )
-			   ,(logprint "enter transmission loop" `((dot ,(g `_iq_out) (empty))
-								  (dot ,(g `_iq_out) (front))
-								  (dot ,(g `_iq_out) (back))))
+			   ,(lprint :msg "enter transmission loop"
+				    :vars
+				    `((dot ,(g `_iq_out) (empty))
+				      (dot ,(g `_iq_out) (front))
+				      (dot ,(g `_iq_out) (back))))
 
 			   (do0 (when (dot ,(g `_iq_out) (empty))
 				  (dot ,(g `_iq_out) (wait_while_empty)))
-				;,(logprint "attempt to write")
+				;,(lprint :msg "attempt to write")
 				(while (not (dot ,(g `_iq_out) (empty)))
 				       (let ((msg (dot ,(g `_iq_out) (pop_front))))
-					 ;;,(logprint "prepare for write" `(msg))
+					 ;;,(lprint :msg "prepare for write" :vars `(msg))
 					 (let ((n (write fd1 (reinterpret_cast<uint8_t*> &msg) 2)))
 					   (when (< n 0)
-					     ,(logprint "write failed"))
-					   ;,(logprint "bytes written: " `(n))
+					     ,(lprint :msg "write failed"))
+					   ;,(lprint :msg "bytes written: " :vars `(n))
 					   ))))
 			   (close fd1)))
 			(do0 
@@ -697,7 +709,7 @@
 
 		    (defun run_server_in_new_thread ()
 		      (declare (values "std::thread"))
-		      ,(logprint "attempt to start a thread with the server")
+		      ,(lprint :msg "attempt to start a thread with the server")
 		      (return (std--thread create_server))
 		      )
 		    )))
