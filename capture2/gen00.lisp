@@ -262,9 +262,7 @@
 			     
 			     
 			     )
-		    (do0
-		     "#define FMT_HEADER_ONLY"
-		     (include "/home/martin/src/fmt/include/fmt/format.h"))
+		    
 
 		     (do0
 		     ;; https://raw.githubusercontent.com/analogdevicesinc/libiio/master/examples/ad9361-iiostream.c
@@ -384,9 +382,11 @@
 			   ,(lprint :msg ""  :vars `(major minor git_tag)))
 			  (unless ctx
 			    ,(lprint :msg "create_default"
-				       :vars `(ctx)))
+				     ;; FIXME: fmt doesn't print pointers
+				      ; :vars `(ctx)
+				      ))
 			  ,(lprint :msg "" :vars
-				     `((iio_context_get_devices_count ctx)))
+				   `((iio_context_get_devices_count ctx)))
 			  #+nil (let ((n (iio_context_get_devices_count ctx))
 				(dev ("std--array<iio_device*,n>")))
 			    
@@ -929,6 +929,11 @@
 			     <queue>
 			     <condition_variable>
 			     )
+		    (do0
+		     "#define FMT_HEADER_ONLY"
+		     (include "/home/martin/src/fmt/include/fmt/format.h")
+		     "void lprint(std::string msg, std::initializer_list<std::string> il, std::string func, std::string file, int line);"
+		     )
 		    " "
 
 		    " "

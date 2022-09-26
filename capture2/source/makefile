@@ -17,7 +17,7 @@ LD=${CROSS}ld
 
 CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 \
--O3 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3 \
+-O0 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3 \
 -std=gnu++17 \
 -Wall -Wextra -Werror -Wfatal-errors\
 -ffunction-sections -fdata-sections \
@@ -36,9 +36,9 @@ CXXFLAGS=-fomit-frame-pointer -fno-common -fno-builtin -mfloat-abi=hard\
 # -I${SDK}/usr/include 
 # -I${CROSS_ROOT}/usr/include
 
+# -Wl,--print-gc-sections 
 LDFLAGS= \
 -Wl,--gc-sections \
--Wl,--print-gc-sections \
 --sysroot=${SDK} \
 -L${SDK}/usr/lib \
 -liio -lpthread
