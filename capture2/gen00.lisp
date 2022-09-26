@@ -557,7 +557,7 @@
 							  (<= mlow 2000))
 						 (setf trig1 i)
 						 (let ((pulse_ms (/ (- trig1 trig) 61.44e3)))
-						   ,(lprint :msg ""
+						    #+nil ,(lprint :msg ""
 							    :vars `(ma trig trig1 pulse_ms)))
 						 ;; read a few more samples (if trig is set negative here)
 						 (setf trig 0)
