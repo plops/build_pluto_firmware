@@ -61,12 +61,12 @@ void lprint(std::string msg, std::initializer_list<std::string> il,
 int main(int argc, char **argv) {
   g_start_time = std::chrono::high_resolution_clock::now();
   setlocale(LC_ALL, "");
-  state._code_version = "2a14fe25b22b20f0031e156ae7ee32a3ea10dbc5";
+  state._code_version = "24859ce8201fa80d9b3a7e4eb9b7c2ca1c327fc7";
   state._code_repository =
       "https://github.com/plops/build_pluto_firmware/tree/master/capture";
   state._code_author = "Martin Kielhorn <kielhorn.martin@gmail.com>";
   state._code_license = "GPL v3";
-  state._code_generation_time = "10:39:06 of Monday, 2022-09-26 (GMT+1)";
+  state._code_generation_time = "11:14:46 of Monday, 2022-09-26 (GMT+1)";
   state._start_time =
       std::chrono::high_resolution_clock::now().time_since_epoch().count();
   lprint("start",
@@ -185,6 +185,11 @@ int main(int argc, char **argv) {
     auto old = (0.f);
     auto trig = 0;
     auto trig1 = 0;
+    //  the ivdep pragma asserts that there are no loop-carried dependencies
+    //  which would prevent that consecutive iterations of the following loop
+    //  can be executed concurrently with SIMD (single instruction multiple
+    //  data) instructions.
+    ;
 #pragma GCC ivdep
     for (uint8_t *p = start; (p) < (end); (p) += (step)) {
       auto si = reinterpret_cast<int16_t *>(p)[0];

@@ -11,7 +11,7 @@
     '("Monday" "Tuesday" "Wednesday"
       "Thursday" "Friday" "Saturday"
       "Sunday"))
-  
+  (defparameter *program-name* "vis")
   (progn
     ;; collect code that will be emitted in utils.h
     (defparameter *utils-code* nil)
@@ -510,7 +510,7 @@
 				       (do0
 				       
 					;"#pragma omp parallel"
-
+					(comments " the ivdep pragma asserts that there are no loop-carried dependencies which would prevent that consecutive iterations of the following loop can be executed concurrently with SIMD (single instruction multiple data) instructions. ")
 					"#pragma GCC ivdep"
 					#-nil
 					(for ((= "uint8_t* p" start)
@@ -910,6 +910,7 @@
 		    " "
 		    "#endif"
 		    " "))
+
     (write-source (asdf:system-relative-pathname 'cl-cpp-generator2 (merge-pathnames
 								     #P"globals.h"
 								     *source-dir*))
@@ -946,7 +947,60 @@
 		    ,(emit-globals)
 		    " "
 		    "#endif"
-		    " "))))
+		    " "))
+
+    (with-open-file (s "source/CMakeLists.txt" :direction :output
+		       :if-exists :supersede
+		       :if-does-not-exist :create)
+      ;;https://clang.llvm.org/docs/AddressSanitizer.html
+      ;; cmake -DCMAKE_BUILD_TYPE=Debug -GNinja ..
+      ;;
+      (let* ((sdk-path "/home/martin/pluto-0.35.sysroot/")
+	     (cxx-embed (format nil  "-fno-common -fno-builtin -mfloat-abi=hard -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a9 -mthumb-interwork -mtune=cortex-a9 -O0 -ffast-math -funsafe-math-optimizations -mfpu=neon-vfpv3  -Wall -Wextra -Werror -Wfatal-errors -ffunction-sections -fdata-sections -Wno-error=unused-variable -Wno-error=unused-parameter -Wno-error=double-promotion -Wno-error=unused-parameter -Wno-error=shift-negative-value -Wno-error=attributes -Wno-error=sign-compare --sysroot=~a -I. -D_GNU_SOURCE -D_DEFAULT_SOURCE"
+			       sdk-path))
+	     (ld-embed (format nil "-Wl,--gc-sections --sysroot=~a -L~a/usr/lib -liio -lpthread" sdk-path sdk-path))
+	    (g++ "arm-linux-gnueabihf-g++")
+	    (dbg "-ggdb -O0 ")
+	    (asan "-fno-omit-frame-pointer -fsanitize=address -fsanitize-address-use-after-return=always -fsanitize-address-use-after-scope")
+	    (show-err "" ; " -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self  -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wswitch-default -Wundef -Werror -Wno-unused"
+					;"-Wlogical-op -Wnoexcept  -Wstrict-null-sentinel  -Wsign-promo-Wstrict-overflow=5  "
+
+	      ))
+	(macrolet ((out (fmt &rest rest)
+		     `(format s ,(format nil "~&~a~%" fmt) ,@rest)))
+	  (out "cmake_minimum_required( VERSION 3.4 )")
+	  (out "project( ~a LANGUAGES CXX )" *program-name*)
+	  (out "set( CMAKE_CXX_COMPILER ~a )" g++)
+	  (out "set( CMAKE_VERBOSE_MAKEFILE ON )")
+	  ;(out "set (CMAKE_CXX_FLAGS_DEBUG \"${CMAKE_CXX_FLAGS_DEBUG} ~a \")" cxx-embed)
+	  (out "set (CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} ~a \")" cxx-embed)
+	  ;(out "set (CMAKE_LINKER_FLAGS_DEBUG \"${CMAKE_LINKER_FLAGS_DEBUG} ~a \")" ld-embed)
+	  (out "set (CMAKE_EXE_LINKER_FLAGS \"${CMAKE_EXE_LINKER_FLAGS} ~a \")" ld-embed)
+	  (out "set( CMAKE_CXX_STANDARD 17 )")
+					;(out "set( CMAKE_CXX_COMPILER clang++ )")
+
+	  (out "set( SRCS ~{~a~^~%~} )"
+	       (append
+		(directory "source/*.cpp")))
+
+	  (out "add_executable( ~a ${SRCS} )"
+	       *program-name*)
+	  (out "target_compile_features( ~a PUBLIC cxx_std_17 )"
+	       *program-name*)
+	  #+nil
+	  (loop for e in `(fmt)
+		do
+		(out "find_package( ~a CONFIG REQUIRED )" e))
+	  #+nil
+	  (out "target_link_libraries( ~a PRIVATE ~{~a~^ ~} )"
+	       *program-name*
+	       `(fmt))
+
+					; (out "target_link_libraries ( mytest Threads::Threads )")
+					;(out "target_precompile_headers( mytest PRIVATE vis_00_base.hpp )")
+	  ))
+      )
+    ))
 
 
 

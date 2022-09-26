@@ -9,6 +9,18 @@ git clone https://github.com/fmtlib/fmt
 #+end_example
 
 
+* build
+
+- you can either build with make
+
+- or cmake:
+#+begin_example
+mkdir build
+cd build
+cmake ..
+make
+#+end_example
+
 * network connection
 - check open port on pluto
 #+begin_example
@@ -46,3 +58,4 @@ tcp        0      0 0.0.0.0:1234            0.0.0.0:*               LISTEN
     200.38 2862556224 vis_01_server.cpp:64 create_server write failed 
 
 #+end_example
+
